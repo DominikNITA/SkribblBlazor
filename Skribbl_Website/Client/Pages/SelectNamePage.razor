@@ -1,0 +1,63 @@
+﻿@page "/name"
+@page "/name/{inviteLink}"
+@using Skribbl_Website.Shared.Exceptions
+@using Skribbl_Website.Shared
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject LocalStorage LocalStorage
+
+
+<EditForm Model="_nameModel" OnValidSubmit="SubmitName">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <InputText @bind-Value="_nameModel.Name"></InputText>
+    <button type="submit">Join</button>
+</EditForm>
+
+@if (_info != string.Empty)
+{
+    <div class="alert alert-danger alert-dismissible">@_info</div>
+}
+
+
+@code {
+    [Parameter] public string InviteLink { get; set; }
+
+    private NameModel _nameModel = new NameModel();
+    private string _info = string.Empty;
+
+    private async void SubmitName()
+    {
+        LobbyRedirectDto response = new LobbyRedirectDto();
+        string query = "lobbies/";
+        if (InviteLink != null)
+        {
+            query += String.Format("join/{0}/{1}", InviteLink, _nameModel.Name);
+            try
+            {
+                response = await Http.GetJsonAsync<LobbyRedirectDto>(query);
+            }
+            catch (MaxPlayersReachedException)
+            {
+                _info = "Lobby is full.";
+            }
+            catch (InviteLinkNotMatchingException)
+            {
+                _info = "Invalid invite link or lobby does not exist anymore.";
+            }
+        }
+        else
+        {
+            query += String.Format("create/{0}", _nameModel.Name);
+            response = await Http.GetJsonAsync<LobbyRedirectDto>(query);
+        }
+        //TODO: save User instance instead of particular class members
+        //await LocalStorage.SetItemAsync("skribblUser_name", response.ConfirmedUser);
+        await LocalStorage.SetItemAsync("skribblUser_name", response.ConfirmedUser.Name);
+        Console.WriteLine("Saving " + response.ConfirmedUser.Name);
+        await LocalStorage.SetItemAsync("skribblUser_id", response.ConfirmedUser.Id);
+        Console.WriteLine("Saving " + response.ConfirmedUser.Id);
+        await LocalStorage.SetItemAsync("skribblUser_isHost", response.ConfirmedUser.IsHost);
+        NavigationManager.NavigateTo("lobby/" + response.LobbyUrl);
+    }
+}

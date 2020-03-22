@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29911.98
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skribbl_Website.Server", "Skribbl_Website\Server\Skribbl_Website.Server.csproj", "{535E74CB-B982-4780-90FA-59C14251C902}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skribbl_Website.Server", "Skribbl_Website\Server\Skribbl_Website.Server.csproj", "{535E74CB-B982-4780-90FA-59C14251C902}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skribbl_Website.Client", "Skribbl_Website\Client\Skribbl_Website.Client.csproj", "{00F99D82-E61C-4C62-BF68-3AD85C441E94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skribbl_Website.Client", "Skribbl_Website\Client\Skribbl_Website.Client.csproj", "{00F99D82-E61C-4C62-BF68-3AD85C441E94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skribbl_Website.Shared", "Skribbl_Website\Shared\Skribbl_Website.Shared.csproj", "{88EA4E5D-FAD2-4A0D-B8F1-7416C8DD5097}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skribbl_Website.Shared", "Skribbl_Website\Shared\Skribbl_Website.Shared.csproj", "{88EA4E5D-FAD2-4A0D-B8F1-7416C8DD5097}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

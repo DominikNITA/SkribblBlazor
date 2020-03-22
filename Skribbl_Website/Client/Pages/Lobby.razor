@@ -1,0 +1,56 @@
+﻿@page "/lobby/{lobbyId}"
+@inject LocalStorage LocalStorage
+@inject HttpClient Http
+
+@LobbyId
+
+<div>
+    Name: @_user.Name
+</div>
+<div>
+    Id: @_user.Id
+</div>
+
+@if (!string.IsNullOrEmpty(_info))
+{
+    <div class="alert alert-danger">@_info</div>
+}
+
+Player count: @count
+
+@code {
+    [Parameter]
+    public string LobbyId { get; set; }
+
+    private LobbyDto _lobby;
+    private int count = -1;
+
+    private User _user = new User();
+    private string _info = string.Empty;
+
+    protected async override Task OnInitializedAsync()
+    {
+        //TODO: Retrieve User instance instead of particular members
+        var name = await LocalStorage.GetItemAsync("skribblUser_name");
+        Console.WriteLine("Reading: " + name);
+        var id = await LocalStorage.GetItemAsync("skribblUser_id");
+        Console.WriteLine("Reading: " + id);
+        var isHost = await LocalStorage.GetItemAsync<bool?>("skribblUser_isHost");
+        if(name == null || id == null || isHost == null)
+        {
+            _info = "User not found! Retry later.";
+            return;
+        }
+        _user.Name = name;
+        _user.Id = id;
+        _user.IsHost = isHost.Value;
+
+        string query = String.Format("lobbies/{0}/{1}",LobbyId,_user.Id);
+        Console.WriteLine(query);
+        _lobby = await Http.GetJsonAsync<LobbyDto>(query);
+        count = _lobby.MaxPlayers;
+        Console.WriteLine(_lobby.Players.Count + " + " +_lobby.Id);
+        StateHasChanged();
+        await base.OnInitializedAsync();
+    }
+}

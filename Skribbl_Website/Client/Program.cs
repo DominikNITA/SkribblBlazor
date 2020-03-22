@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Skribbl_Website.Client.Services;
+using Cloudcrate.AspNetCore.Blazor.Browser.Storage;
 
 namespace Skribbl_Website.Client
 {
@@ -18,6 +19,7 @@ namespace Skribbl_Website.Client
             builder.Services.AddBaseAddressHttpClient();
             builder.Services.AddAuthorizationCore();
             builder.Services.AddTokenAuthenticationStateProvider();
+            builder.Services.AddStorage();
 
             await builder.Build().RunAsync();
         }

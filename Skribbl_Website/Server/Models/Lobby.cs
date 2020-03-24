@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Skribbl_Website.Shared;
 using Skribbl_Website.Shared.Dtos;
 
@@ -9,15 +10,22 @@ namespace Skribbl_Website.Server.Models
 {
     public class Lobby : LobbyDto
     {
-        public Lobby(User host)
+        public List<UserDto> Users { get; set; }
+        public Dictionary<string, string> Connections { get; set; }
+        public string HostConnection { get; set; }
+
+        public Lobby(UserDto host)
         {      
             Id = Guid.NewGuid().ToString();
             InviteLink = Guid.NewGuid().ToString();
-            Players = new List<User>();
-            Players.Add(host);
             MaxPlayers = 10;
             RoundsLimit = 6;
             TimeLimit = 60;
+            Users = new List<UserDto>();
+            Players = new List<PlayerDto>();
+            _ = AddUser(host);
+            Connections = new Dictionary<string, string>();
+            HostConnection = string.Empty;
         }
 
         /// <summary>
@@ -25,11 +33,12 @@ namespace Skribbl_Website.Server.Models
         /// </summary>
         /// <param name="player">User to add to the lobby</param>
         /// <returns>Is succesful?</returns>
-        public bool AddPlayer(User player)
+        public bool AddUser(UserDto user)
         {
-            if (Players.Count < MaxPlayers)
+            if (Users.Count < MaxPlayers)
             {
-                Players.Add(player);
+                Players.Add(user);
+                Users.Add(user);
                 return true;
             }
             else
@@ -37,5 +46,7 @@ namespace Skribbl_Website.Server.Models
                 return false;
             }
         }
+
+        
     }
 }

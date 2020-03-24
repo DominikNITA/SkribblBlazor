@@ -45,6 +45,10 @@
             {
                 _info = "Invalid invite link or lobby does not exist anymore.";
             }
+            catch (UserNameAlreadyExistsException)
+            {
+                _info = "Username taken! Try another one.";
+            }
         }
         else
         {
@@ -52,7 +56,7 @@
             response = await Http.GetJsonAsync<LobbyRedirectDto>(query);
         }
         //TODO: save User instance instead of particular class members
-        //await LocalStorage.SetItemAsync("skribblUser_name", response.ConfirmedUser);
+        //await LocalStorage.SetItemAsync("skribblUser", response.ConfirmedUser);
         await LocalStorage.SetItemAsync("skribblUser_name", response.ConfirmedUser.Name);
         Console.WriteLine("Saving " + response.ConfirmedUser.Name);
         await LocalStorage.SetItemAsync("skribblUser_id", response.ConfirmedUser.Id);

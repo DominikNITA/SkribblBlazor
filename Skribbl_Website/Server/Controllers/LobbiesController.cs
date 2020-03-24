@@ -27,7 +27,7 @@ namespace Skribbl_Website.Server.Controllers
         [HttpGet("create/{name}")]
         async public Task<ActionResult<LobbyRedirectDto>> Get(string name)
         {
-            var host = new User(name);
+            var host = new UserDto(name);
             var lobbyUrl = _lobbiesManager.CreateLobby(host);
             return new LobbyRedirectDto(host, lobbyUrl);
         }
@@ -36,7 +36,7 @@ namespace Skribbl_Website.Server.Controllers
         [HttpGet("join/{inviteLink}/{name}")]
         async public Task<ActionResult<LobbyRedirectDto>> Get(string inviteLink, string name)
         {
-            var player = new User(name);
+            var player = new UserDto(name);
             try
             {
                 var lobbyUrl = _lobbiesManager.AddPlayerToLobby(inviteLink, player);
@@ -51,11 +51,12 @@ namespace Skribbl_Website.Server.Controllers
         [HttpGet("{lobbyId}/{userId}")]
         async public Task<ActionResult<LobbyDto>> GetLobby(string lobbyId, string userId)
         {
+            //TODO: Move logic outside
             foreach (var lobby in _lobbiesManager.Lobbies)
             {
                 if (lobby.Id == lobbyId)
                 {
-                    if(lobby.Players.Where(player => player.Id == userId).Count() == 1)
+                    if(lobby.Users.Where(user => user.Id == userId).Count() == 1)
                     {
                         return lobby;
                     }

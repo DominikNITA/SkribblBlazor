@@ -7,7 +7,7 @@ namespace Skribbl_Website.Shared.Dtos
 {
     public class LobbyDto
     {
-        public List<User> Players { get; set; }
+        public List<PlayerDto> Players { get; set; }
         public int MaxPlayers { get; set; }
         public string Id { get; set; }
         public string InviteLink { get; set; }

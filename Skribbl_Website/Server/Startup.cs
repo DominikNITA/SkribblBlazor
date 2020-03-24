@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Skribbl_Website.Server.Services;
+using Skribbl_Website.Server.Hubs;
 
 namespace Skribbl_Website.Server
 {
@@ -26,9 +27,9 @@ namespace Skribbl_Website.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllersWithViews();
             services.AddSingleton<LobbiesManager>();
+            services.AddSignalR();
             //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
             // options =>
             // {
@@ -72,6 +73,7 @@ namespace Skribbl_Website.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<LobbyHub>("/lobbyHub");
                 endpoints.MapFallbackToFile("index.html");
             });
         }

@@ -1,8 +1,17 @@
 ﻿@page "/lobby/{lobbyId}"
+@using Microsoft.AspNetCore.SignalR.Client
 @inject LocalStorage LocalStorage
 @inject HttpClient Http
+@inject NavigationManager NavigationManager
 
 @LobbyId
+
+@if(_lobby != null)
+{
+    <span>
+        Invite: @_lobby.InviteLink
+    </span>
+}
 
 <div>
     Name: @_user.Name
@@ -16,17 +25,24 @@
     <div class="alert alert-danger">@_info</div>
 }
 
-Player count: @count
+@foreach (var message in _messages)
+{
+    <div>
+        @message
+    </div>
+}
 
 @code {
     [Parameter]
     public string LobbyId { get; set; }
 
-    private LobbyDto _lobby;
-    private int count = -1;
-
-    private User _user = new User();
+    private UserDto _user = new UserDto();
     private string _info = string.Empty;
+    private LobbyDto _lobby;
+    //Create special class
+    private List<string> _messages = new List<string>();
+
+    private HubConnection _hubConnection;
 
     protected async override Task OnInitializedAsync()
     {
@@ -36,21 +52,58 @@ Player count: @count
         var id = await LocalStorage.GetItemAsync("skribblUser_id");
         Console.WriteLine("Reading: " + id);
         var isHost = await LocalStorage.GetItemAsync<bool?>("skribblUser_isHost");
-        if(name == null || id == null || isHost == null)
+        if (name == null || id == null || isHost == null)
         {
-            _info = "User not found! Retry later.";
+            _info = "User not found! Or You not have access to this lobby.";
             return;
         }
         _user.Name = name;
         _user.Id = id;
         _user.IsHost = isHost.Value;
 
-        string query = String.Format("lobbies/{0}/{1}",LobbyId,_user.Id);
-        Console.WriteLine(query);
+        //Retrieve initial Lobby state
+        string query = String.Format("lobbies/{0}/{1}", LobbyId, _user.Id);
+        //Console.WriteLine(query);
         _lobby = await Http.GetJsonAsync<LobbyDto>(query);
-        count = _lobby.MaxPlayers;
-        Console.WriteLine(_lobby.Players.Count + " + " +_lobby.Id);
-        StateHasChanged();
+
+        //Connect to SignalRHub
+        _hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/lobbyHub"), options =>
+        {
+            options.Headers.Add("User", _user.Id);
+            options.Headers.Add("Lobby", LobbyId);
+        }
+            ).Build();
+
+
+        _hubConnection.On<NameModel, string>("ReceiveMessage", (user, message) =>
+        {
+            var encodedMsg = $"{user.Name}: {message}";
+            _messages.Add(encodedMsg);
+            StateHasChanged();
+        });
+
+        _hubConnection.On<PlayerDto>("ReceiveJoinMessage", (player) =>
+        {
+            Console.WriteLine("Name: " + player.Name);
+            _lobby.Players.Add(player);
+            _messages.Add(player.Name + " joined");
+            StateHasChanged();
+        });
+
+        await _hubConnection.StartAsync();
+
+        await Join();
+        //await Send();
+
         await base.OnInitializedAsync();
     }
+
+    public bool IsConnected =>
+        _hubConnection.State == HubConnectionState.Connected;
+
+    Task Send() =>
+    _hubConnection.SendAsync("SendMessage", _user.Name, "Hello from SEND");
+
+    Task Join() =>
+    _hubConnection.SendAsync("AddToGroup", _user.Id, LobbyId);
 }

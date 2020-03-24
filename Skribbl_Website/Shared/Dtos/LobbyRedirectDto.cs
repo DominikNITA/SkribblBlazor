@@ -6,10 +6,10 @@ namespace Skribbl_Website.Shared.Dtos
 {
     public class LobbyRedirectDto
     {
-        public User ConfirmedUser { get; set; }
+        public UserDto ConfirmedUser { get; set; }
         public string LobbyUrl { get; set; }
 
-        public LobbyRedirectDto(User confirmedUser, string lobbyUrl)
+        public LobbyRedirectDto(UserDto confirmedUser, string lobbyUrl)
         {
             ConfirmedUser = confirmedUser;
             LobbyUrl = lobbyUrl;

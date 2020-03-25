@@ -23,11 +23,10 @@ namespace Skribbl_Website.Server.Hubs
             _lobbiesManager = lobbiesManager;
         }
 
-        public async Task SendMessage(string user, string message)
-        {
-            var a = Context.UserIdentifier;
-            await Clients.All.SendAsync("ReceiveMessage", new NameModel(user), message);
-        }
+        //public async Task SendMessage(string user, string message)
+        //{
+        //    await Clients.All.SendAsync("ReceiveMessage", new Message(message,));
+        //}
 
         public async Task AddToGroup(string userId, string lobbyId)
         {
@@ -35,12 +34,14 @@ namespace Skribbl_Website.Server.Hubs
             {
                 var player = _lobbiesManager.GetUserByIdFromLobby(userId, lobbyId);
                 await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId);
-                await Clients.Group(lobbyId).SendAsync("ReceiveJoinMessage",player);
+                await Clients.Group(lobbyId).SendAsync("AddPlayer", player);
+                await Clients.Group(lobbyId).SendAsync("ReceiveMessage",
+                    new Message(player.Name + " joined.", Message.MessageType.Join));
                 if (_lobbiesManager.TrySetHost(lobbyId, userId, Context.ConnectionId))
                 {
-                    await Clients.Group(lobbyId).SendAsync("ReceiveJoinMessage", player);
+                    await Clients.Group(lobbyId).SendAsync("ReceiveMessage", 
+                        new Message(player.Name + "is new host",Message.MessageType.Host,player.Name));
                 }
-                await SendMessage("AddToGroup", "after");
             }
         }
 
@@ -48,7 +49,7 @@ namespace Skribbl_Website.Server.Hubs
         {
             if (_lobbiesManager.IsUserIdInSpecificLobby(userId, lobbyId))
             {
-               return true;
+                return true;
             }
             return false;
         }

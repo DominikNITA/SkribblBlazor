@@ -27,10 +27,10 @@
 
 @foreach (var message in _messages)
 {
-    <div>
-        @message
-    </div>
+    <MessageComponent Message="message"></MessageComponent>
 }
+
+@*<span> Is connected: @IsConnected.ToString()</span>*@
 
 @code {
     [Parameter]
@@ -40,7 +40,7 @@
     private string _info = string.Empty;
     private LobbyDto _lobby;
     //Create special class
-    private List<string> _messages = new List<string>();
+    private List<Message> _messages = new List<Message>();
 
     private HubConnection _hubConnection;
 
@@ -75,18 +75,25 @@
             ).Build();
 
 
-        _hubConnection.On<NameModel, string>("ReceiveMessage", (user, message) =>
+        //_hubConnection.On<NameModel, Message>("ReceiveMessage", (user, message) =>
+        //{
+        //    var encodedMsg = $"{user.Name}: {message}";
+        //    _messages.Add(message);
+        //    StateHasChanged();
+        //});
+
+        //Change to receive user
+        _hubConnection.On<PlayerDto>("AddPlayer", (player) =>
         {
-            var encodedMsg = $"{user.Name}: {message}";
-            _messages.Add(encodedMsg);
+            _lobby.Players.Add(player);
+            //_messages.Add(new Message(player.Name + " joined", Message.MessageType.Join));
             StateHasChanged();
         });
 
-        _hubConnection.On<PlayerDto>("ReceiveJoinMessage", (player) =>
+        _hubConnection.On<Message>("ReceiveMessage", (message) =>
         {
-            Console.WriteLine("Name: " + player.Name);
-            _lobby.Players.Add(player);
-            _messages.Add(player.Name + " joined");
+            _messages.Add(message);
+            Console.WriteLine(_messages.Count);
             StateHasChanged();
         });
 

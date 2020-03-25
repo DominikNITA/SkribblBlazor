@@ -1,0 +1,23 @@
+﻿@switch (Message.Type)
+{
+    case Message.MessageType.Join:
+        <span class="alert alert-info">
+            @Message.MessageContent
+        </span>
+        break;
+    case Message.MessageType.Host:
+        <span class="alert alert-danger">
+            @Message.MessageContent
+        </span>
+        break;
+    default:
+        <span>
+            @Message.MessageContent
+        </span>
+        break;
+}
+
+
+@code {
+    [Parameter] public Message Message { get; set; }
+}

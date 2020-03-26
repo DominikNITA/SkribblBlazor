@@ -1,23 +1,58 @@
-﻿@switch (Message.Type)
-{
-    case Message.MessageType.Join:
-        <span class="alert alert-info">
-            @Message.MessageContent
-        </span>
-        break;
-    case Message.MessageType.Host:
-        <span class="alert alert-danger">
-            @Message.MessageContent
-        </span>
-        break;
-    default:
-        <span>
-            @Message.MessageContent
-        </span>
-        break;
-}
+﻿<div class="message @_style">
+    @if(Message.Sender != null)
+    {
+        <span class="message__sender">@Message.Sender:</span>
+    }
+    <div class="message__content">
+        @Message.MessageContent
+    </div>
+</div>
 
 
 @code {
     [Parameter] public Message Message { get; set; }
+
+    private string _style = "message--default";
+
+    protected override Task OnInitializedAsync()
+    {
+        SetMessageStyle(Message);
+        return base.OnInitializedAsync();
+    }
+
+    private void SetMessageStyle(Message message)
+    {
+        switch (message.Type)
+        {
+            case Message.MessageType.Guess:
+                _style = "message--guess";
+                break;
+            case Message.MessageType.CloseGuess:
+                _style = "message--closeGuess";
+                break;
+            case Message.MessageType.Guessed:
+                _style = "message--guessed";
+                break;
+            case Message.MessageType.Join:
+                _style = "message--join";
+                break;
+            case Message.MessageType.Host:
+                _style = "message--host";
+                break;
+            case Message.MessageType.Disconnect:
+                _style = "message--disconnect";
+                break;
+            case Message.MessageType.Ban:
+                _style = "message--ban";
+                break;
+            case Message.MessageType.Leave:
+                _style = "message--leave";
+                break;
+            case Message.MessageType.Server:
+                _style = "message--server";
+                break;
+            default:
+                break;
+        }
+    }
 }

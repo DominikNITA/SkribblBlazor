@@ -24,13 +24,18 @@
 {
     <div class="alert alert-danger">@_info</div>
 }
-
-@foreach (var message in _messages)
-{
-    <MessageComponent Message="message"></MessageComponent>
-}
-
-@*<span> Is connected: @IsConnected.ToString()</span>*@
+<div class="chat d-flex flex-column">
+    <div class="chat__messages d-flex flex-column">
+        @foreach (var message in _messages)
+        {
+            <MessageComponent Message="message"></MessageComponent>
+        }
+    </div>
+    <div class="chat__input d-flex flex-row">
+        <input type="text" />
+        <button>Send!</button>
+    </div>
+</div>
 
 @code {
     [Parameter]
@@ -54,13 +59,14 @@
         var isHost = await LocalStorage.GetItemAsync<bool?>("skribblUser_isHost");
         if (name == null || id == null || isHost == null)
         {
-            _info = "User not found! Or You not have access to this lobby.";
+            _info = "User not found! Or you do not have access to this lobby.";
             return;
         }
         _user.Name = name;
         _user.Id = id;
         _user.IsHost = isHost.Value;
 
+        //TODO: Separate to other classes
         //Retrieve initial Lobby state
         string query = String.Format("lobbies/{0}/{1}", LobbyId, _user.Id);
         //Console.WriteLine(query);

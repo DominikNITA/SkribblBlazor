@@ -14,13 +14,6 @@ namespace Skribbl_Website.Server.Services
         //TODO: change to private
         public List<Lobby> Lobbies { get; private set; } = new List<Lobby>();
 
-        //async public Task<string> CreateLobby()
-        //{
-        //    var newLobby = new Lobby(null);
-        //    Lobbies.Add(newLobby);
-        //    return newLobby.InviteLink;
-        //}
-
         public string CreateLobby(UserDto host)
         {
             var lobby = new Lobby(host);
@@ -31,7 +24,7 @@ namespace Skribbl_Website.Server.Services
 
         public bool TrySetHost(string lobbyId, string userId, string connection)
         {
-            if (!HasLobbyHost(lobbyId))
+            if (!LobbyHasHost(lobbyId))
             {
                 GetLobbyId(lobbyId).HostConnection = connection;
                 GetUserByIdFromLobby(userId, lobbyId).IsHost = true;
@@ -40,7 +33,7 @@ namespace Skribbl_Website.Server.Services
             return false;
         }
 
-        private bool HasLobbyHost(string lobbyId)
+        private bool LobbyHasHost(string lobbyId)
         {
             return GetLobbyId(lobbyId).HostConnection != string.Empty;
         }

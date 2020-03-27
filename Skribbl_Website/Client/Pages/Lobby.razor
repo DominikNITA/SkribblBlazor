@@ -4,15 +4,27 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject UserState UserState
+@inject LobbyConnection LobbyConnection
 
 @LobbyId
 
-@if (_lobby != null)
+@if (LobbyConnection.Lobby != null)
 {
     <span>
-        Invite: @_lobby.InviteLink
+        Invite: @LobbyConnection.Lobby.InviteLink
     </span>
+    @if (LobbyConnection.Lobby.Players != null)
+    {
+        foreach (var player in LobbyConnection.Lobby.Players)
+        {
+            <div>
+                @player.Name
+            </div>
+        }
+    }
 }
+
+
 
 <div>
     Name: @_user.Name
@@ -26,7 +38,13 @@
     <div class="alert alert-danger">@_info</div>
 }
 
-<ChatComponent Messages="_messages"></ChatComponent>
+@if (LobbyConnection.Messages != null)
+{
+    <ChatComponent Messages="@LobbyConnection.Messages"></ChatComponent>
+}
+
+<button @onclick="Reload">reload</button>
+
 
 @code {
     [Parameter]
@@ -34,16 +52,13 @@
 
     private UserDto _user = new UserDto();
     private string _info = string.Empty;
-    private LobbyDto _lobby;
-    //Create special class
-    private List<Message> _messages = new List<Message>();
+    //private LobbyDto _lobby;
+    //private List<Message> _messages = new List<Message>();
 
-    private HubConnection _hubConnection;
+    //private HubConnection _hubConnection;
 
     protected async override Task OnInitializedAsync()
     {
-        //TODO: Retrieve User instance instead of particular members
-        //TODO: Create singleton for state storage
         try
         {
             _user = await UserState.GetUser();
@@ -55,51 +70,35 @@
 
         //TODO: Separate to other classes
         //Retrieve initial Lobby state
-        string query = String.Format("lobbies/{0}/{1}", LobbyId, _user.Id);
-        //Console.WriteLine(query);
-        _lobby = await Http.GetJsonAsync<LobbyDto>(query);
+        //string query = String.Format("lobbies/{0}/{1}", LobbyId, _user.Id);
+        ////Console.WriteLine(query);
+        //_lobby = await Http.GetJsonAsync<LobbyDto>(query);
 
         //Connect to SignalRHub
         //TODO: Create Singleton
-        _hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/lobbyHub"), options =>
-        {
-            options.Headers.Add("User", _user.Id);
-            options.Headers.Add("Lobby", LobbyId);
-        }
-            ).Build();
-
-        _hubConnection.On<LobbyDto>("ReceiveLobbyState", (lobby) =>
-        {
-           _lobby = lobby;
-           StateHasChanged();
-        });
-
-        _hubConnection.On<PlayerDto>("AddPlayer", (player) =>
-        {
-            _lobby.Players.Add(player);
-            StateHasChanged();
-        });
-
-        _hubConnection.On<Message>("ReceiveMessage", (message) =>
-        {
-            _messages.Add(message);
-            Console.WriteLine(_messages.Count);
-            StateHasChanged();
-        });
-
-        await _hubConnection.StartAsync();
-
-        await Join();
-
+        //_hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/lobbyHub"), options =>
+        //{
+        //    options.Headers.Add("User", _user.Id);
+        //    options.Headers.Add("Lobby", LobbyId);
+        //}
+        //    ).Build();
+        LobbyConnection.StateChanged += Update;
+        await LobbyConnection.StartConnection(_user, NavigationManager.ToAbsoluteUri("/lobbyHub"), LobbyId);
         await base.OnInitializedAsync();
     }
 
-    public bool IsConnected =>
-        _hubConnection.State == HubConnectionState.Connected;
+    private void Update(object sender, EventArgs e)
+    {
+        StateHasChanged();
+    }
 
-    Task Send() =>
-    _hubConnection.SendAsync("SendMessage", _user.Name, "Hello from SEND");
+    public void Reload()
+    {
+        StateHasChanged();
+    }
 
-    Task Join() =>
-    _hubConnection.SendAsync("AddToGroup", _user.Id, LobbyId);
+    //public bool IsConnected =>
+    //    _hubConnection.State == HubConnectionState.Connected;
+
+
 }

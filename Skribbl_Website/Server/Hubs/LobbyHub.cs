@@ -34,15 +34,17 @@ namespace Skribbl_Website.Server.Hubs
             {
                 var player = _lobbiesManager.GetUserByIdFromLobby(userId, lobbyId);
                 await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId);
+                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveLobbyState", _lobbiesManager.GetLobbyId(lobbyId));
                 await Clients.Group(lobbyId).SendAsync("AddPlayer", player);
                 await Clients.Group(lobbyId).SendAsync("ReceiveMessage",
                     new Message(player.Name + " joined.", Message.MessageType.Join));
                 if (_lobbiesManager.TrySetHost(lobbyId, userId, Context.ConnectionId))
                 {
-                    await Clients.Group(lobbyId).SendAsync("ReceiveMessage", 
-                        new Message(player.Name + " is the new host.",Message.MessageType.Host));
+                    await Clients.Group(lobbyId).SendAsync("ReceiveMessage",
+                        new Message(player.Name + " is the new host.", Message.MessageType.Host));
                 }
             }
+            //TODO: add wrong user
         }
 
         private bool IsUser(string userId, string lobbyId)

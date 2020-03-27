@@ -50,10 +50,12 @@ namespace Skribbl_Website.Client.Services
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<PlayerDto>("AddPlayer", (player) =>
+            _hubConnection.On<PlayerDto>("AddPlayer", (playerToAdd) =>
             {
-                //TODO: Check for same player already
-                Lobby.Players.Add(player);
+                if(!Lobby.Players.Any(p => p.Name == playerToAdd.Name))
+                {
+                    Lobby.Players.Add(playerToAdd);
+                }               
                 InvokeOnReceive();
             });
 

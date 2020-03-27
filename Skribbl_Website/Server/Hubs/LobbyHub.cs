@@ -40,7 +40,7 @@ namespace Skribbl_Website.Server.Hubs
                 if (_lobbiesManager.TrySetHost(lobbyId, userId, Context.ConnectionId))
                 {
                     await Clients.Group(lobbyId).SendAsync("ReceiveMessage", 
-                        new Message(player.Name + " is the new host.",Message.MessageType.Host,player.Name));
+                        new Message(player.Name + " is the new host.",Message.MessageType.Host));
                 }
             }
         }

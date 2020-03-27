@@ -1,1 +1,22 @@
-﻿
+﻿.message {
+  width: 100%;
+  min-height: 20px;
+  padding: 2px 3px;
+  border: solid 1px #000000;
+  background-color: #808080; }
+  .message__content {
+    width: auto;
+    text-wrap: normal; }
+
+.chat {
+  width: 300px;
+  border-radius: 10px;
+  background-color: #d09761;
+  height: 800px;
+  overflow: hidden; }
+  .chat__messages {
+    flex-grow: 2;
+    height: auto;
+    overflow-y: scroll; }
+  .chat__input {
+    margin: 3px auto; }

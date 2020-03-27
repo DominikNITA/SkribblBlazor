@@ -136,18 +136,6 @@ app {
     top: 0.5rem;
 }
 
-.chat{
-    width: 200px;
-    border-radius: 10px;
-    background-color: #d09761;
-    height: 800px;
-}
-
-.chat__messages{
-    height: auto;
-    overflow-y: scroll;
-}
-
 @media (max-width: 767.98px) {
     .main .top-row:not(.auth) {
         display: none;

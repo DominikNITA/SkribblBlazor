@@ -1,0 +1,14 @@
+﻿
+
+.message {
+    width: 100%;
+    min-height: 20px;
+    padding: 2px 3px;
+    border: solid 1px #000000;
+    background-color: #808080;
+
+    &__content {
+        width: auto;
+        text-wrap: normal;
+    }
+}

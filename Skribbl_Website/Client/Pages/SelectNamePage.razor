@@ -5,6 +5,7 @@
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject LocalStorage LocalStorage
+@inject UserState UserState 
 
 
 <EditForm Model="_nameModel" OnValidSubmit="SubmitName">
@@ -57,11 +58,7 @@
         }
         //TODO: save User instance instead of particular class members
         //await LocalStorage.SetItemAsync("skribblUser", response.ConfirmedUser);
-        await LocalStorage.SetItemAsync("skribblUser_name", response.ConfirmedUser.Name);
-        Console.WriteLine("Saving " + response.ConfirmedUser.Name);
-        await LocalStorage.SetItemAsync("skribblUser_id", response.ConfirmedUser.Id);
-        Console.WriteLine("Saving " + response.ConfirmedUser.Id);
-        await LocalStorage.SetItemAsync("skribblUser_isHost", response.ConfirmedUser.IsHost);
+        UserState.SaveUser(response.ConfirmedUser);
         NavigationManager.NavigateTo("lobby/" + response.LobbyUrl);
     }
 }

@@ -1,0 +1,20 @@
+﻿<div class="chat d-flex flex-column">
+    <div class="chat__messages d-flex flex-column">
+        @foreach (var message in Messages)
+        {
+            <MessageComponent Message="message"></MessageComponent>
+        }
+    </div>
+    <div class="chat__input-container d-flex flex-row">
+        <div class="chat__input">
+            <input type="text" />
+            <button @onclick="MyObject">Send!</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<Message> Messages { get; set; }
+
+    [Parameter] public EventCallback MyObject { get; set; }
+}

@@ -3,10 +3,11 @@
 @inject LocalStorage LocalStorage
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@inject UserState UserState
 
 @LobbyId
 
-@if(_lobby != null)
+@if (_lobby != null)
 {
     <span>
         Invite: @_lobby.InviteLink
@@ -24,18 +25,8 @@
 {
     <div class="alert alert-danger">@_info</div>
 }
-<div class="chat d-flex flex-column">
-    <div class="chat__messages d-flex flex-column">
-        @foreach (var message in _messages)
-        {
-            <MessageComponent Message="message"></MessageComponent>
-        }
-    </div>
-    <div class="chat__input d-flex flex-row">
-        <input type="text" />
-        <button>Send!</button>
-    </div>
-</div>
+
+<ChatComponent Messages="_messages"></ChatComponent>
 
 @code {
     [Parameter]
@@ -52,19 +43,15 @@
     protected async override Task OnInitializedAsync()
     {
         //TODO: Retrieve User instance instead of particular members
-        var name = await LocalStorage.GetItemAsync("skribblUser_name");
-        Console.WriteLine("Reading: " + name);
-        var id = await LocalStorage.GetItemAsync("skribblUser_id");
-        Console.WriteLine("Reading: " + id);
-        var isHost = await LocalStorage.GetItemAsync<bool?>("skribblUser_isHost");
-        if (name == null || id == null || isHost == null)
+        //TODO: Create singleton for state storage
+        try
         {
-            _info = "User not found! Or you do not have access to this lobby.";
-            return;
+            _user = await UserState.GetUser();
         }
-        _user.Name = name;
-        _user.Id = id;
-        _user.IsHost = isHost.Value;
+        catch (UserNotInLocalStorageException exception)
+        {
+            _info = exception.Message;
+        }
 
         //TODO: Separate to other classes
         //Retrieve initial Lobby state
@@ -73,6 +60,7 @@
         _lobby = await Http.GetJsonAsync<LobbyDto>(query);
 
         //Connect to SignalRHub
+        //TODO: Create Singleton
         _hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/lobbyHub"), options =>
         {
             options.Headers.Add("User", _user.Id);
@@ -80,19 +68,15 @@
         }
             ).Build();
 
+        _hubConnection.On<LobbyDto>("ReceiveLobbyState", (lobby) =>
+        {
+           _lobby = lobby;
+           StateHasChanged();
+        });
 
-        //_hubConnection.On<NameModel, Message>("ReceiveMessage", (user, message) =>
-        //{
-        //    var encodedMsg = $"{user.Name}: {message}";
-        //    _messages.Add(message);
-        //    StateHasChanged();
-        //});
-
-        //Change to receive user
         _hubConnection.On<PlayerDto>("AddPlayer", (player) =>
         {
             _lobby.Players.Add(player);
-            //_messages.Add(new Message(player.Name + " joined", Message.MessageType.Join));
             StateHasChanged();
         });
 
@@ -106,7 +90,6 @@
         await _hubConnection.StartAsync();
 
         await Join();
-        //await Send();
 
         await base.OnInitializedAsync();
     }

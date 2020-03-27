@@ -17,9 +17,8 @@ namespace Skribbl_Website.Client
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddBaseAddressHttpClient();
-            builder.Services.AddAuthorizationCore();
-            builder.Services.AddTokenAuthenticationStateProvider();
             builder.Services.AddStorage();
+            builder.Services.AddSingleton<UserState>();
 
             await builder.Build().RunAsync();
         }

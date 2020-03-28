@@ -1,18 +1,17 @@
 ﻿@page "/lobby/{lobbyId}"
-@using Microsoft.AspNetCore.SignalR.Client
 @inject LocalStorage LocalStorage
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject UserState UserState
 @inject LobbyConnection LobbyConnection
 
-@LobbyId
+Lobby ID: @LobbyId
 
 @if (LobbyConnection.Lobby != null)
 {
-    <span>
-        Invite: @LobbyConnection.Lobby.InviteLink
-    </span>
+    <div>
+        Invite:   @NavigationManager.ToAbsoluteUri("join/"+ LobbyConnection.Lobby.InviteLink)
+    </div>
     @if (LobbyConnection.Lobby.Players != null)
     {
         foreach (var player in LobbyConnection.Lobby.Players)
@@ -23,8 +22,6 @@
         }
     }
 }
-
-
 
 <div>
     Name: @_user.Name
@@ -42,8 +39,6 @@
 {
     <ChatComponent Messages="@LobbyConnection.Messages"></ChatComponent>
 }
-
-<button @onclick="Reload">reload</button>
 
 
 @code {
@@ -68,31 +63,13 @@
             _info = exception.Message;
         }
 
-        //TODO: Separate to other classes
-        //Retrieve initial Lobby state
-        //string query = String.Format("lobbies/{0}/{1}", LobbyId, _user.Id);
-        ////Console.WriteLine(query);
-        //_lobby = await Http.GetJsonAsync<LobbyDto>(query);
-
-        //Connect to SignalRHub
-        //TODO: Create Singleton
-        //_hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/lobbyHub"), options =>
-        //{
-        //    options.Headers.Add("User", _user.Id);
-        //    options.Headers.Add("Lobby", LobbyId);
-        //}
-        //    ).Build();
         LobbyConnection.StateChanged += Update;
         await LobbyConnection.StartConnection(_user, NavigationManager.ToAbsoluteUri("/lobbyHub"), LobbyId);
+
         await base.OnInitializedAsync();
     }
 
     private void Update(object sender, EventArgs e)
-    {
-        StateHasChanged();
-    }
-
-    public void Reload()
     {
         StateHasChanged();
     }

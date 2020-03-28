@@ -29,9 +29,6 @@
     <ProjectReference Include="..\Shared\Skribbl_Website.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Styles\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="compilerconfig.json" />
   </ItemGroup>
 

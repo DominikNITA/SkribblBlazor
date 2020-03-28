@@ -17,7 +17,7 @@ namespace Skribbl_Website.Server.Models
         public Lobby(UserDto host)
         {      
             Id = Guid.NewGuid().ToString();
-            InviteLink = Guid.NewGuid().ToString();
+            InviteLink = Guid.NewGuid().ToString().Substring(0, 5);
             MaxPlayers = 10;
             RoundsLimit = 6;
             TimeLimit = 60;
@@ -44,6 +44,14 @@ namespace Skribbl_Website.Server.Models
             else
             {
                 return false;
+            }
+        }
+
+        public void SetConnectionIdForUser(string username, string connection)
+        {
+            if(!Connections.TryGetValue(username, out string actualConnection))
+            {
+                Connections[username] = connection;
             }
         }
 

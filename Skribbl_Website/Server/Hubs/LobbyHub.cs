@@ -23,18 +23,13 @@ namespace Skribbl_Website.Server.Hubs
             _lobbiesManager = lobbiesManager;
         }
 
-        //public async Task SendMessage(string user, string message)
-        //{
-        //    await Clients.All.SendAsync("ReceiveMessage", new Message(message,));
-        //}
-
         public async Task AddToGroup(string userId, string lobbyId)
         {
             if (IsUser(userId, lobbyId))
             {
                 var player = _lobbiesManager.GetUserByIdFromLobby(userId, lobbyId);
                 await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId);
-                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveLobbyState", _lobbiesManager.GetLobbyId(lobbyId));
+                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveLobbyState", _lobbiesManager.GetLobbyById(lobbyId));
                 await Clients.Group(lobbyId).SendAsync("AddPlayer", player);
                 await Clients.Group(lobbyId).SendAsync("ReceiveMessage",
                     new Message(player.Name + " joined.", Message.MessageType.Join));
@@ -56,32 +51,9 @@ namespace Skribbl_Website.Server.Hubs
             return false;
         }
 
-        //private void SetLocals(string lobbyId, string userId)
-        //{
-        //    _lobbyId = lobbyId;
-        //    _player = _lobbiesManager.GetUserByIdFromLobby(userId, lobbyId);
-        //}
-
-
-
-        //private bool IsUser()
-        //{
-        //    var headers = Context.GetHttpContext().Request.Headers;
-        //    if (!(headers.ContainsKey("User") && headers.ContainsKey("Lobby")))
-        //    {
-        //        headers.TryGetValue("User", out var userId);
-        //        headers.TryGetValue("Lobby", out var lobbyId);
-        //        if(_lobbiesManager.IsUserIdInSpecificLobby(userId, lobbyId))
-        //        {
-        //            _lobbyId = lobbyId;
-        //            Context.Items.Add("User", userId);
-        //            Context.Items.Add("Lobby", lobbyId);
-        //        }
-        //    }
-
-        //    return false;
-        //}
-
-
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            return base.OnDisconnectedAsync(exception);
+        }
     }
 }

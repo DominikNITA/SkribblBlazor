@@ -26,7 +26,7 @@ namespace Skribbl_Website.Server.Services
         {
             if (!LobbyHasHost(lobbyId))
             {
-                GetLobbyId(lobbyId).HostConnection = connection;
+                GetLobbyById(lobbyId).HostConnection = connection;
                 GetUserByIdFromLobby(userId, lobbyId).IsHost = true;
                 return true;
             }
@@ -35,7 +35,7 @@ namespace Skribbl_Website.Server.Services
 
         private bool LobbyHasHost(string lobbyId)
         {
-            return GetLobbyId(lobbyId).HostConnection != string.Empty;
+            return GetLobbyById(lobbyId).HostConnection != string.Empty;
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Skribbl_Website.Server.Services
             return foundLobby.Users.Where(player => player.Id == playerId).First();
         }
 
-        public Lobby GetLobbyId(string lobbyId)
+        public Lobby GetLobbyById(string lobbyId)
         {
             return Lobbies.Where(lobby => lobby.Id == lobbyId).First();
         }
@@ -99,6 +99,11 @@ namespace Skribbl_Website.Server.Services
                 }
             }
             return false;
+        }
+
+        public void SetConnectionIdForUserInLobby(string lobbyId, string username, string connectionId)
+        {
+            GetLobbyById(lobbyId).SetConnectionIdForUser(username, connectionId);
         }
     }
 }

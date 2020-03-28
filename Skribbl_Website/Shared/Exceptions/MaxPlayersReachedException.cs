@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Skribbl_Website.Shared.Exceptions
 {
-    public class MaxPlayersReachedException : Exception
+    public class MaxPlayersReachedException : LobbyExceptionBase
     {
     }
 }

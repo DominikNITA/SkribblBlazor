@@ -2,10 +2,11 @@
 @page "/join/{inviteLink}"
 @using Skribbl_Website.Shared.Exceptions
 @using Skribbl_Website.Shared
+@using System.Net.Http
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject LocalStorage LocalStorage
-@inject UserState UserState 
+@inject UserState UserState
 
 
 <EditForm Model="_nameModel" OnValidSubmit="SubmitName">
@@ -38,18 +39,30 @@
             {
                 response = await Http.GetJsonAsync<LobbyRedirectDto>(query);
             }
-            catch (MaxPlayersReachedException)
+            //catch (MaxPlayersReachedException)
+            //{
+            //    _info = "Lobby is full.";
+            //}
+            //catch (InviteLinkNotMatchingException)
+            //{
+            //    _info = "Invalid invite link or lobby does not exist anymore.";
+            //}
+            //catch (UserNameAlreadyExistsException)
+            //{
+            //    _info = "Username taken! Try another one.";
+            //}
+            catch(Exception e)
             {
-                _info = "Lobby is full.";
+                _info += e.Message + "DODOaddon";
+                StateHasChanged();
+                return;
             }
-            catch (InviteLinkNotMatchingException)
-            {
-                _info = "Invalid invite link or lobby does not exist anymore.";
-            }
-            catch (UserNameAlreadyExistsException)
-            {
-                _info = "Username taken! Try another one.";
-            }
+            //catch(HttpRequestException e)
+            //{
+            //    Console.WriteLine(e.Message);
+            //    _info = e.InnerException.Message;
+            //    return;
+            //}
         }
         else
         {

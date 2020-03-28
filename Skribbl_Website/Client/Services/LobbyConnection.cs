@@ -16,17 +16,18 @@ namespace Skribbl_Website.Client.Services
 
         private HubConnection _hubConnection;
 
-        protected virtual void OnReceive(EventArgs e)
-        {
-            StateChanged?.Invoke(this, e);
-        }
-
         private void InvokeOnReceive()
         {
-            OnReceive(EventArgs.Empty);
+            StateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public event EventHandler StateChanged;
+
+        protected virtual void OnError()
+        {
+            ErrorOccured?.Invoke(this, EventArgs.Empty);
+        }
+        public event EventHandler ErrorOccured;
 
         public LobbyConnection()
         {
@@ -35,7 +36,6 @@ namespace Skribbl_Website.Client.Services
 
         public async Task StartConnection(UserDto user, Uri hubUrl, string lobbyId)
         {
-            Console.WriteLine("hello");
             _hubConnection = new HubConnectionBuilder().WithUrl(hubUrl).Build();
             User = user;
             _hubConnection.On<Message>("ReceiveMessage", (message) =>
@@ -59,14 +59,33 @@ namespace Skribbl_Website.Client.Services
                 InvokeOnReceive();
             });
 
-            await _hubConnection.StartAsync();
+            _hubConnection.On<string>("RemovePlayer", (playerNameToRemove) =>
+            {
+                Lobby.RemoveUserByName(playerNameToRemove);
+                InvokeOnReceive();
+            });
 
-            await Join(lobbyId);
+            await _hubConnection.StartAsync();
+            try
+            {
+                await Join(lobbyId);
+            }
+            catch
+            {
+                // User does not hace access to demanded lobby
+                OnError();
+            }
         }
+        public void CloseConnection()
+        {
+            _hubConnection.StopAsync();
+            //TODO: Clear UserState
+        }
+
         Task Send() =>
 _hubConnection.SendAsync("SendMessage", User.Name, "Hello from SEND");
 
         Task Join(string lobbyId) =>
-        _hubConnection.SendAsync("AddToGroup", User.Id, lobbyId);
+        _hubConnection.InvokeAsync("AddToGroup", User.Id, lobbyId);
     }
 }

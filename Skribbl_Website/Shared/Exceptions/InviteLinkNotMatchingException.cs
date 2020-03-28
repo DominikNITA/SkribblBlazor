@@ -4,7 +4,11 @@ using System.Text;
 
 namespace Skribbl_Website.Shared.Exceptions
 {
-    public class InviteLinkNotMatchingException : Exception
+    public class InviteLinkNotMatchingException : LobbyExceptionBase
     {
+        public InviteLinkNotMatchingException()
+        {
+            
+        }
     }
 }

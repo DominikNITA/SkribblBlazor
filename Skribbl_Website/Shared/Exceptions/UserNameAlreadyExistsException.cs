@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Skribbl_Website.Shared.Exceptions
 {
-    public class UserNameAlreadyExistsException : Exception
+    public class UserNameAlreadyExistsException : LobbyExceptionBase
     {
     }
 }

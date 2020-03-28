@@ -53,9 +53,9 @@ namespace Skribbl_Website.Server.Services
                 //Search for lobby with corresponding invite link
                 if (lobby.InviteLink.Equals(inviteLink))
                 {
-                    if(lobby.Users.Any(user => user.Name == player.Name))
+                    if (lobby.Users.Any(user => user.Name == player.Name))
                     {
-                        throw new UserNameAlreadyExistsException();
+                        throw new Exception("Username already exists in this lobby! Try another one.");
                     }
                     //Try to add a new player
                     if (lobby.AddUser(player))
@@ -64,11 +64,11 @@ namespace Skribbl_Website.Server.Services
                     }
                     else
                     {
-                        throw new MaxPlayersReachedException();
+                        throw new Exception("Lobby is full. Cannot join.");
                     }
                 }
             }
-            throw new InviteLinkNotMatchingException();
+            throw new Exception("This invite link doesn't match to any lobby.");
         }
 
         public PlayerDto GetUserByIdFromLobby(string playerId, string lobbyId)
@@ -86,9 +86,9 @@ namespace Skribbl_Website.Server.Services
         {
             foreach (var lobby in Lobbies)
             {
-                if(lobby.Id == lobbyId)
+                if (lobby.Id == lobbyId)
                 {
-                    if(lobby.Users.Where(player => player.Id == userId).Count() == 1)
+                    if (lobby.Users.Where(player => player.Id == userId).Count() == 1)
                     {
                         return true;
                     }
@@ -103,7 +103,16 @@ namespace Skribbl_Website.Server.Services
 
         public void SetConnectionIdForUserInLobby(string lobbyId, string username, string connectionId)
         {
-            GetLobbyById(lobbyId).SetConnectionIdForUser(username, connectionId);
+            GetLobbyById(lobbyId).SetConnectionIdForUser(connectionId, username);
         }
+
+        public Lobby GetLobbyByUserConnectionId(string connectionId)
+        {
+            return Lobbies.Where(lobby => lobby.Connections.ContainsKey(connectionId)).First();
+        }
+        //public void RemoveUserByConnectionId(string connectionId)
+        //{
+
+        //}
     }
 }

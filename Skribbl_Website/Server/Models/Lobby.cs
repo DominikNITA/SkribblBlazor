@@ -11,6 +11,10 @@ namespace Skribbl_Website.Server.Models
     public class Lobby : LobbyDto
     {
         public List<UserDto> Users { get; set; }
+        /// <summary>
+        /// Key: ConnectionId
+        /// Value: Username
+        /// </summary>
         public Dictionary<string, string> Connections { get; set; }
         public string HostConnection { get; set; }
 
@@ -47,14 +51,32 @@ namespace Skribbl_Website.Server.Models
             }
         }
 
-        public void SetConnectionIdForUser(string username, string connection)
+        public void SetConnectionIdForUser(string connection, string username)
         {
-            if(!Connections.TryGetValue(username, out string actualConnection))
+            if(!Connections.TryGetValue(connection, out string user))
             {
-                Connections[username] = connection;
+                Connections[connection] = username;
             }
         }
 
-        
+        public string GetUserNameByConnectionId(string connectionId)
+        {
+            if(Connections.TryGetValue(connectionId, out var username))
+            {
+                return username;
+            }
+            else
+            {
+                //TODO: Rework or new exception
+                throw new Exception();
+            }
+        }
+
+        public override void RemoveUserByName(string username)
+        {
+            base.RemoveUserByName(username);
+            Users.RemoveAll(user => user.Name == username);
+            //TODO: Delete from Connections
+        }
     }
 }

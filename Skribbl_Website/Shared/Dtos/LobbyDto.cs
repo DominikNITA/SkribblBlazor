@@ -22,5 +22,10 @@ namespace Skribbl_Website.Shared.Dtos
         {
 
         }
+
+        public virtual void RemoveUserByName(string username)
+        {
+            Players.RemoveAll(player => player.Name == username);
+        }
     }
 }

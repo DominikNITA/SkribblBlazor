@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Skribbl_Website.Server.Models;
 using Skribbl_Website.Server.Services;
 using Skribbl_Website.Shared;
 using Skribbl_Website.Shared.Dtos;
+using Skribbl_Website.Shared.Exceptions;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -14,7 +16,7 @@ namespace Skribbl_Website.Server.Controllers
 {
     [ApiController]
     [Route("lobbies")]
-    public class LobbiesController : Controller
+    public class LobbiesController : ControllerBase
     {
         private LobbiesManager _lobbiesManager;
 
@@ -23,7 +25,6 @@ namespace Skribbl_Website.Server.Controllers
             _lobbiesManager = lobbiesManager;
         }
 
-        // GET: api/<controller>
         [HttpGet("create/{name}")]
         async public Task<ActionResult<LobbyRedirectDto>> Get(string name)
         {
@@ -32,7 +33,6 @@ namespace Skribbl_Website.Server.Controllers
             return new LobbyRedirectDto(host, lobbyUrl);
         }
 
-        // GET api/<controller>/5
         [HttpGet("join/{inviteLink}/{name}")]
         async public Task<ActionResult<LobbyRedirectDto>> Get(string inviteLink, string name)
         {
@@ -42,9 +42,9 @@ namespace Skribbl_Website.Server.Controllers
                 var lobbyUrl = _lobbiesManager.AddPlayerToLobby(inviteLink, player);
                 return new LobbyRedirectDto(player, lobbyUrl);
             }
-            catch (Exception)
+            catch(LobbyExceptionBase e)
             {
-                throw;
+                throw new BlazorClientException(e);
             }
         }
 
@@ -56,7 +56,7 @@ namespace Skribbl_Website.Server.Controllers
             {
                 if (lobby.Id == lobbyId)
                 {
-                    if(lobby.Users.Where(user => user.Id == userId).Count() == 1)
+                    if (lobby.Users.Where(user => user.Id == userId).Count() == 1)
                     {
                         return lobby;
                     }
@@ -64,28 +64,10 @@ namespace Skribbl_Website.Server.Controllers
                     {
                         return Unauthorized();
                     }
-                        
+
                 }
             }
             return NotFound();
         }
-
-        //// POST api/<controller>
-        //[HttpPost]
-        //public void Post([FromBody]string value)
-        //{
-        //}
-
-        //// PUT api/<controller>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody]string value)
-        //{
-        //}
-
-        //// DELETE api/<controller>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }

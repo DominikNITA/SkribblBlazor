@@ -4,13 +4,13 @@
 @inject NavigationManager NavigationManager
 @inject UserState UserState
 @inject LobbyConnection LobbyConnection
-
 Lobby ID: @LobbyId
 
+@using Skribbl_Website.Client.Components
 @if (LobbyConnection.Lobby != null)
 {
     <div>
-        Invite:   @NavigationManager.ToAbsoluteUri("join/"+ LobbyConnection.Lobby.InviteLink)
+        Invite:   @NavigationManager.ToAbsoluteUri("join/" + LobbyConnection.Lobby.InviteLink)
     </div>
     @if (LobbyConnection.Lobby.Players != null)
     {
@@ -40,6 +40,8 @@ Lobby ID: @LobbyId
     <ChatComponent Messages="@LobbyConnection.Messages"></ChatComponent>
 }
 
+<button @onclick="LeaveLobby">Leave!</button>
+
 
 @code {
     [Parameter]
@@ -47,10 +49,6 @@ Lobby ID: @LobbyId
 
     private UserDto _user = new UserDto();
     private string _info = string.Empty;
-    //private LobbyDto _lobby;
-    //private List<Message> _messages = new List<Message>();
-
-    //private HubConnection _hubConnection;
 
     protected async override Task OnInitializedAsync()
     {
@@ -64,6 +62,7 @@ Lobby ID: @LobbyId
         }
 
         LobbyConnection.StateChanged += Update;
+        LobbyConnection.ErrorOccured += RedirectToErrorPage;
         await LobbyConnection.StartConnection(_user, NavigationManager.ToAbsoluteUri("/lobbyHub"), LobbyId);
 
         await base.OnInitializedAsync();
@@ -74,8 +73,18 @@ Lobby ID: @LobbyId
         StateHasChanged();
     }
 
+    private void RedirectToErrorPage(object sender, EventArgs e)
+    {
+        NavigationManager.NavigateTo("");
+    }
+
+    private void LeaveLobby()
+    {
+        //TODO: Show dialog
+        LobbyConnection.CloseConnection();
+        NavigationManager.NavigateTo("");
+    }
+
     //public bool IsConnected =>
     //    _hubConnection.State == HubConnectionState.Connected;
-
-
 }

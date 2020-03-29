@@ -53,7 +53,7 @@ namespace Skribbl_Website.Server.Services
                 //Search for lobby with corresponding invite link
                 if (lobby.InviteLink.Equals(inviteLink))
                 {
-                    if (lobby.Users.Any(user => user.Name == player.Name))
+                    if (lobby.Players.Any(user => user.Name == player.Name))
                     {
                         throw new Exception("Username already exists in this lobby! Try another one.");
                     }
@@ -71,10 +71,12 @@ namespace Skribbl_Website.Server.Services
             throw new Exception("This invite link doesn't match to any lobby.");
         }
 
-        public PlayerDto GetUserByIdFromLobby(string playerId, string lobbyId)
+        public PlayerDto GetUserByIdFromLobby(string userId, string lobbyId)
         {
             var foundLobby = Lobbies.Where(lobby => lobby.Id == lobbyId).First();
-            return foundLobby.Users.Where(player => player.Id == playerId).First();
+            return null;
+            //TODO: below
+           // return foundLobby.Users.Where(player => player.Id == userId).First();
         }
 
         public Lobby GetLobbyById(string lobbyId)
@@ -86,17 +88,18 @@ namespace Skribbl_Website.Server.Services
         {
             foreach (var lobby in Lobbies)
             {
-                if (lobby.Id == lobbyId)
-                {
-                    if (lobby.Users.Where(player => player.Id == userId).Count() == 1)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
+                //TODO: below
+                //if (lobby.Id == lobbyId)
+                //{
+                //    if (lobby.Users.Where(player => player.Id == userId).Count() == 1)
+                //    {
+                //        return true;
+                //    }
+                //    else
+                //    {
+                //        return false;
+                //    }
+                //}
             }
             return false;
         }

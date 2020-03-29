@@ -10,7 +10,7 @@ namespace Skribbl_Website.Server.Models
 {
     public class Lobby : LobbyDto
     {
-        public List<UserDto> Users { get; set; }
+        public Dictionary<string, string> UsersIds { get; set; }
         /// <summary>
         /// Key: ConnectionId
         /// Value: Username
@@ -18,16 +18,10 @@ namespace Skribbl_Website.Server.Models
         public Dictionary<string, string> Connections { get; set; }
         public string HostConnection { get; set; }
 
-        public Lobby(UserDto host)
-        {      
-            Id = Guid.NewGuid().ToString();
-            InviteLink = Guid.NewGuid().ToString().Substring(0, 5);
-            MaxPlayers = 10;
-            RoundsLimit = 6;
-            TimeLimit = 60;
-            Users = new List<UserDto>();
-            Players = new List<PlayerDto>();
+        public Lobby(UserDto host) :base()
+        {
             _ = AddUser(host);
+            UsersIds = new Dictionary<string, string>();
             Connections = new Dictionary<string, string>();
             HostConnection = string.Empty;
         }
@@ -39,10 +33,10 @@ namespace Skribbl_Website.Server.Models
         /// <returns>Is succesful?</returns>
         public bool AddUser(UserDto user)
         {
-            if (Users.Count < MaxPlayers)
+            if (Players.Count < MaxPlayers)
             {
                 Players.Add(user);
-                Users.Add(user);
+                UsersIds[user.Id] = user.Name;
                 return true;
             }
             else
@@ -51,9 +45,10 @@ namespace Skribbl_Website.Server.Models
             }
         }
 
+
         public void SetConnectionIdForUser(string connection, string username)
         {
-            if(!Connections.TryGetValue(connection, out string user))
+            if (!Connections.TryGetValue(connection, out string user))
             {
                 Connections[connection] = username;
             }
@@ -61,7 +56,7 @@ namespace Skribbl_Website.Server.Models
 
         public string GetUserNameByConnectionId(string connectionId)
         {
-            if(Connections.TryGetValue(connectionId, out var username))
+            if (Connections.TryGetValue(connectionId, out var username))
             {
                 return username;
             }
@@ -75,8 +70,33 @@ namespace Skribbl_Website.Server.Models
         public override void RemoveUserByName(string username)
         {
             base.RemoveUserByName(username);
-            Users.RemoveAll(user => user.Name == username);
+            //TODO: Change RemoveALl below
+            //UsersIds.RemoveAll(user => user.Name == username);
             //TODO: Delete from Connections
+        }
+
+        public void RemoveUserByConnectionId(string connectionId)
+        {
+            RemoveUserByName(GetUserNameByConnectionId(connectionId));
+            if(Players.Count == 0)
+            {
+                //TODO: invoke empty event;
+                return;
+            }
+            if(connectionId == HostConnection)
+            {
+
+            }
+        }
+
+        public void SetUserStateToDisconnected(string connectionId)
+        {
+            var username = GetUserNameByConnectionId(connectionId);
+        }
+
+        public void SetNewHost()
+        {
+            Players[0].IsHost = true;
         }
     }
 }

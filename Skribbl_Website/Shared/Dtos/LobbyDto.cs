@@ -20,7 +20,12 @@ namespace Skribbl_Website.Shared.Dtos
 
         public LobbyDto()
         {
-
+            Id = Guid.NewGuid().ToString();
+            InviteLink = Guid.NewGuid().ToString().Substring(0, 5);
+            MaxPlayers = 10;
+            RoundsLimit = 6;
+            TimeLimit = 60;
+            Players = new List<PlayerDto>();
         }
 
         public virtual void RemoveUserByName(string username)

@@ -49,26 +49,26 @@ namespace Skribbl_Website.Server.Controllers
             }
         }
 
-        [HttpGet("{lobbyId}/{userId}")]
-        async public Task<ActionResult<LobbyDto>> GetLobby(string lobbyId, string userId)
-        {
-            //TODO: Move logic outside
-            foreach (var lobby in _lobbiesManager.Lobbies)
-            {
-                if (lobby.Id == lobbyId)
-                {
-                    if (lobby.Users.Where(user => user.Id == userId).Count() == 1)
-                    {
-                        return lobby;
-                    }
-                    else
-                    {
-                        return Unauthorized();
-                    }
+        //[HttpGet("{lobbyId}/{userId}")]
+        //async public Task<ActionResult<LobbyDto>> GetLobby(string lobbyId, string userId)
+        //{
+        //    //TODO: Move logic outside
+        //    foreach (var lobby in _lobbiesManager.Lobbies)
+        //    {
+        //        if (lobby.Id == lobbyId)
+        //        {
+        //            if (lobby.Users.Where(user => user.Id == userId).Count() == 1)
+        //            {
+        //                return lobby;
+        //            }
+        //            else
+        //            {
+        //                return Unauthorized();
+        //            }
 
-                }
-            }
-            return NotFound();
-        }
+        //        }
+        //    }
+        //    return NotFound();
+        //}
     }
 }

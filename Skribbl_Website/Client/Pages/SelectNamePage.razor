@@ -39,30 +39,10 @@
             {
                 response = await Http.GetJsonAsync<LobbyRedirectDto>(query);
             }
-            //catch (MaxPlayersReachedException)
-            //{
-            //    _info = "Lobby is full.";
-            //}
-            //catch (InviteLinkNotMatchingException)
-            //{
-            //    _info = "Invalid invite link or lobby does not exist anymore.";
-            //}
-            //catch (UserNameAlreadyExistsException)
-            //{
-            //    _info = "Username taken! Try another one.";
-            //}
             catch(Exception e)
             {
-                _info += e.Message + "DODOaddon";
-                StateHasChanged();
-                return;
+                Console.WriteLine(e.Message);
             }
-            //catch(HttpRequestException e)
-            //{
-            //    Console.WriteLine(e.Message);
-            //    _info = e.InnerException.Message;
-            //    return;
-            //}
         }
         else
         {
@@ -71,7 +51,16 @@
         }
         //TODO: save User instance instead of particular class members
         //await LocalStorage.SetItemAsync("skribblUser", response.ConfirmedUser);
-        UserState.SaveUser(response.ConfirmedUser);
-        NavigationManager.NavigateTo("lobby/" + response.LobbyUrl);
+        if (!response.HasError)
+        {
+            UserState.SaveUser(response.ConfirmedUser);
+            NavigationManager.NavigateTo("lobby/" + response.LobbyUrl);
+        }
+        else
+        {
+            _info = response.ExceptionMessage;
+            StateHasChanged();
+        }
+
     }
 }

@@ -35,16 +35,17 @@ namespace Skribbl_Website.Server.Controllers
 
         [HttpGet("join/{inviteLink}/{name}")]
         async public Task<ActionResult<LobbyRedirectDto>> Get(string inviteLink, string name)
-        {
-            var player = new UserDto(name);
+        {            
             try
             {
+                var player = new UserDto(name);
                 var lobbyUrl = _lobbiesManager.AddPlayerToLobby(inviteLink, player);
                 return new LobbyRedirectDto(player, lobbyUrl);
             }
-            catch(LobbyExceptionBase e)
+            //Catch custom exception
+            catch(Exception exception)
             {
-                throw new BlazorClientException(e);
+                return new LobbyRedirectDto(exception.Message);
             }
         }
 

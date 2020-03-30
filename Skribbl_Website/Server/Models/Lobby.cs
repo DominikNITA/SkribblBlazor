@@ -18,12 +18,12 @@ namespace Skribbl_Website.Server.Models
         public Dictionary<string, string> Connections { get; set; }
         public string HostConnection { get; set; }
 
-        public Lobby(UserDto host) :base()
-        {
-            _ = AddUser(host);
+        public Lobby(UserDto host) : base()
+        {       
             UsersIds = new Dictionary<string, string>();
             Connections = new Dictionary<string, string>();
             HostConnection = string.Empty;
+            _ = AddUser(host);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Skribbl_Website.Server.Models
 
         public void SetConnectionIdForUser(string connection, string username)
         {
-            if (!Connections.TryGetValue(connection, out string user))
+            if (!Connections.TryGetValue(connection, out _))
             {
                 Connections[connection] = username;
             }
@@ -67,9 +67,9 @@ namespace Skribbl_Website.Server.Models
             }
         }
 
-        public override void RemoveUserByName(string username)
+        public override int RemovePlayerByName(string username)
         {
-            base.RemoveUserByName(username);
+            return base.RemovePlayerByName(username);
             //TODO: Change RemoveALl below
             //UsersIds.RemoveAll(user => user.Name == username);
             //TODO: Delete from Connections
@@ -77,7 +77,7 @@ namespace Skribbl_Website.Server.Models
 
         public void RemoveUserByConnectionId(string connectionId)
         {
-            RemoveUserByName(GetUserNameByConnectionId(connectionId));
+            RemovePlayerByName(GetUserNameByConnectionId(connectionId));
             if(Players.Count == 0)
             {
                 //TODO: invoke empty event;

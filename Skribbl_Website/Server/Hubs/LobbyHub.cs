@@ -59,7 +59,7 @@ namespace Skribbl_Website.Server.Hubs
             {
                 var lobby = _lobbiesManager.GetLobbyByUserConnectionId(Context.ConnectionId);
                 var username = lobby.GetUserNameByConnectionId(Context.ConnectionId);
-                lobby.RemoveUserByName(username);
+                lobby.RemovePlayerByName(username);
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobby.Id);
                 await Clients.Group(lobby.Id).SendAsync("ReceiveMessage",
     new Message(username + " left.", Message.MessageType.Leave));

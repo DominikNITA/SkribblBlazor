@@ -55,6 +55,7 @@ Lobby ID: @LobbyId
         try
         {
             _user = await UserState.GetUser();
+            Console.WriteLine(_user.IsHost);
         }
         catch (UserNotInLocalStorageException exception)
         {
@@ -75,7 +76,7 @@ Lobby ID: @LobbyId
 
     private void RedirectToErrorPage(object sender, EventArgs e)
     {
-        NavigationManager.NavigateTo("");
+        //NavigationManager.NavigateTo("");
     }
 
     private void LeaveLobby()

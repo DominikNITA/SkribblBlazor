@@ -36,7 +36,7 @@ namespace Skribbl_Website.Client.Services
             }
             var user = new UserDto(name);
             user.Id = id;
-            user.IsHost = false;
+            user.IsHost = isHost.Value;
             return user;
         }
     }

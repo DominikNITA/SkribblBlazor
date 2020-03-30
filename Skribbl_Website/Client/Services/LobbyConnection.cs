@@ -61,7 +61,7 @@ namespace Skribbl_Website.Client.Services
 
             _hubConnection.On<string>("RemovePlayer", (playerNameToRemove) =>
             {
-                Lobby.RemoveUserByName(playerNameToRemove);
+                Lobby.RemovePlayerByName(playerNameToRemove);
                 InvokeOnReceive();
             });
 

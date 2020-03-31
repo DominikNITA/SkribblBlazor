@@ -17,7 +17,7 @@ namespace Skribbl_Website.Server.Services
         public string CreateLobby(UserDto host)
         {
             var lobby = new Lobby(host);
-            host.IsHost = true;
+            //host.IsHost = true;
             Lobbies.Add(lobby);
             return lobby.Id.ToString();
         }
@@ -58,25 +58,20 @@ namespace Skribbl_Website.Server.Services
                         throw new Exception("Username already exists in this lobby! Try another one.");
                     }
                     //Try to add a new player
-                    if (lobby.AddUser(player))
-                    {
-                        return lobby.Id.ToString();
-                    }
-                    else
-                    {
-                        throw new Exception("Lobby is full. Cannot join.");
-                    }
+                    lobby.AddPlayer(player);
+                    return lobby.Id.ToString();
+//                    throw new Exception("Lobby is full. Cannot join.");
                 }
             }
             throw new Exception("This invite link doesn't match to any lobby.");
         }
 
-        public PlayerDto GetUserByIdFromLobby(string userId, string lobbyId)
+        public PlayerClient GetUserByIdFromLobby(string userId, string lobbyId)
         {
             var foundLobby = Lobbies.Where(lobby => lobby.Id == lobbyId).First();
             return null;
             //TODO: below
-           // return foundLobby.Users.Where(player => player.Id == userId).First();
+            // return foundLobby.Users.Where(player => player.Id == userId).First();
         }
 
         public Lobby GetLobbyById(string lobbyId)

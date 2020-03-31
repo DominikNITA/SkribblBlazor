@@ -20,6 +20,7 @@
 {
     <div class="alert alert-danger alert-dismissible">@_info</div>
 }
+ChangedAfter
 
 
 @code {
@@ -39,7 +40,7 @@
             {
                 response = await Http.GetJsonAsync<LobbyRedirectDto>(query);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }

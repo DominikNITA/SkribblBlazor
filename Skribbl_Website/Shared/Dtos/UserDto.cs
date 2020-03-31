@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Skribbl_Website.Shared.Dtos
 {
-    public class UserDto : PlayerDto
+    public class UserDto : PlayerClient
     {
         public string Id { get; set; }
 

@@ -8,7 +8,7 @@ using Skribbl_Website.Shared.Dtos;
 
 namespace Skribbl_Website.Server.Models
 {
-    public class Lobby : LobbyDto
+    public class Lobby : LobbyClient
     {
         public Dictionary<string, string> UsersIds { get; set; }
         /// <summary>
@@ -19,11 +19,11 @@ namespace Skribbl_Website.Server.Models
         public string HostConnection { get; set; }
 
         public Lobby(UserDto host) : base()
-        {       
+        {
             UsersIds = new Dictionary<string, string>();
             Connections = new Dictionary<string, string>();
             HostConnection = string.Empty;
-            _ = AddUser(host);
+            AddPlayer(host);
         }
 
         /// <summary>
@@ -31,18 +31,10 @@ namespace Skribbl_Website.Server.Models
         /// </summary>
         /// <param name="player">User to add to the lobby</param>
         /// <returns>Is succesful?</returns>
-        public bool AddUser(UserDto user)
+        public void AddPlayer(UserDto user)
         {
-            if (Players.Count < MaxPlayers)
-            {
-                Players.Add(user);
-                UsersIds[user.Id] = user.Name;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            base.AddPlayer(user);
+            UsersIds[user.Id] = user.Name;
         }
 
 
@@ -75,15 +67,20 @@ namespace Skribbl_Website.Server.Models
             //TODO: Delete from Connections
         }
 
+        public object GetUserById(string id)
+        {
+            throw new NotImplementedException();
+        }
+
         public void RemoveUserByConnectionId(string connectionId)
         {
             RemovePlayerByName(GetUserNameByConnectionId(connectionId));
-            if(Players.Count == 0)
+            if (Players.Count == 0)
             {
                 //TODO: invoke empty event;
                 return;
             }
-            if(connectionId == HostConnection)
+            if (connectionId == HostConnection)
             {
 
             }

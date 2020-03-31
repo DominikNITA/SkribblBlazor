@@ -11,7 +11,7 @@ namespace Skribbl_Website.Client.Services
     public class LobbyConnection
     {
         public UserDto User { get; set; }
-        public LobbyDto Lobby { get; set; }
+        public LobbyClient Lobby { get; set; }
         public List<Message> Messages { get; set; } = new List<Message>(); 
 
         private HubConnection _hubConnection;
@@ -44,13 +44,13 @@ namespace Skribbl_Website.Client.Services
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<LobbyDto>("ReceiveLobbyState", (lobby) =>
+            _hubConnection.On<LobbyClient>("ReceiveLobbyState", (lobby) =>
             {
                 Lobby = lobby;
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<PlayerDto>("AddPlayer", (playerToAdd) =>
+            _hubConnection.On<PlayerClient>("AddPlayer", (playerToAdd) =>
             {
                 if(!Lobby.Players.Any(p => p.Name == playerToAdd.Name))
                 {

@@ -14,7 +14,7 @@ namespace Skribbl_Website.Server.Services
         //TODO: change to private
         public List<Lobby> Lobbies { get; private set; } = new List<Lobby>();
 
-        public string CreateLobby(UserDto host)
+        public string CreateLobby(Player host)
         {
             var lobby = new Lobby(host);
             //host.IsHost = true;
@@ -46,7 +46,7 @@ namespace Skribbl_Website.Server.Services
         /// <exception cref="InviteLinkNotMatchingException"></exception>
         /// <exception cref="MaxPlayersReachedException"></exception>
         /// <returns></returns>
-        public string AddPlayerToLobby(string inviteLink, UserDto player)
+        public string AddPlayerToLobby(string inviteLink, Player player)
         {
             foreach (var lobby in Lobbies)
             {

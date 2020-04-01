@@ -47,7 +47,7 @@ Lobby ID: @LobbyId
     [Parameter]
     public string LobbyId { get; set; }
 
-    private UserDto _user = new UserDto();
+    private Player _user = new Player();
     private string _info = string.Empty;
 
     protected async override Task OnInitializedAsync()

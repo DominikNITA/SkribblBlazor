@@ -10,7 +10,7 @@ namespace Skribbl_Website.Client.Services
 {
     public class LobbyConnection
     {
-        public UserDto User { get; set; }
+        public Player User { get; set; }
         public LobbyClient Lobby { get; set; }
         public List<Message> Messages { get; set; } = new List<Message>(); 
 
@@ -34,7 +34,7 @@ namespace Skribbl_Website.Client.Services
 
         }
 
-        public async Task StartConnection(UserDto user, Uri hubUrl, string lobbyId)
+        public async Task StartConnection(Player user, Uri hubUrl, string lobbyId)
         {
             _hubConnection = new HubConnectionBuilder().WithUrl(hubUrl).Build();
             User = user;

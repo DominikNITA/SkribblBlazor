@@ -6,12 +6,12 @@ namespace Skribbl_Website.Shared.Dtos
 {
     public class LobbyRedirectDto
     {
-        public UserDto ConfirmedUser { get; set; }
+        public Player ConfirmedUser { get; set; }
         public string LobbyUrl { get; set; }
         public string ExceptionMessage { get; set; }
         public bool HasError { get; set; }
 
-        public LobbyRedirectDto(UserDto confirmedUser, string lobbyUrl)
+        public LobbyRedirectDto(Player confirmedUser, string lobbyUrl)
         {
             ConfirmedUser = confirmedUser;
             LobbyUrl = lobbyUrl;
@@ -22,7 +22,7 @@ namespace Skribbl_Website.Shared.Dtos
         {
             ExceptionMessage = exceptionMessage;
             HasError = true;
-            ConfirmedUser = new UserDto();
+            ConfirmedUser = new Player();
             LobbyUrl = string.Empty;
         }
         public LobbyRedirectDto()

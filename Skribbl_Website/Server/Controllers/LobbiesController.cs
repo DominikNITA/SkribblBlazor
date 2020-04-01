@@ -28,7 +28,7 @@ namespace Skribbl_Website.Server.Controllers
         [HttpGet("create/{name}")]
         async public Task<ActionResult<LobbyRedirectDto>> Get(string name)
         {
-            var host = new UserDto(name);
+            var host = new Player(name);
             var lobbyUrl = _lobbiesManager.CreateLobby(host);
             return new LobbyRedirectDto(host, lobbyUrl);
         }
@@ -38,7 +38,7 @@ namespace Skribbl_Website.Server.Controllers
         {            
             try
             {
-                var player = new UserDto(name);
+                var player = new Player(name);
                 var lobbyUrl = _lobbiesManager.AddPlayerToLobby(inviteLink, player);
                 return new LobbyRedirectDto(player, lobbyUrl);
             }

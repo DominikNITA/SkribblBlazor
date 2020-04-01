@@ -13,7 +13,7 @@ namespace LobbyTests
         [Fact]
         public void Lobby_ShouldWork()
         {
-            var user = new UserDto("player");
+            var user = new Player("player");
 
             var lobby = new Lobby(user);
 
@@ -31,9 +31,9 @@ namespace LobbyTests
         [Fact]
         public void AddPlayer_FullLobbyShouldThrowException()
         {
-            var lobby = new Lobby(new UserDto("player1"));
+            var lobby = new Lobby(new Player("player1"));
             lobby.MaxPlayers = 2;
-            lobby.AddPlayer((PlayerClient)new UserDto("player2"));
+            lobby.AddPlayer((PlayerClient)new Player("player2"));
 
             Assert.Throws<MaxPlayersReachedException>(() => lobby.AddPlayer(new PlayerClient("player3")));
         }
@@ -41,8 +41,8 @@ namespace LobbyTests
         [Fact]
         public void AddPlayer_UsernameAlreadyInLobbyShouldThrowException()
         {
-            var lobby = new Lobby(new UserDto("player"));
-            var player2 = new UserDto("player");
+            var lobby = new Lobby(new Player("player"));
+            var player2 = new Player("player");
 
             Assert.Throws<UserNameAlreadyExistsException>(() => lobby.AddPlayer(player2));
         }
@@ -56,8 +56,8 @@ namespace LobbyTests
         [Fact]
         public void GetUserById_ShouldWork()
         {
-            var user1 = new UserDto("user1");
-            var user2 = new UserDto("user2");
+            var user1 = new Player("user1");
+            var user2 = new Player("user2");
             var lobby = new Lobby(user1);
             lobby.AddPlayer(user2);
 

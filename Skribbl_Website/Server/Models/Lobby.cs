@@ -18,7 +18,7 @@ namespace Skribbl_Website.Server.Models
         public Dictionary<string, string> Connections { get; set; }
         public string HostConnection { get; set; }
 
-        public Lobby(UserDto host) : base()
+        public Lobby(Player host) : base()
         {
             UsersIds = new Dictionary<string, string>();
             Connections = new Dictionary<string, string>();
@@ -31,7 +31,7 @@ namespace Skribbl_Website.Server.Models
         /// </summary>
         /// <param name="player">User to add to the lobby</param>
         /// <returns>Is succesful?</returns>
-        public void AddPlayer(UserDto user)
+        public void AddPlayer(Player user)
         {
             base.AddPlayer(user);
             UsersIds[user.Id] = user.Name;

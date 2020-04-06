@@ -1,7 +1,5 @@
 ﻿using Skribbl_Website.Shared.Dtos;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace LobbyTests
@@ -26,11 +24,11 @@ namespace LobbyTests
         {
             var player = new PlayerClient("player");
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => player.AddScore(-1));       
+            Assert.Throws<ArgumentOutOfRangeException>(() => player.AddScore(-1));
         }
 
         [Fact]
-        public void SetIsHost_ConnectedPlayer()
+        public void SetIsHost_ShouldWork()
         {
             var player = new PlayerClient("player");
             player.IsConnected = true;
@@ -46,6 +44,16 @@ namespace LobbyTests
             var player = new PlayerClient("player");
             player.IsConnected = false;
             Assert.Throws<Exception>(() => player.IsHost = true);
+        }
+        [Fact]
+        public void SetIsDrawing_ShouldWork()
+        {
+            var player = new PlayerClient("player");
+            player.IsConnected = true;
+
+            player.IsDrawing = true;
+
+            Assert.True(player.IsDrawing);
         }
 
         [Fact]

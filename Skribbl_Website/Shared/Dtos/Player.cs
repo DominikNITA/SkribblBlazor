@@ -1,14 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Skribbl_Website.Shared.Dtos
 {
     public class Player : PlayerClient
     {
+        private string _connection;
+
         public string Id { get; set; }
 
-        private string Connection { get; set; }
+        public string Connection
+        {
+            get => _connection; 
+            set {
+                IsConnected = true;
+                _connection = value;
+            }
+        }
 
         public Player(string name) : base(name)
         {
@@ -18,6 +25,6 @@ namespace Skribbl_Website.Shared.Dtos
         {
 
         }
-        
+
     }
 }

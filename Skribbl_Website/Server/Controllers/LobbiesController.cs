@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Skribbl_Website.Server.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using Skribbl_Website.Server.Services;
-using Skribbl_Website.Shared;
 using Skribbl_Website.Shared.Dtos;
-using Skribbl_Website.Shared.Exceptions;
+using System;
+using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -35,7 +29,7 @@ namespace Skribbl_Website.Server.Controllers
 
         [HttpGet("join/{inviteLink}/{name}")]
         async public Task<ActionResult<LobbyRedirectDto>> Get(string inviteLink, string name)
-        {            
+        {
             try
             {
                 var player = new Player(name);
@@ -43,32 +37,10 @@ namespace Skribbl_Website.Server.Controllers
                 return new LobbyRedirectDto(player, lobbyUrl);
             }
             //Catch custom exception
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 return new LobbyRedirectDto(exception.Message);
             }
         }
-
-        //[HttpGet("{lobbyId}/{userId}")]
-        //async public Task<ActionResult<LobbyClient>> GetLobby(string lobbyId, string userId)
-        //{
-        //    //TODO: Move logic outside
-        //    foreach (var lobby in _lobbiesManager.Lobbies)
-        //    {
-        //        if (lobby.Id == lobbyId)
-        //        {
-        //            if (lobby.Users.Where(user => user.Id == userId).Count() == 1)
-        //            {
-        //                return lobby;
-        //            }
-        //            else
-        //            {
-        //                return Unauthorized();
-        //            }
-
-        //        }
-        //    }
-        //    return NotFound();
-        //}
     }
 }

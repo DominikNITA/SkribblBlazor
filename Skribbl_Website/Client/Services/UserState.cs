@@ -1,9 +1,6 @@
 ﻿using Cloudcrate.AspNetCore.Blazor.Browser.Storage;
 using Skribbl_Website.Shared.Dtos;
 using Skribbl_Website.Shared.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Skribbl_Website.Client.Services

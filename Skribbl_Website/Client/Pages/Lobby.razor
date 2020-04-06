@@ -4,11 +4,15 @@
 @inject NavigationManager NavigationManager
 @inject UserState UserState
 @inject LobbyConnection LobbyConnection
-Lobby ID: @LobbyId
 
 @using Skribbl_Website.Client.Components
+
+
+Lobby ID: @LobbyId
+
 @if (LobbyConnection.Lobby != null)
 {
+    <div>LobbyDto ID: @LobbyConnection.Lobby.Id</div>
     <div>
         Invite:   @NavigationManager.ToAbsoluteUri("join/" + LobbyConnection.Lobby.InviteLink)
     </div>
@@ -69,8 +73,10 @@ Lobby ID: @LobbyId
         await base.OnInitializedAsync();
     }
 
-    private void Update(object sender, EventArgs e)
+    private async void Update(object sender, EventArgs e)
     {
+        StateHasChanged();
+        await Task.Delay(50);
         StateHasChanged();
     }
 

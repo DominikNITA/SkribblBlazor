@@ -1,30 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Skribbl_Website.Shared.Dtos
 {
     public class PlayerClient
     {
-        private bool isHost;
-        private bool isDrawing;
-        private bool isConnected;
+        private bool _isHost;
+        private bool _isDrawing;
+        private bool _isConnected;
 
         public string Name { get; set; }
         public bool IsConnected
         {
-            get => isConnected;
+            get => _isConnected;
             set
             {
                 if (value)
                 {
-                    isConnected = true;
+                    _isConnected = true;
                 }
                 else
                 {
-                    isConnected = false;
-                    isHost = false;
-                    isDrawing = false;
+                    _isConnected = false;
+                    _isHost = false;
+                    _isDrawing = false;
                 }
             }
 
@@ -33,12 +31,12 @@ namespace Skribbl_Website.Shared.Dtos
 
         public bool IsHost
         {
-            get => isHost;
+            get => _isHost;
             set
             {
                 if (IsConnected || !value)
                 {
-                    isHost = value;
+                    _isHost = value;
                 }
                 else
                 {
@@ -48,12 +46,12 @@ namespace Skribbl_Website.Shared.Dtos
         }
         public bool IsDrawing
         {
-            get => isDrawing;
+            get => _isDrawing;
             set
             {
                 if (IsConnected || !value)
                 {
-                    isDrawing = value;
+                    _isDrawing = value;
                 }
                 else
                 {

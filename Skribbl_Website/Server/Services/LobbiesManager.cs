@@ -1,11 +1,11 @@
-﻿using Skribbl_Website.Server.Models;
+﻿using Microsoft.AspNetCore.SignalR;
+using Skribbl_Website.Server.Hubs;
+using Skribbl_Website.Server.Models;
+using Skribbl_Website.Shared.Dtos;
 using Skribbl_Website.Shared.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Skribbl_Website.Shared;
-using Skribbl_Website.Shared.Dtos;
 
 namespace Skribbl_Website.Server.Services
 {
@@ -14,28 +14,19 @@ namespace Skribbl_Website.Server.Services
         //TODO: change to private
         public List<Lobby> Lobbies { get; private set; } = new List<Lobby>();
 
+        private IHubContext<LobbyHub> _lobbyHub;
+
+        public LobbiesManager(IHubContext<LobbyHub> hubContext)
+        {
+            _lobbyHub = hubContext;
+        }
+
         public string CreateLobby(Player host)
         {
-            var lobby = new Lobby(host);
-            //host.IsHost = true;
+            var lobby = new Lobby(_lobbyHub);
+            lobby.AddPlayer(host);
             Lobbies.Add(lobby);
             return lobby.Id.ToString();
-        }
-
-        public bool TrySetHost(string lobbyId, string userId, string connection)
-        {
-            if (!LobbyHasHost(lobbyId))
-            {
-                GetLobbyById(lobbyId).HostConnection = connection;
-                GetUserByIdFromLobby(userId, lobbyId).IsHost = true;
-                return true;
-            }
-            return false;
-        }
-
-        private bool LobbyHasHost(string lobbyId)
-        {
-            return GetLobbyById(lobbyId).HostConnection != string.Empty;
         }
 
         /// <summary>
@@ -60,18 +51,10 @@ namespace Skribbl_Website.Server.Services
                     //Try to add a new player
                     lobby.AddPlayer(player);
                     return lobby.Id.ToString();
-//                    throw new Exception("Lobby is full. Cannot join.");
+                    //throw new Exception("Lobby is full. Cannot join.");
                 }
             }
             throw new Exception("This invite link doesn't match to any lobby.");
-        }
-
-        public PlayerClient GetUserByIdFromLobby(string userId, string lobbyId)
-        {
-            var foundLobby = Lobbies.Where(lobby => lobby.Id == lobbyId).First();
-            return null;
-            //TODO: below
-            // return foundLobby.Users.Where(player => player.Id == userId).First();
         }
 
         public Lobby GetLobbyById(string lobbyId)
@@ -101,12 +84,12 @@ namespace Skribbl_Website.Server.Services
 
         public void SetConnectionIdForUserInLobby(string lobbyId, string username, string connectionId)
         {
-            GetLobbyById(lobbyId).SetConnectionIdForUser(connectionId, username);
+            GetLobbyById(lobbyId).SetConnectionIdForPlayer(connectionId, username);
         }
 
-        public Lobby GetLobbyByUserConnectionId(string connectionId)
+        public Lobby GetLobbyByPlayerConnectionId(string connectionId)
         {
-            return Lobbies.Where(lobby => lobby.Connections.ContainsKey(connectionId)).First();
+            return Lobbies.Where(lobby => lobby.Players.Any(player => player.Connection == connectionId)).First();
         }
         //public void RemoveUserByConnectionId(string connectionId)
         //{

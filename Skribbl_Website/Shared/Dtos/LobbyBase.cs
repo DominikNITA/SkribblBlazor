@@ -1,21 +1,32 @@
 ﻿using Skribbl_Website.Shared.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 
 namespace Skribbl_Website.Shared.Dtos
 {
-    public class LobbyBase<T> where T : PlayerClient
-    {
-        public List<T> Players { get; protected set; }
-        public int MaxPlayers { get; set; }
-        public string Id { get; protected set; }
-        public string InviteLink { get; protected set; }
-        public int RoundsLimit { get; protected set; }
-        public int TimeLimit { get; protected set; }
+    public enum LobbyState { Preparing, Started, Choosing, Drawing, Ended }
 
-        public PlayerClient GetPlayerByName(string username)
+    public class LobbyBase<T> : LobbyParameters<T> where T : PlayerClient
+    {
+        //public List<T> Players { get; protected set; } = new List<T>();
+        //public int MaxPlayers { get; set; } = 10;
+        //public int MinPlayers { get; protected set; } = 2;
+        //public string Id { get; protected set; }
+        //public string InviteLink { get; protected set; }
+        //public int RoundsLimit { get; protected set; } = 6;
+        //public int RoundCount { get; protected set; }
+        //public int TimeLimit { get; protected set; } = 60;
+        //public int TimeCount { get; protected set; }
+        //public LobbyState State { get; protected set; } = LobbyState.Preparing;
+
+        public LobbyBase()
+        {
+            Id = Guid.NewGuid().ToString();
+            InviteLink = Guid.NewGuid().ToString().Substring(0, 5);
+        }
+
+        public T GetPlayerByName(string username)
         {
             try
             {
@@ -37,7 +48,7 @@ namespace Skribbl_Website.Shared.Dtos
             return Players.RemoveAll(player => player.Name == username);
         }
 
-        public void AddPlayer(T playerDto)
+        public virtual void AddPlayer(T playerDto)
         {
             if (playerDto == null)
             {
@@ -54,17 +65,24 @@ namespace Skribbl_Website.Shared.Dtos
 
             Players.Add(playerDto);
         }
+
         private void SetAllPlayersToNotDrawing()
         {
             Players.ForEach((player) => player.IsDrawing = false);
         }
+
         public void SetDrawingPlayer(string username)
         {
             SetAllPlayersToNotDrawing();
             GetPlayerByName(username).IsDrawing = true;
         }
 
-        public void ChangeConnectionForPlayer(string username, bool newIsConnected)
+        public T GetDrawingPlayer()
+        {
+            return Players.Where(player => player.IsDrawing).FirstOrDefault();
+        }
+
+        public virtual void ChangeConnectionForPlayer(string username, bool newIsConnected)
         {
             GetPlayerByName(username).IsConnected = newIsConnected;
         }
@@ -74,7 +92,7 @@ namespace Skribbl_Website.Shared.Dtos
             Players.ForEach((player) => player.IsHost = false);
         }
 
-        public void SetHostPlayer(string username)
+        public virtual void SetHostPlayer(string username)
         {
             var player = GetPlayerByName(username);
             if (!player.IsConnected)
@@ -83,6 +101,11 @@ namespace Skribbl_Website.Shared.Dtos
             }
             SetAllPlayersToNotHosts();
             player.IsHost = true;
+        }
+
+        public T GetHostPlayer()
+        {
+            return Players.Where(player => player.IsHost).FirstOrDefault();
         }
     }
 }

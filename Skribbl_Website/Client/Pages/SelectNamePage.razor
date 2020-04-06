@@ -50,8 +50,6 @@ ChangedAfter
             query += String.Format("create/{0}", _nameModel.Name);
             response = await Http.GetJsonAsync<LobbyRedirectDto>(query);
         }
-        //TODO: save User instance instead of particular class members
-        //await LocalStorage.SetItemAsync("skribblUser", response.ConfirmedUser);
         if (!response.HasError)
         {
             UserState.SaveUser(response.ConfirmedUser);

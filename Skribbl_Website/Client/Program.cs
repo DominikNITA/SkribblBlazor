@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Text;
+using Cloudcrate.AspNetCore.Blazor.Browser.Storage;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Skribbl_Website.Client.Services;
-using Cloudcrate.AspNetCore.Blazor.Browser.Storage;
+using System.Threading.Tasks;
 
 namespace Skribbl_Website.Client
 {

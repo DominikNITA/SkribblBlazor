@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.SignalR.Client;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Skribbl_Website.Shared.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Skribbl_Website.Client.Services
 {
@@ -12,7 +14,7 @@ namespace Skribbl_Website.Client.Services
     {
         public Player User { get; set; }
         public LobbyClient Lobby { get; set; }
-        public List<Message> Messages { get; set; } = new List<Message>(); 
+        public List<Message> Messages { get; set; } = new List<Message>();
 
         private HubConnection _hubConnection;
 
@@ -36,26 +38,66 @@ namespace Skribbl_Website.Client.Services
 
         public async Task StartConnection(Player user, Uri hubUrl, string lobbyId)
         {
-            _hubConnection = new HubConnectionBuilder().WithUrl(hubUrl).Build();
+            _hubConnection = new HubConnectionBuilder().WithUrl(hubUrl).AddJsonProtocol(options => {
+                options.PayloadSerializerOptions.PropertyNamingPolicy = null;
+            }).WithAutomaticReconnect().Build();
             User = user;
+
+
+
+            _hubConnection.On<Message>("ReceiveNewHost", (message) =>
+            {
+                Messages.Add(message);
+                Lobby.SetHostPlayer(message.Sender);
+                InvokeOnReceive();
+            });
+
             _hubConnection.On<Message>("ReceiveMessage", (message) =>
             {
                 Messages.Add(message);
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<LobbyClient>("ReceiveLobbyState", (lobby) =>
+            _hubConnection.On<LobbyClientDto>("SetLobby", (lobbyClientDto) =>
             {
-                Lobby = lobby;
+
+                //Console.WriteLine(lobbyClientDto);
+                Lobby = new LobbyClient(lobbyClientDto);
+                Console.WriteLine("In LOBBY receive");
+                Console.WriteLine(Lobby.Players.Count);
+                Console.WriteLine(Lobby.InviteLink);
+                Console.WriteLine(lobbyClientDto.Players.Count);
+                Console.WriteLine(lobbyClientDto.InviteLink);
+                InvokeOnReceive();
+            });
+
+            _hubConnection.On<string>("SetLobbyString", (lobbyJson) =>
+            {
+                //Lobby = new LobbyClient(lobbyClientDto);
+                Console.WriteLine("In lobby STRING receive");
+                Console.WriteLine(lobbyJson);
+                try
+                {
+                    var lobbyDto = JsonSerializer.Deserialize<LobbyClientDto>(lobbyJson);
+                    Console.WriteLine(lobbyDto == null);
+                    Console.WriteLine("DTO player1: " + lobbyDto.Players[0].Name);
+                    Lobby = new LobbyClient(lobbyDto);
+                }
+                catch(Exception error)
+                {
+                    Console.WriteLine(error.Message);
+                }
+
+                //Console.WriteLine(Lobby.Players.Count);
                 InvokeOnReceive();
             });
 
             _hubConnection.On<PlayerClient>("AddPlayer", (playerToAdd) =>
             {
-                if(!Lobby.Players.Any(p => p.Name == playerToAdd.Name))
+                if (!Lobby.Players.Any(p => p.Name == playerToAdd.Name))
                 {
                     Lobby.Players.Add(playerToAdd);
-                }               
+                }
                 InvokeOnReceive();
             });
 

@@ -1,10 +1,7 @@
-﻿using Microsoft.JSInterop;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Components.Authorization;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Skribbl_Website.Client.Services
 {

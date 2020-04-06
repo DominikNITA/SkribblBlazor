@@ -1,62 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.SignalR;
+using Skribbl_Website.Server.Hubs;
+using Skribbl_Website.Shared.Dtos;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Skribbl_Website.Shared;
-using Skribbl_Website.Shared.Dtos;
 
 namespace Skribbl_Website.Server.Models
 {
-    public class Lobby : LobbyClient
+    public class Lobby : LobbyBase<Player>
     {
-        public Dictionary<string, string> UsersIds { get; set; }
-        /// <summary>
-        /// Key: ConnectionId
-        /// Value: Username
-        /// </summary>
-        public Dictionary<string, string> Connections { get; set; }
-        public string HostConnection { get; set; }
-
-        public Lobby(Player host) : base()
+        IHubContext<LobbyHub> _lobbyHub;
+        public Lobby(IHubContext<LobbyHub> lobbyHub) : base()
         {
-            UsersIds = new Dictionary<string, string>();
-            Connections = new Dictionary<string, string>();
-            HostConnection = string.Empty;
-            AddPlayer(host);
+            _lobbyHub = lobbyHub;
         }
 
-        /// <summary>
-        /// Add new player if the limit of players in the lobby is not reached
-        /// </summary>
-        /// <param name="player">User to add to the lobby</param>
-        /// <returns>Is succesful?</returns>
-        public void AddPlayer(Player user)
+        public Lobby()
         {
-            base.AddPlayer(user);
-            UsersIds[user.Id] = user.Name;
+
         }
 
-
-        public void SetConnectionIdForUser(string connection, string username)
+        public void SetConnectionIdForPlayer(string connection, string username)
         {
-            if (!Connections.TryGetValue(connection, out _))
+            if (connection == null || connection == string.Empty)
             {
-                Connections[connection] = username;
+                throw new ArgumentException();
             }
+            var player = GetPlayerByName(username);
+            player.Connection = connection;
         }
 
-        public string GetUserNameByConnectionId(string connectionId)
+        public Player GetPlayerByConnectionId(string connectionId)
         {
-            if (Connections.TryGetValue(connectionId, out var username))
-            {
-                return username;
-            }
-            else
-            {
-                //TODO: Rework or new exception
-                throw new Exception();
-            }
+            return Players.Where(player => player.Connection == connectionId).First();
         }
 
         public override int RemovePlayerByName(string username)
@@ -67,33 +43,45 @@ namespace Skribbl_Website.Server.Models
             //TODO: Delete from Connections
         }
 
-        public object GetUserById(string id)
+        public Player GetPlayerById(string id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return Players.Where(player => player.Id == id).First();
+            }
+            catch
+            {
+                throw new ArgumentException();
+            }
         }
 
         public void RemoveUserByConnectionId(string connectionId)
         {
-            RemovePlayerByName(GetUserNameByConnectionId(connectionId));
+            RemovePlayerByName(GetPlayerByConnectionId(connectionId).Name);
             if (Players.Count == 0)
             {
                 //TODO: invoke empty event;
                 return;
             }
-            if (connectionId == HostConnection)
-            {
-
-            }
+            //TODO: Add host check
         }
 
         public void SetUserStateToDisconnected(string connectionId)
         {
-            var username = GetUserNameByConnectionId(connectionId);
+            GetPlayerByConnectionId(connectionId).IsConnected = false;
         }
 
         public void SetNewHost()
         {
+            //TODO: Check connection
             Players[0].IsHost = true;
+        }
+
+        public new async Task SetHostPlayer(string username)
+        {
+            base.SetHostPlayer(username);
+            await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveNewHost",
+    new Message(username + " is the new host.", Message.MessageType.Host, username));
         }
     }
 }

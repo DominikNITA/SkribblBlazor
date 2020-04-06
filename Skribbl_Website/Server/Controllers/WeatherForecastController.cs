@@ -1,10 +1,9 @@
-﻿using Skribbl_Website.Shared;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Skribbl_Website.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Skribbl_Website.Server.Controllers
 {

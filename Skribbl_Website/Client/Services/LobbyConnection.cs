@@ -60,35 +60,7 @@ namespace Skribbl_Website.Client.Services
 
             _hubConnection.On<LobbyClientDto>("SetLobby", (lobbyClientDto) =>
             {
-
-                //Console.WriteLine(lobbyClientDto);
                 Lobby = new LobbyClient(lobbyClientDto);
-                Console.WriteLine("In LOBBY receive");
-                Console.WriteLine(Lobby.Players.Count);
-                Console.WriteLine(Lobby.InviteLink);
-                Console.WriteLine(lobbyClientDto.Players.Count);
-                Console.WriteLine(lobbyClientDto.InviteLink);
-                InvokeOnReceive();
-            });
-
-            _hubConnection.On<string>("SetLobbyString", (lobbyJson) =>
-            {
-                //Lobby = new LobbyClient(lobbyClientDto);
-                Console.WriteLine("In lobby STRING receive");
-                Console.WriteLine(lobbyJson);
-                try
-                {
-                    var lobbyDto = JsonSerializer.Deserialize<LobbyClientDto>(lobbyJson);
-                    Console.WriteLine(lobbyDto == null);
-                    Console.WriteLine("DTO player1: " + lobbyDto.Players[0].Name);
-                    Lobby = new LobbyClient(lobbyDto);
-                }
-                catch(Exception error)
-                {
-                    Console.WriteLine(error.Message);
-                }
-
-                //Console.WriteLine(Lobby.Players.Count);
                 InvokeOnReceive();
             });
 
@@ -124,8 +96,8 @@ namespace Skribbl_Website.Client.Services
             //TODO: Clear UserState
         }
 
-        Task Send() =>
-_hubConnection.SendAsync("SendMessage", User.Name, "Hello from SEND");
+        public Task Send(string messageContent) =>
+_hubConnection.SendAsync("SendMessage", new Message(messageContent,Message.MessageType.Guess,User.Name));
 
         Task Join(string lobbyId) =>
         _hubConnection.InvokeAsync("AddToGroup", User.Id, lobbyId);

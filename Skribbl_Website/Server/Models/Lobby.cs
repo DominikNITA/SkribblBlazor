@@ -37,10 +37,19 @@ namespace Skribbl_Website.Server.Models
 
         public override int RemovePlayerByName(string username)
         {
-            return base.RemovePlayerByName(username);
-            //TODO: Change RemoveALl below
-            //UsersIds.RemoveAll(user => user.Name == username);
-            //TODO: Delete from Connections
+            var deletedPlayers = base.RemovePlayerByName(username);
+            if (Players.Count > 0 && GetHostPlayer() == null)
+            {
+                foreach (var player in Players)
+                {
+                    if (player.IsConnected)
+                    {
+                        SetHostPlayer(player.Name);
+                        break;
+                    }
+                }
+            }
+            return deletedPlayers;
         }
 
         public Player GetPlayerById(string id)
@@ -55,26 +64,20 @@ namespace Skribbl_Website.Server.Models
             }
         }
 
-        public void RemoveUserByConnectionId(string connectionId)
-        {
-            RemovePlayerByName(GetPlayerByConnectionId(connectionId).Name);
-            if (Players.Count == 0)
-            {
-                //TODO: invoke empty event;
-                return;
-            }
-            //TODO: Add host check
-        }
+        //public void RemoveUserByConnectionId(string connectionId)
+        //{
+        //    RemovePlayerByName(GetPlayerByConnectionId(connectionId).Name);
+        //    if (Players.Count == 0)
+        //    {
+        //        //TODO: invoke empty event;
+        //        return;
+        //    }
+        //    //TODO: Add host check
+        //}
 
         public void SetUserStateToDisconnected(string connectionId)
         {
             GetPlayerByConnectionId(connectionId).IsConnected = false;
-        }
-
-        public void SetNewHost()
-        {
-            //TODO: Check connection
-            Players[0].IsHost = true;
         }
 
         public new async Task SetHostPlayer(string username)

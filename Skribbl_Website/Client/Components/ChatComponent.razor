@@ -8,8 +8,8 @@
     </div>
     <div class="chat__input-container d-flex flex-row">
         <div class="chat__input">
-            <input type="text" />
-            <button @onclick="MyObject">Send!</button>
+            <input @bind="_newMessageContent" type="text" />
+            <button @onclick="SendMessage">Send!</button>
         </div>
     </div>
 </div>
@@ -17,5 +17,13 @@
 @code {
     [Parameter] public List<Message> Messages { get; set; }
 
-    [Parameter] public EventCallback MyObject { get; set; }
+    [Parameter] public LobbyConnection LobbyConnection { get; set; }
+
+    private string _newMessageContent;
+
+    public async Task SendMessage()
+    {
+        await LobbyConnection.Send(_newMessageContent);
+        _newMessageContent = string.Empty;
+    }
 }

@@ -45,7 +45,8 @@ namespace Skribbl_Website.Shared.Dtos
 
         public virtual int RemovePlayerByName(string username)
         {
-            return Players.RemoveAll(player => player.Name == username);
+            var deletedPlayers = Players.RemoveAll(player => player.Name == username);
+            return deletedPlayers;
         }
 
         public virtual void AddPlayer(T playerDto)

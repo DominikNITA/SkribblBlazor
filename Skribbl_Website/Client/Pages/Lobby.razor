@@ -41,7 +41,8 @@ Lobby ID: @LobbyId
 
 @if (LobbyConnection.Messages != null)
 {
-    <ChatComponent Messages="@LobbyConnection.Messages"></ChatComponent>
+    <ChatComponent Messages="@LobbyConnection.Messages"
+                   LobbyConnection="@LobbyConnection"></ChatComponent>
 }
 
 <button @onclick="LeaveLobby">Leave!</button>

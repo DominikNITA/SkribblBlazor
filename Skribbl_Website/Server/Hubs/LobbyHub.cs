@@ -17,6 +17,12 @@ namespace Skribbl_Website.Server.Hubs
             _lobbiesManager = lobbiesManager;
         }
 
+        public async Task SendMessage(Message message)
+        {
+            var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
+            await Clients.Group(lobby.Id).SendAsync("ReceiveMessage", message);
+        }
+
         public async Task AddToGroup(string userId, string lobbyId)
         {
             var lobby = _lobbiesManager.GetLobbyById(lobbyId);
@@ -26,9 +32,6 @@ namespace Skribbl_Website.Server.Hubs
             await Clients.Group(lobbyId).SendAsync("AddPlayer", player);
             await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId);
             var lobbyState = new LobbyClientDto(lobby);
-            string lobbyJson = JsonSerializer.Serialize(lobbyState);
-            //await Clients.Client(Context.ConnectionId).SendAsync("SetLobby", lobbyState);
-            //await Clients.All.SendAsync("SetLobbyString", lobbyJson);
             await Clients.All.SendAsync("SetLobby", lobbyState);
             await Clients.Group(lobbyId).SendAsync("ReceiveMessage",
                 new Message(player.Name + " joined.", Message.MessageType.Join));
@@ -45,19 +48,19 @@ namespace Skribbl_Website.Server.Hubs
             {
                 var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
                 var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
-                lobby.RemovePlayerByName(player.Name);
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobby.Id);
                 await Clients.Group(lobby.Id).SendAsync("ReceiveMessage",
     new Message(player.Name + " left.", Message.MessageType.Leave));
                 await Clients.Group(lobby.Id).SendAsync("RemovePlayer", player.Name);
+                lobby.RemovePlayerByName(player.Name);                     
             }
             else
             {
                 var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
-                var username = lobby.GetPlayerByConnectionId(Context.ConnectionId);
+                var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
                 //lobby.RemoveUserByName(username);
                 await Clients.Group(lobby.Id).SendAsync("ReceiveMessage",
-new Message(username + " lost connection.", Message.MessageType.Leave));
+new Message(player.Name + " lost connection.", Message.MessageType.Leave));
             }
             await base.OnDisconnectedAsync(exception);
         }

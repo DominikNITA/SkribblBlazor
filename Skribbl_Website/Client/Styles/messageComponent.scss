@@ -2,7 +2,7 @@
 
 .message {
     width: 100%;
-    min-height: 20px;
+    min-height: 28px;
     padding: 2px 3px;
     border: solid 1px #000000;
     background-color: #808080;
@@ -10,5 +10,18 @@
     &__content {
         width: auto;
         text-wrap: normal;
+    }
+
+    &--join, &--host {
+        background-color: #5ca026;
+    }
+
+    &--host{
+        font-weight: 700;
+    }
+
+    &__sender{
+        font-weight: 700;
+        padding-right: 3px;
     }
 }

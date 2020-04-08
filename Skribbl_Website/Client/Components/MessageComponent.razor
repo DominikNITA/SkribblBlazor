@@ -1,5 +1,5 @@
 ﻿<div class="message @_style d-flex flex-row">
-    @if(Message.Sender != null && Message.Sender != string.Empty)
+    @if(Message.Sender != null && Message.Sender != string.Empty && Message.Type == Message.MessageType.Guess)
     {
         <span class="message__sender">@Message.Sender:</span>
     }

@@ -1,6 +1,4 @@
 ﻿@page "/lobby/{lobbyId}"
-@inject LocalStorage LocalStorage
-@inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject UserState UserState
 @inject LobbyConnection LobbyConnection
@@ -16,28 +14,49 @@ Lobby ID: @LobbyId
     <div>
         Invite:   @NavigationManager.ToAbsoluteUri("join/" + LobbyConnection.Lobby.InviteLink)
     </div>
-    @if (LobbyConnection.Lobby.Players != null)
+    <div class="border border-success">
+        Players:
+        @if (LobbyConnection.Lobby.Players != null)
+        {
+            foreach (var player in LobbyConnection.Lobby.Players)
+            {
+                <div>
+                    @player.Name
+                </div>
+            }
+        }
+    </div>
+    @if (LobbyConnection.Lobby.State == LobbyState.Preparing)
     {
-        foreach (var player in LobbyConnection.Lobby.Players)
+        @if (LobbyConnection.Lobby.LobbySettings != null)
+        {
+            <LobbySettingsComponent></LobbySettingsComponent>
+        }
+        else
         {
             <div>
-                @player.Name
+                It's null
             </div>
         }
+
     }
 }
 
-<div>
-    Name: @_user.Name
-</div>
-<div>
-    Id: @_user.Id
+<div class="border border-dark">
+    <div>
+        Name: @_user.Name
+    </div>
+    <div>
+        Id: @_user.Id
+    </div>
 </div>
 
 @if (!string.IsNullOrEmpty(_info))
 {
     <div class="alert alert-danger">@_info</div>
 }
+
+
 
 @if (LobbyConnection.Messages != null)
 {
@@ -83,8 +102,8 @@ Lobby ID: @LobbyId
 
     private void RedirectToErrorPage(object sender, EventArgs e)
     {
-        Console.WriteLine("Eror occured in LobbyConnection");
-        //NavigationManager.NavigateTo("");
+        Console.WriteLine("Error occured in LobbyConnection");
+        NavigationManager.NavigateTo("");
     }
 
     private void LeaveLobby()
@@ -93,7 +112,4 @@ Lobby ID: @LobbyId
         LobbyConnection.CloseConnection();
         NavigationManager.NavigateTo("");
     }
-
-    //public bool IsConnected =>
-    //    _hubConnection.State == HubConnectionState.Connected;
 }

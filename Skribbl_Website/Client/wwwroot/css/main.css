@@ -1,12 +1,19 @@
 ﻿.message {
   width: 100%;
-  min-height: 20px;
+  min-height: 28px;
   padding: 2px 3px;
   border: solid 1px #000000;
   background-color: #808080; }
   .message__content {
     width: auto;
     text-wrap: normal; }
+  .message--join, .message--host {
+    background-color: #5ca026; }
+  .message--host {
+    font-weight: 700; }
+  .message__sender {
+    font-weight: 700;
+    padding-right: 3px; }
 
 .chat {
   width: 300px;

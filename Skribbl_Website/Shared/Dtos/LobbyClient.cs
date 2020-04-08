@@ -9,12 +9,10 @@
             MinPlayers = lobbyClientDto.MinPlayers;
             Id = lobbyClientDto.Id;
             InviteLink = lobbyClientDto.InviteLink;
-            RoundsLimit = lobbyClientDto.RoundsLimit;
             RoundCount = lobbyClientDto.RoundCount;
-            TimeLimit = lobbyClientDto.TimeLimit;
+            LobbySettings = lobbyClientDto.LobbySettings;
             TimeCount = lobbyClientDto.TimeCount;
             State = lobbyClientDto.State;
-
         }
 
         public LobbyClient() : base()

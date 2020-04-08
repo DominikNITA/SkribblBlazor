@@ -59,6 +59,7 @@ namespace Skribbl_Website.Shared.Dtos
                 }
             }
         }
+        public bool HasGuessedCorrectly { get; set; }
 
         public PlayerClient(string name)
         {
@@ -66,6 +67,7 @@ namespace Skribbl_Website.Shared.Dtos
             IsHost = false;
             IsConnected = false;
             IsDrawing = false;
+            HasGuessedCorrectly = false;
             Score = 0;
         }
         public PlayerClient()

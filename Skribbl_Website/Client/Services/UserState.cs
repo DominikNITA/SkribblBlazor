@@ -16,24 +16,22 @@ namespace Skribbl_Website.Client.Services
 
         public async void SaveUser(Player user)
         {
-            //TODO: save User instance instead of particular class members
             await LocalStorage.SetItemAsync("skribblUser_name", user.Name);
             await LocalStorage.SetItemAsync("skribblUser_id", user.Id);
-            await LocalStorage.SetItemAsync("skribblUser_isHost", user.IsHost);
         }
 
         public async Task<Player> GetUser()
         {
             var name = await LocalStorage.GetItemAsync("skribblUser_name");
             var id = await LocalStorage.GetItemAsync("skribblUser_id");
-            var isHost = await LocalStorage.GetItemAsync<bool?>("skribblUser_isHost");
-            if (name == null || id == null || isHost == null)
+            if (name == null || id == null)
             {
                 throw new UserNotInLocalStorageException("User not found! Or you do not have access to this lobby.");
             }
-            var user = new Player(name);
-            user.Id = id;
-            user.IsHost = isHost.Value;
+            var user = new Player(name)
+            {
+                Id = id
+            };
             return user;
         }
     }

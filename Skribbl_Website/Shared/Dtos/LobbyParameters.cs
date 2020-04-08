@@ -11,24 +11,22 @@ namespace Skribbl_Website.Shared.Dtos
         public int MinPlayers { get; set; } = 2;
         public string Id { get; set; }
         public string InviteLink { get; set; }
-        public int RoundsLimit { get; set; } = 6;
         public int RoundCount { get; set; }
-        public int TimeLimit { get; set; } = 60;
         public int TimeCount { get; set; }
+        public LobbySettings LobbySettings { get; set; } = new LobbySettings();
         public LobbyState State { get; set; } = LobbyState.Preparing;
 
-        public LobbyParameters(List<T> players, int maxPlayers, int minPlayers, string id, string inviteLink, int roundsLimit, int roundCount, int timeLimit, int timeCount, LobbyState state)
+        public LobbyParameters(List<T> players, int maxPlayers, int minPlayers, string id, string inviteLink, int roundCount, int timeCount, LobbyState state, LobbySettings lobbySettings)
         {
             Players = players;
             MaxPlayers = maxPlayers;
             MinPlayers = minPlayers;
             Id = id;
             InviteLink = inviteLink;
-            RoundsLimit = roundsLimit;
             RoundCount = roundCount;
-            TimeLimit = timeLimit;
             TimeCount = timeCount;
             State = state;
+            LobbySettings = lobbySettings;
         }
 
         public LobbyParameters()

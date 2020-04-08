@@ -43,11 +43,9 @@ namespace Skribbl_Website.Client.Services
             }).WithAutomaticReconnect().Build();
             User = user;
 
-
-
             _hubConnection.On<Message>("ReceiveNewHost", (message) =>
             {
-                Messages.Add(message);
+                Messages.Add(new Message(message.MessageContent,message.Type));
                 Lobby.SetHostPlayer(message.Sender);
                 InvokeOnReceive();
             });
@@ -79,6 +77,14 @@ namespace Skribbl_Website.Client.Services
                 InvokeOnReceive();
             });
 
+            _hubConnection.On<LobbySettings>("ReceiveLobbySettings", (lobbySettings) => 
+            {
+                Console.WriteLine("In ReceiveLobbySettings!");
+                Lobby.LobbySettings = lobbySettings;
+                Console.WriteLine("Rounds: " + Lobby.LobbySettings.RoundsLimit);
+                InvokeOnReceive();
+            });
+
             await _hubConnection.StartAsync();
             try
             {
@@ -87,6 +93,7 @@ namespace Skribbl_Website.Client.Services
             catch
             {
                 // User does not hace access to demanded lobby
+                Console.WriteLine("Catched error from hub");
                 OnError();
             }
         }
@@ -101,5 +108,18 @@ _hubConnection.SendAsync("SendMessage", new Message(messageContent,Message.Messa
 
         Task Join(string lobbyId) =>
         _hubConnection.InvokeAsync("AddToGroup", User.Id, lobbyId);
+
+        public Task UpdateLobbySettings()
+        {
+            if(Lobby.GetHostPlayer().Name == User.Name)
+            {
+                Console.WriteLine(Lobby.LobbySettings.RoundsLimit);
+                return _hubConnection.SendAsync("SendLobbySettings", Lobby.LobbySettings);
+            }
+            else
+            {
+                return Task.CompletedTask;
+            }
+        }
     }
 }

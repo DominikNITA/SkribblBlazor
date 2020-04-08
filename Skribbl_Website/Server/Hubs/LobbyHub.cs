@@ -10,7 +10,7 @@ namespace Skribbl_Website.Server.Hubs
 {
     public class LobbyHub : Hub
     {
-        private LobbiesManager _lobbiesManager;
+        private readonly LobbiesManager _lobbiesManager;
 
         public LobbyHub(LobbiesManager lobbiesManager)
         {
@@ -19,8 +19,20 @@ namespace Skribbl_Website.Server.Hubs
 
         public async Task SendMessage(Message message)
         {
+            if(message.MessageContent != null && message.MessageContent != string.Empty)
+            {
+                var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
+                await Clients.Group(lobby.Id).SendAsync("ReceiveMessage", message);
+            }
+        }
+
+        public async Task StartGame()
+        {
             var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
-            await Clients.Group(lobby.Id).SendAsync("ReceiveMessage", message);
+            if (lobby.GetHostPlayer()?.Connection == Context.ConnectionId)
+            {
+                //lobby.
+            }
         }
 
         public async Task AddToGroup(string userId, string lobbyId)
@@ -32,7 +44,7 @@ namespace Skribbl_Website.Server.Hubs
             await Clients.Group(lobbyId).SendAsync("AddPlayer", player);
             await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId);
             var lobbyState = new LobbyClientDto(lobby);
-            await Clients.All.SendAsync("SetLobby", lobbyState);
+            await Clients.Caller.SendAsync("SetLobby", lobbyState);
             await Clients.Group(lobbyId).SendAsync("ReceiveMessage",
                 new Message(player.Name + " joined.", Message.MessageType.Join));
 
@@ -42,9 +54,27 @@ namespace Skribbl_Website.Server.Hubs
             }
         }
 
+        public async Task SendLobbySettings(LobbySettings lobbySettings)
+        {
+            var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
+            if(lobby.GetHostPlayer().Connection == Context.ConnectionId)
+            {
+                lobby.LobbySettings = lobbySettings;
+                await Clients.Group(lobby.Id).SendAsync("ReceiveLobbySettings", lobbySettings);
+            }
+        }
+
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            if (exception == null)
+            if (exception != null)
+            {
+                var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
+                var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
+                await lobby.SetUserStateToDisconnected(Context.ConnectionId);
+                await Clients.Group(lobby.Id).SendAsync("ReceiveMessage",
+new Message(player.Name + " lost connection.", Message.MessageType.Leave));
+            }
+            else
             {
                 var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
                 var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
@@ -52,15 +82,7 @@ namespace Skribbl_Website.Server.Hubs
                 await Clients.Group(lobby.Id).SendAsync("ReceiveMessage",
     new Message(player.Name + " left.", Message.MessageType.Leave));
                 await Clients.Group(lobby.Id).SendAsync("RemovePlayer", player.Name);
-                lobby.RemovePlayerByName(player.Name);                     
-            }
-            else
-            {
-                var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
-                var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
-                //lobby.RemoveUserByName(username);
-                await Clients.Group(lobby.Id).SendAsync("ReceiveMessage",
-new Message(player.Name + " lost connection.", Message.MessageType.Leave));
+                await lobby.RemovePlayerByName(player.Name);
             }
             await base.OnDisconnectedAsync(exception);
         }

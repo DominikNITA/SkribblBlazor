@@ -9,17 +9,6 @@ namespace Skribbl_Website.Shared.Dtos
 
     public class LobbyBase<T> : LobbyParameters<T> where T : PlayerClient
     {
-        //public List<T> Players { get; protected set; } = new List<T>();
-        //public int MaxPlayers { get; set; } = 10;
-        //public int MinPlayers { get; protected set; } = 2;
-        //public string Id { get; protected set; }
-        //public string InviteLink { get; protected set; }
-        //public int RoundsLimit { get; protected set; } = 6;
-        //public int RoundCount { get; protected set; }
-        //public int TimeLimit { get; protected set; } = 60;
-        //public int TimeCount { get; protected set; }
-        //public LobbyState State { get; protected set; } = LobbyState.Preparing;
-
         public LobbyBase()
         {
             Id = Guid.NewGuid().ToString();

@@ -13,9 +13,8 @@ namespace Skribbl_Website.Shared.Dtos
             MinPlayers = lobby.MinPlayers;
             Id = lobby.Id;
             InviteLink = lobby.InviteLink;
-            RoundsLimit = lobby.RoundsLimit;
             RoundCount = lobby.RoundCount;
-            TimeLimit = lobby.TimeLimit;
+            LobbySettings = lobby.LobbySettings;
             TimeCount = lobby.TimeCount;
             State = lobby.State;
         }

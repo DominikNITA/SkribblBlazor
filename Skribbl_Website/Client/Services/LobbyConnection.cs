@@ -79,9 +79,8 @@ namespace Skribbl_Website.Client.Services
 
             _hubConnection.On<LobbySettings>("ReceiveLobbySettings", (lobbySettings) => 
             {
-                Console.WriteLine("In ReceiveLobbySettings!");
+                Console.WriteLine("in receive");
                 Lobby.LobbySettings = lobbySettings;
-                Console.WriteLine("Rounds: " + Lobby.LobbySettings.RoundsLimit);
                 InvokeOnReceive();
             });
 
@@ -119,6 +118,14 @@ _hubConnection.SendAsync("SendMessage", new Message(messageContent,Message.Messa
             else
             {
                 return Task.CompletedTask;
+            }
+        }
+
+        public bool IsHost
+        {
+            get
+            {
+                return User?.Name == Lobby.GetHostPlayer()?.Name;
             }
         }
     }

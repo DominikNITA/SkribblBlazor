@@ -30,7 +30,7 @@ Lobby ID: @LobbyId
     {
         @if (LobbyConnection.Lobby.LobbySettings != null)
         {
-            <LobbySettingsComponent></LobbySettingsComponent>
+            <LobbySettingsComponent LobbySettings="LobbyConnection.Lobby.LobbySettings" IsHost="LobbyConnection.IsHost"></LobbySettingsComponent>
         }
         else
         {

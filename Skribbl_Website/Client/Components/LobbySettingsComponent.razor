@@ -1,14 +1,14 @@
 ﻿@inject LobbyConnection LobbyConnection
 <div class="border border-info">
     <h3>LobbySettingsComponent</h3>
-    <EditForm Model="_lobbySettings" OnValidSubmit="OnValuesChanged">
+    <EditForm Model="LobbySettings" OnValidSubmit="OnValuesChanged">
         <div class="rounds-input d-flex flex-row">
             <span class="rounds-input--title">Rounds:</span>
             <div class="rounds-input--radios d-flex flex-row">
-                @foreach (var roundLimit in _lobbySettings.PossibleRoundsLimit)
+                @foreach (var roundLimit in LobbySettings.PossibleRoundsLimit)
                 {
                     <label>
-                        <InputRadio name="round" SelectedValue="roundLimit" @bind-Value="_lobbySettings.RoundsLimit" @onclick="OnValuesChanged" />
+                        <InputRadio name="round" SelectedValue="roundLimit" @bind-Value="LobbySettings.RoundsLimit" @onclick="OnValuesChanged" IsDisabled="!IsHost" />
                         @roundLimit
                     </label>
                 }
@@ -17,33 +17,36 @@
         <div class="time-input d-flex flex-row">
             <span class="time-input--title">Time:</span>
             <div class="time-input--radios d-flex flex-row">
-                @foreach (var timeLimit in _lobbySettings.PossibleTimeLimit)
+                @foreach (var timeLimit in LobbySettings.PossibleTimeLimit)
                 {
                     <label>
-                        <InputRadio name="time" SelectedValue="timeLimit" @bind-Value="_lobbySettings.TimeLimit" @onclick="OnValuesChanged" />
+                        <InputRadio name="time" SelectedValue="timeLimit" @bind-Value="LobbySettings.TimeLimit" @onclick="OnValuesChanged" IsDisabled="!IsHost" />
                         @timeLimit
                     </label>
                 }
             </div>
         </div>
     </EditForm>
-    <div> Rounds: @_lobbySettings.RoundsLimit</div>
-    <div> Time: @_lobbySettings.TimeLimit</div>
+    <div> Rounds: @LobbySettings.RoundsLimit</div>
+    <div> Time: @LobbySettings.TimeLimit</div>
 </div>
 
 @code {
-    private LobbySettings _lobbySettings;
+    [Parameter]
+    public LobbySettings LobbySettings { get; set; }
+
+    [Parameter] public bool IsHost { get; set; }
 
     protected override Task OnInitializedAsync()
     {
-        _lobbySettings = LobbyConnection.Lobby.LobbySettings;
+        LobbySettings = LobbyConnection.Lobby.LobbySettings;
         return base.OnInitializedAsync();
     }
 
     private async Task OnValuesChanged()
     {
         await Task.Delay(50);
-        LobbyConnection.Lobby.LobbySettings = _lobbySettings;
+        LobbyConnection.Lobby.LobbySettings = LobbySettings;
         await LobbyConnection.UpdateLobbySettings();
     }
 }

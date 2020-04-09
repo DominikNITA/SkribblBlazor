@@ -29,9 +29,9 @@ namespace Skribbl_Website.Server.Hubs
         public async Task StartGame()
         {
             var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
-            if (lobby.GetHostPlayer()?.Connection == Context.ConnectionId)
+            if (lobby.IsConnectionAHost(Context.ConnectionId))
             {
-                //lobby.
+                lobby.StartGame();
             }
         }
 
@@ -67,7 +67,7 @@ namespace Skribbl_Website.Server.Hubs
         public async Task BanPlayer(string playerName)
         {
             var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
-            if (lobby.GetHostPlayer().Connection == Context.ConnectionId)
+            if (lobby.IsConnectionAHost(Context.ConnectionId))
             {
                 var playerToBan = lobby.GetPlayerByName(playerName);
                 await Clients.Client(playerToBan.Connection).SendAsync("RedirectToKickedPage", lobby.GetHostPlayer().Name);

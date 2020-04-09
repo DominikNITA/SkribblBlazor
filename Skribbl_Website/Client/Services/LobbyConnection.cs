@@ -23,7 +23,6 @@ namespace Skribbl_Website.Client.Services
         {
             StateChanged?.Invoke(this, EventArgs.Empty);
         }
-
         public event EventHandler StateChanged;
 
         protected virtual void OnError()
@@ -98,6 +97,19 @@ namespace Skribbl_Website.Client.Services
                 OnBan(hostName);
             });
 
+            _hubConnection.On<int>("StartGame", (delay) =>
+            {
+                Lobby.StartGame();
+                InvokeOnReceive();
+            });
+
+            _hubConnection.On<Message>("ReceiveNewDrawingPlayer", (message) =>
+            {
+                Messages.Add(message);
+                Lobby.SetDrawingPlayer(message.Sender);
+                InvokeOnReceive();
+            });
+
             await _hubConnection.StartAsync();
             try
             {
@@ -105,8 +117,6 @@ namespace Skribbl_Website.Client.Services
             }
             catch
             {
-                // User does not hace access to demanded lobby
-                Console.WriteLine("Catched error from hub");
                 OnError();
             }
         }
@@ -117,9 +127,9 @@ namespace Skribbl_Website.Client.Services
         }
 
         public Task Send(string messageContent) =>
-_hubConnection.SendAsync("SendMessage", new Message(messageContent, Message.MessageType.Guess, User.Name));
+        _hubConnection.SendAsync("SendMessage", new Message(messageContent, Message.MessageType.Guess, User.Name));
 
-        Task Join(string lobbyId) =>
+        private Task Join(string lobbyId) =>
         _hubConnection.InvokeAsync("AddToGroup", User.Id, lobbyId);
 
         public Task UpdateLobbySettings()
@@ -146,11 +156,33 @@ _hubConnection.SendAsync("SendMessage", new Message(messageContent, Message.Mess
             }
         }
 
+        public Task StartGame()
+        {
+            Console.WriteLine("button clicked");
+            if (UserIsHost && Lobby.GetConnectedPlayersCount() >= Lobby.MinPlayers && Lobby.State == LobbyState.Preparing)
+            {
+                Console.WriteLine("message sent");
+                return _hubConnection.SendAsync("StartGame");
+            }
+            else
+            {
+                return Task.CompletedTask;
+            }
+        }
+
         public bool UserIsHost
         {
             get
             {
                 return User?.Name == Lobby.GetHostPlayer()?.Name;
+            }
+        }
+
+        public bool UserIsDrawing
+        {
+            get
+            {
+                return User?.Name == Lobby.GetDrawingPlayer()?.Name;
             }
         }
     }

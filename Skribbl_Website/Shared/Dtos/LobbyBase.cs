@@ -64,6 +64,7 @@ namespace Skribbl_Website.Shared.Dtos
         public void SetDrawingPlayer(string username)
         {
             SetAllPlayersToNotDrawing();
+            State = LobbyState.Choosing;
             GetPlayerByName(username).IsDrawing = true;
         }
 
@@ -96,6 +97,19 @@ namespace Skribbl_Website.Shared.Dtos
         public T GetHostPlayer()
         {
             return Players.Where(player => player.IsHost).FirstOrDefault();
+        }
+
+        public int GetConnectedPlayersCount()
+        {
+            return Players.Where(player => player.IsConnected).Count();
+        }
+
+        public void StartGame()
+        {
+            if (GetConnectedPlayersCount() >= MinPlayers)
+            {
+                State = LobbyState.Started;
+            }
         }
     }
 }

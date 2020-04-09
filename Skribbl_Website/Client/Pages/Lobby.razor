@@ -26,6 +26,7 @@ Lobby ID: @LobbyId
         @if (LobbyConnection.Lobby.LobbySettings != null)
         {
             <LobbySettingsComponent LobbySettings="LobbyConnection.Lobby.LobbySettings" IsHost="LobbyConnection.UserIsHost"></LobbySettingsComponent>
+            <button @onclick="LobbyConnection.StartGame"> Start Game!</button>
         }
         else
         {
@@ -33,7 +34,10 @@ Lobby ID: @LobbyId
                 It's null
             </div>
         }
-
+    }
+    else if (LobbyConnection.Lobby.State == LobbyState.Started)
+    {
+        <div>It has started!!!!</div>
     }
 }
 

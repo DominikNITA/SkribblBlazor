@@ -43,6 +43,11 @@ namespace Skribbl_Website.Server.Models
             return Players.Where(player => player.Connection == connectionId).First();
         }
 
+        public bool IsConnectionAHost(string connectionId)
+        {
+            return GetHostPlayer().Connection == connectionId;
+        }
+
         public Player GetPlayerById(string id)
         {
             try
@@ -77,7 +82,6 @@ namespace Skribbl_Website.Server.Models
         public new async Task SetDrawingPlayer(string username)
         {
             base.SetDrawingPlayer(username);
-            //TODO: add listener to lobbyConnection
             await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveNewDrawingPlayer",
     new Message(username + " is drawing now.", Message.MessageType.Join, username));
         }
@@ -101,6 +105,35 @@ namespace Skribbl_Website.Server.Models
                     }
                 }
             }
+        }
+
+        public new async Task StartGame()
+        {
+            base.StartGame();
+            int delay = 3000;
+            await _lobbyHub.Clients.Group(Id).SendAsync("StartGame",delay);
+            await Task.Delay(delay);
+            await SelectNextDrawingPlayer();
+        }
+
+        private async Task SelectNextDrawingPlayer()
+        {
+            var actualDrawingPlayer = GetDrawingPlayer();
+            var newDrawingPlayer = new Player();
+            if (actualDrawingPlayer == null)
+            {
+                newDrawingPlayer = Players.Where(player => player.IsConnected).First();
+            }
+            else
+            {
+                int actualDrawingIndex = Players.IndexOf(actualDrawingPlayer);
+                while (!newDrawingPlayer.IsConnected)
+                {
+                    actualDrawingIndex = actualDrawingIndex >= Players.Count ? 0 : actualDrawingIndex+1;
+                    newDrawingPlayer = Players[actualDrawingIndex];
+                }
+            }
+            await SetDrawingPlayer(newDrawingPlayer.Name);
         }
     }
 }

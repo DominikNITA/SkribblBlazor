@@ -14,23 +14,18 @@ Lobby ID: @LobbyId
     <div>
         Invite:   @NavigationManager.ToAbsoluteUri("join/" + LobbyConnection.Lobby.InviteLink)
     </div>
-    <div class="border border-success">
-        Players:
+    <div class="border border-success w-auto">
         @if (LobbyConnection.Lobby.Players != null)
         {
-            foreach (var player in LobbyConnection.Lobby.Players)
-            {
-                <div>
-                    @player.Name
-                </div>
-            }
+            <PlayersListComponent Players="LobbyConnection.Lobby.Players" UserIsHost="LobbyConnection.UserIsHost">
+            </PlayersListComponent>
         }
     </div>
     @if (LobbyConnection.Lobby.State == LobbyState.Preparing)
     {
         @if (LobbyConnection.Lobby.LobbySettings != null)
         {
-            <LobbySettingsComponent LobbySettings="LobbyConnection.Lobby.LobbySettings" IsHost="LobbyConnection.IsHost"></LobbySettingsComponent>
+            <LobbySettingsComponent LobbySettings="LobbyConnection.Lobby.LobbySettings" IsHost="LobbyConnection.UserIsHost"></LobbySettingsComponent>
         }
         else
         {
@@ -88,6 +83,7 @@ Lobby ID: @LobbyId
 
         LobbyConnection.StateChanged += Update;
         LobbyConnection.ErrorOccured += RedirectToErrorPage;
+        LobbyConnection.UserBanned += RedirectToKickedPage;
         await LobbyConnection.StartConnection(_user, NavigationManager.ToAbsoluteUri("/lobbyHub"), LobbyId);
 
         await base.OnInitializedAsync();
@@ -104,6 +100,12 @@ Lobby ID: @LobbyId
     {
         Console.WriteLine("Error occured in LobbyConnection");
         NavigationManager.NavigateTo("");
+    }
+
+    private void RedirectToKickedPage(object sender, string username)
+    {
+        Console.WriteLine("in redirect");
+        NavigationManager.NavigateTo("kicked/" + username);
     }
 
     private void LeaveLobby()

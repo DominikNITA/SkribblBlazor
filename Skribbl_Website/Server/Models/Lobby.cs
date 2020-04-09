@@ -77,6 +77,7 @@ namespace Skribbl_Website.Server.Models
         public new async Task SetDrawingPlayer(string username)
         {
             base.SetDrawingPlayer(username);
+            //TODO: add listener to lobbyConnection
             await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveNewDrawingPlayer",
     new Message(username + " is drawing now.", Message.MessageType.Join, username));
         }

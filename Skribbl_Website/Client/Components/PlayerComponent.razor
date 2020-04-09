@@ -1,0 +1,47 @@
+﻿@inject IJSRuntime JSRuntime
+@inject LobbyConnection LobbyConnection
+@*//@onmouseover="@(() => ChangeShowBanPlayer(true))" @onmouseout="@(() => ChangeShowBanPlayer(false))"*@
+
+<div class="player d-flex flex-row" onmouseenter="changeShowBan(true,'@Player.Name')" onmouseleave="changeShowBan(false,'@Player.Name')">
+    <span class="player--name">@Player.Name</span>
+    @if (Player.IsHost)
+    {
+        <span class="player--host oi oi-person"></span>
+    }
+    @if (UserIsHost && !Player.IsHost && _showBanPlayer)
+    {
+        <span class="player--ban oi oi-ban" @onclick="BanPlayer"></span>
+    }
+    else if (Player.IsDrawing)
+    {
+        <span class="player--drawing oi oi-pencil"></span>
+    }
+</div>
+
+@code {
+    [Parameter] public PlayerClient Player { get; set; }
+    [Parameter] public bool UserIsHost { get; set; }
+
+    private bool _showBanPlayer = false;
+    private DotNetObjectReference<PlayerComponent> dotNetReference;
+
+    protected override Task OnInitializedAsync()
+    {
+        dotNetReference = DotNetObjectReference.Create(this);
+        JSRuntime.InvokeVoidAsync("addNewReference",dotNetReference,Player.Name);
+        return base.OnInitializedAsync();
+    }
+
+    [JSInvokable]
+    public void ChangeShowBanPlayer(bool newState)
+    {
+        _showBanPlayer = newState;
+        StateHasChanged();
+    }
+
+    private async Task BanPlayer()
+    {
+        //TODO: ask for confirmation
+        await LobbyConnection.BanPlayer(Player.Name);
+    }
+}

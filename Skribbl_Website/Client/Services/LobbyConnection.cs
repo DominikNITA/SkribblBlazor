@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Components;
 
 namespace Skribbl_Website.Client.Services
 {
@@ -31,6 +32,12 @@ namespace Skribbl_Website.Client.Services
         }
         public event EventHandler ErrorOccured;
 
+        protected virtual void OnBan(string username)
+        {
+            UserBanned?.Invoke(this, username);
+        }
+        public event EventHandler<string> UserBanned;
+
         public LobbyConnection()
         {
 
@@ -38,14 +45,15 @@ namespace Skribbl_Website.Client.Services
 
         public async Task StartConnection(Player user, Uri hubUrl, string lobbyId)
         {
-            _hubConnection = new HubConnectionBuilder().WithUrl(hubUrl).AddJsonProtocol(options => {
+            _hubConnection = new HubConnectionBuilder().WithUrl(hubUrl).AddJsonProtocol(options =>
+            {
                 options.PayloadSerializerOptions.PropertyNamingPolicy = null;
             }).WithAutomaticReconnect().Build();
             User = user;
 
             _hubConnection.On<Message>("ReceiveNewHost", (message) =>
             {
-                Messages.Add(new Message(message.MessageContent,message.Type));
+                Messages.Add(new Message(message.MessageContent, message.Type));
                 Lobby.SetHostPlayer(message.Sender);
                 InvokeOnReceive();
             });
@@ -71,17 +79,23 @@ namespace Skribbl_Website.Client.Services
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<string>("RemovePlayer", (playerNameToRemove) =>
+            _hubConnection.On<Message>("RemovePlayer", (message) =>
             {
-                Lobby.RemovePlayerByName(playerNameToRemove);
+                Lobby.RemovePlayerByName(message.Sender);
+                Messages.Add(message);
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<LobbySettings>("ReceiveLobbySettings", (lobbySettings) => 
+            _hubConnection.On<LobbySettings>("ReceiveLobbySettings", (lobbySettings) =>
             {
                 Console.WriteLine("in receive");
                 Lobby.LobbySettings = lobbySettings;
                 InvokeOnReceive();
+            });
+
+            _hubConnection.On<string>("RedirectToKickedPage", (hostName) =>
+            {
+                OnBan(hostName);
             });
 
             await _hubConnection.StartAsync();
@@ -103,16 +117,15 @@ namespace Skribbl_Website.Client.Services
         }
 
         public Task Send(string messageContent) =>
-_hubConnection.SendAsync("SendMessage", new Message(messageContent,Message.MessageType.Guess,User.Name));
+_hubConnection.SendAsync("SendMessage", new Message(messageContent, Message.MessageType.Guess, User.Name));
 
         Task Join(string lobbyId) =>
         _hubConnection.InvokeAsync("AddToGroup", User.Id, lobbyId);
 
         public Task UpdateLobbySettings()
         {
-            if(Lobby.GetHostPlayer().Name == User.Name)
+            if (UserIsHost)
             {
-                Console.WriteLine(Lobby.LobbySettings.RoundsLimit);
                 return _hubConnection.SendAsync("SendLobbySettings", Lobby.LobbySettings);
             }
             else
@@ -121,7 +134,19 @@ _hubConnection.SendAsync("SendMessage", new Message(messageContent,Message.Messa
             }
         }
 
-        public bool IsHost
+        public Task BanPlayer(string playerName)
+        {
+            if (UserIsHost)
+            {
+                return _hubConnection.SendAsync("BanPlayer", playerName);
+            }
+            else
+            {
+                return Task.CompletedTask;
+            }
+        }
+
+        public bool UserIsHost
         {
             get
             {

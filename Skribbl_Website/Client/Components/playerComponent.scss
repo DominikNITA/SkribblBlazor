@@ -1,0 +1,18 @@
+﻿
+.player{
+    width: 100%;
+    justify-content:space-between;
+    font-size: 1.3rem;
+
+    &--name{
+        font-weight: 600;
+    }
+
+    &--ban{
+        color: red;
+    }
+
+    &--drawing{
+        color: #100e82;
+    }
+}

@@ -1,0 +1,8 @@
+﻿@page "/kicked/{username}"
+<h3>Kicked :(</h3>
+
+<p>You have been kicked by @Username</p>
+
+@code {
+    [Parameter] public string Username { get; set; }
+}

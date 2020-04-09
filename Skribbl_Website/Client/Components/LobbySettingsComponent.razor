@@ -20,7 +20,7 @@
                 @foreach (var timeLimit in LobbySettings.PossibleTimeLimit)
                 {
                     <label>
-                        <InputRadio name="time" SelectedValue="timeLimit" @bind-Value="LobbySettings.TimeLimit" @onclick="OnValuesChanged" IsDisabled="!IsHost" />
+                        <InputRadio name="time" SelectedValue="timeLimit" @bind-Value="@LobbySettings.TimeLimit" @onclick="OnValuesChanged" IsDisabled="!IsHost" />
                         @timeLimit
                     </label>
                 }
@@ -39,14 +39,14 @@
 
     protected override Task OnInitializedAsync()
     {
-        LobbySettings = LobbyConnection.Lobby.LobbySettings;
+        //LobbySettings = LobbyConnection.Lobby.LobbySettings;
         return base.OnInitializedAsync();
     }
 
     private async Task OnValuesChanged()
     {
         await Task.Delay(50);
-        LobbyConnection.Lobby.LobbySettings = LobbySettings;
+        //LobbyConnection.Lobby.LobbySettings = LobbySettings;
         await LobbyConnection.UpdateLobbySettings();
     }
 }

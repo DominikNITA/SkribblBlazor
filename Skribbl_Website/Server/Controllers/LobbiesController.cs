@@ -12,7 +12,7 @@ namespace Skribbl_Website.Server.Controllers
     [Route("lobbies")]
     public class LobbiesController : ControllerBase
     {
-        private LobbiesManager _lobbiesManager;
+        private readonly LobbiesManager _lobbiesManager;
 
         public LobbiesController(LobbiesManager lobbiesManager)
         {

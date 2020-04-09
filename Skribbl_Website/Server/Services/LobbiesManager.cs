@@ -77,9 +77,5 @@ namespace Skribbl_Website.Server.Services
         {
             return Lobbies.Where(lobby => lobby.Players.Any(player => player.Connection == connectionId)).First();
         }
-        //public void RemoveUserByConnectionId(string connectionId)
-        //{
-
-        //}
     }
 }

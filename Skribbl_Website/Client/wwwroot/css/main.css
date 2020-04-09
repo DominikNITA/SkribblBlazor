@@ -27,3 +27,20 @@
     overflow-y: scroll; }
   .chat__input {
     margin: 3px auto; }
+
+.player {
+  width: 100%;
+  justify-content: space-between;
+  font-size: 1.3rem; }
+  .player--name {
+    font-weight: 600; }
+  .player--ban {
+    color: red; }
+  .player--drawing {
+    color: #100e82; }
+
+.players-list {
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  background-color: beige; }

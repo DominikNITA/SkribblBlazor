@@ -64,6 +64,19 @@ namespace Skribbl_Website.Server.Hubs
             }
         }
 
+        public async Task BanPlayer(string playerName)
+        {
+            var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
+            if (lobby.GetHostPlayer().Connection == Context.ConnectionId)
+            {
+                var playerToBan = lobby.GetPlayerByName(playerName);
+                await Clients.Client(playerToBan.Connection).SendAsync("RedirectToKickedPage", lobby.GetHostPlayer().Name);
+                await Groups.RemoveFromGroupAsync(playerToBan.Connection, lobby.Id);
+                await lobby.RemovePlayerByName(playerName);
+                await Clients.Group(lobby.Id).SendAsync("RemovePlayer", new Message(playerName + " banned.", Message.MessageType.Leave, playerName));
+            }
+        }
+
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             if (exception != null)
@@ -79,9 +92,7 @@ new Message(player.Name + " lost connection.", Message.MessageType.Leave));
                 var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
                 var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobby.Id);
-                await Clients.Group(lobby.Id).SendAsync("ReceiveMessage",
-    new Message(player.Name + " left.", Message.MessageType.Leave));
-                await Clients.Group(lobby.Id).SendAsync("RemovePlayer", player.Name);
+                await Clients.Group(lobby.Id).SendAsync("RemovePlayer", new Message(player.Name + " left.", Message.MessageType.Leave, player.Name));
                 await lobby.RemovePlayerByName(player.Name);
             }
             await base.OnDisconnectedAsync(exception);

@@ -21,6 +21,12 @@ Lobby ID: @LobbyId
             </PlayersListComponent>
         }
     </div>
+
+
+
+    <Board></Board>
+
+
     @if (LobbyConnection.Lobby.State == LobbyState.Preparing)
     {
         @if (LobbyConnection.Lobby.LobbySettings != null)
@@ -32,6 +38,25 @@ Lobby ID: @LobbyId
         {
             <div>
                 It's null
+            </div>
+        }
+    }
+    else if (LobbyConnection.Lobby.State == LobbyState.Choosing)
+    {
+        <SelectWordComponent Words="LobbyConnection.Lobby.WordsToChoose"></SelectWordComponent>
+    }
+    else if (LobbyConnection.Lobby.State == LobbyState.Drawing)
+    {
+        if (LobbyConnection.UserIsDrawing)
+        {
+            <div class="bg-light p-3 m-1">
+                @LobbyConnection.Lobby.Selection
+            </div>
+        }
+        else
+        {
+            <div class="bg-danger p-3 m-1">
+                @LobbyConnection.Lobby.SelectionTemplate[0]
             </div>
         }
     }

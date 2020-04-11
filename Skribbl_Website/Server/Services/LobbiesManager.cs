@@ -15,15 +15,17 @@ namespace Skribbl_Website.Server.Services
         public List<Lobby> Lobbies { get; private set; } = new List<Lobby>();
 
         private readonly IHubContext<LobbyHub> _lobbyHub;
+        private IWordsProviderService _wordsProviderService;
 
-        public LobbiesManager(IHubContext<LobbyHub> hubContext)
+        public LobbiesManager(IHubContext<LobbyHub> hubContext, IWordsProviderService wordsProviderService)
         {
             _lobbyHub = hubContext;
+            _wordsProviderService = wordsProviderService;
         }
 
         public string CreateLobby(Player host)
         {
-            var lobby = new Lobby(_lobbyHub);
+            var lobby = new Lobby(_lobbyHub, _wordsProviderService);
             lobby.AddPlayer(host);
             Lobbies.Add(lobby);
             return lobby.Id.ToString();
@@ -66,11 +68,6 @@ namespace Skribbl_Website.Server.Services
         public Lobby GetLobbyById(string lobbyId)
         {
             return Lobbies.Where(lobby => lobby.Id == lobbyId).First();
-        }
-
-        public void SetConnectionIdForUserInLobby(string lobbyId, string username, string connectionId)
-        {
-            GetLobbyById(lobbyId).SetConnectionIdForPlayer(connectionId, username);
         }
 
         public Lobby GetLobbyByPlayerConnectionId(string connectionId)

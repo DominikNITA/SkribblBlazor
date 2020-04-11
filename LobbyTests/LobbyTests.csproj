@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Skribbl_Website\Client\Skribbl_Website.Client.csproj" />
     <ProjectReference Include="..\Skribbl_Website\Server\Skribbl_Website.Server.csproj" />
     <ProjectReference Include="..\Skribbl_Website\Shared\Skribbl_Website.Shared.csproj" />
   </ItemGroup>

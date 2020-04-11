@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Skribbl_Website.Shared;
 
 namespace Skribbl_Website.Server.Hubs
 {
@@ -22,6 +23,18 @@ namespace Skribbl_Website.Server.Hubs
             if(message.MessageContent != null && message.MessageContent != string.Empty)
             {
                 var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
+                if(lobby.State == LobbyState.Drawing)
+                {
+                    var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
+                    if (player.HasGuessedCorrectly || lobby.GetDrawingPlayer() == player)
+                    {
+                        return;
+                    }
+                    if(await lobby.CheckGuess(player, message.MessageContent))
+                    {
+                        return;
+                    }
+                }
                 await Clients.Group(lobby.Id).SendAsync("ReceiveMessage", message);
             }
         }
@@ -31,7 +44,7 @@ namespace Skribbl_Website.Server.Hubs
             var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
             if (lobby.IsConnectionAHost(Context.ConnectionId))
             {
-                lobby.StartGame();
+                await lobby.StartGame();
             }
         }
 
@@ -77,6 +90,23 @@ namespace Skribbl_Website.Server.Hubs
             }
         }
 
+        public async Task SetSelection(string word)
+        {
+            var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
+            var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
+            await lobby.SelectSelection(player, word);
+        }
+
+        public async Task SendDraw(DrawDetails drawDetails)
+        {
+            var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
+            var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
+            if(lobby.GetDrawingPlayer() == player && lobby.State == LobbyState.Drawing)
+            {
+                await Clients.OthersInGroup(lobby.Id).SendAsync("GetDraw", drawDetails);
+            }
+        }
+
         public override async Task OnDisconnectedAsync(Exception exception)
         {
             if (exception != null)
@@ -84,6 +114,7 @@ namespace Skribbl_Website.Server.Hubs
                 var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
                 var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
                 await lobby.SetUserStateToDisconnected(Context.ConnectionId);
+                //TODO send request to set is connected to false.
                 await Clients.Group(lobby.Id).SendAsync("ReceiveMessage",
 new Message(player.Name + " lost connection.", Message.MessageType.Leave));
             }

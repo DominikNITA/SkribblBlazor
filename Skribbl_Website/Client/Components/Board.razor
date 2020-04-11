@@ -1,0 +1,44 @@
+﻿@inject IJSRuntime JSRuntime
+@inject LobbyConnection LobbyConnection
+<div class="border border-warning">
+    <h3>Board</h3>
+    <span class="p-2">
+        Round: @LobbyConnection.Lobby.RoundCount / @LobbyConnection.Lobby.LobbySettings.RoundsLimit
+    </span>
+    <span class="p-2">
+        Time: @LobbyConnection.Lobby.TimeCount
+    </span>
+    <canvas id="myCanvas" width="500" height="200" style="border:2px solid black"></canvas>
+</div>
+@code {
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var dotNetReference = DotNetObjectReference.Create(this);
+            JSRuntime.InvokeVoidAsync("initThis", dotNetReference);
+            LobbyConnection.DrawReceived += ReceiveDraw;
+            LobbyConnection.StateChanged += Update;
+        }
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async void Update(object sender, EventArgs e)
+    {
+        StateHasChanged();
+        await Task.Delay(50);
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public async Task SendDraw(float x, float y, bool isDraw, string color, float width )
+    {
+        var drawDetails = new DrawDetails(x, y, isDraw, color, width);
+        await LobbyConnection.SendDraw(drawDetails);
+    }
+
+    public void ReceiveDraw(object sender, DrawDetails drawDetails)
+    {
+        JSRuntime.InvokeVoidAsync("drawFromOutside", drawDetails.X, drawDetails.Y, drawDetails.IsDown, drawDetails.Color, drawDetails.Size);
+    }
+}

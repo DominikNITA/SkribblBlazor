@@ -5,10 +5,16 @@ using System.Linq;
 
 namespace Skribbl_Website.Shared.Dtos
 {
-    public enum LobbyState { Preparing, Started, Choosing, Drawing, Ended }
+    public enum LobbyState { Preparing, Started, Choosing, Drawing, Completed, Ended }
 
     public class LobbyBase<T> : LobbyParameters<T> where T : PlayerClient
     {
+        public List<string> WordsToChoose { get; set; } = new List<string>();
+
+        public List<int> SelectionTemplate { get; set; } = new List<int>();
+
+        public string Selection { get; set; } = string.Empty;
+
         public LobbyBase()
         {
             Id = Guid.NewGuid().ToString();
@@ -110,6 +116,26 @@ namespace Skribbl_Website.Shared.Dtos
             {
                 State = LobbyState.Started;
             }
+        }
+
+        public void SelectSelection(string selection)
+        {
+            if (WordsToChoose.Contains(selection))
+            {
+                Selection = selection;
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
+        }
+
+        public void PrepareForNextDrawer()
+        {
+            Selection = string.Empty;
+            WordsToChoose = new List<string>();
+            SelectionTemplate = new List<int>();
+            Players.ForEach((player) => player.HasGuessedCorrectly = false);
         }
     }
 }

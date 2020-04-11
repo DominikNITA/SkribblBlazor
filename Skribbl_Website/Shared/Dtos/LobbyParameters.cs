@@ -11,8 +11,8 @@ namespace Skribbl_Website.Shared.Dtos
         public int MinPlayers { get; set; } = 2;
         public string Id { get; set; }
         public string InviteLink { get; set; }
-        public int RoundCount { get; set; }
-        public int TimeCount { get; set; }
+        public int RoundCount { get; set; } = 1;
+        public int TimeCount { get; set; } = 1;
         public LobbySettings LobbySettings { get; set; } = new LobbySettings();
         public LobbyState State { get; set; } = LobbyState.Preparing;
 

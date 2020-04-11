@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Components;
+using Skribbl_Website.Shared;
+using Microsoft.JSInterop;
 
 namespace Skribbl_Website.Client.Services
 {
@@ -17,6 +19,7 @@ namespace Skribbl_Website.Client.Services
         public LobbyClient Lobby { get; set; }
         public List<Message> Messages { get; set; } = new List<Message>();
 
+        private IJSRuntime _jsRuntime;
         private HubConnection _hubConnection;
 
         private void InvokeOnReceive()
@@ -37,9 +40,15 @@ namespace Skribbl_Website.Client.Services
         }
         public event EventHandler<string> UserBanned;
 
-        public LobbyConnection()
+        protected virtual void OnDraw(DrawDetails drawDetails)
         {
+            DrawReceived?.Invoke(this, drawDetails);
+        }
+        public event EventHandler<DrawDetails> DrawReceived;
 
+        public LobbyConnection(IJSRuntime jSRuntime)
+        {
+            _jsRuntime = jSRuntime;
         }
 
         public async Task StartConnection(Player user, Uri hubUrl, string lobbyId)
@@ -103,10 +112,54 @@ namespace Skribbl_Website.Client.Services
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<Message>("ReceiveNewDrawingPlayer", (message) =>
+            _hubConnection.On<Message>("ReceiveNewDrawingPlayer", async (message) =>
             {
+                await _jsRuntime.InvokeVoidAsync("prepareBoard");
+                Lobby.PrepareForNextDrawer();
                 Messages.Add(message);
                 Lobby.SetDrawingPlayer(message.Sender);
+                if (UserIsDrawing)
+                {
+                    await _jsRuntime.InvokeVoidAsync("setIsDrawing", true);
+                }
+                InvokeOnReceive();
+            });
+
+            _hubConnection.On<List<string>>("ReceiveWords", (words) => {
+                Lobby.WordsToChoose = words;
+                InvokeOnReceive();
+            });
+
+            _hubConnection.On<List<int>>("ReceiveWordTemplate", (wordTemplate) => {
+                Lobby.SelectionTemplate = wordTemplate;
+                Lobby.State = LobbyState.Drawing;
+                InvokeOnReceive();
+            });
+
+            _hubConnection.On<string>("ReceiveSelection", (selection) => {
+                Lobby.Selection = selection;
+                Lobby.State = LobbyState.Drawing;
+                InvokeOnReceive();
+            });
+
+            _hubConnection.On<char,int>("GetHint", (character, position) => {
+                throw new NotImplementedException();
+                InvokeOnReceive();
+            });
+
+            _hubConnection.On<DrawDetails>("GetDraw", (drawDetails) => {
+                OnDraw(drawDetails);
+                InvokeOnReceive();
+            });
+
+            _hubConnection.On<int>("UpdateRound", (newRoundCount) => {
+                Console.WriteLine("new round " + newRoundCount);
+                Lobby.RoundCount = newRoundCount;
+                InvokeOnReceive();
+            });
+
+            _hubConnection.On("EndGame", () => {
+                OnBan("Game ended");
                 InvokeOnReceive();
             });
 
@@ -144,29 +197,34 @@ namespace Skribbl_Website.Client.Services
             }
         }
 
-        public Task BanPlayer(string playerName)
+        public async Task BanPlayer(string playerName)
         {
             if (UserIsHost)
             {
-                return _hubConnection.SendAsync("BanPlayer", playerName);
-            }
-            else
-            {
-                return Task.CompletedTask;
+                await _hubConnection.SendAsync("BanPlayer", playerName);
             }
         }
 
-        public Task StartGame()
+        public async Task StartGame()
         {
-            Console.WriteLine("button clicked");
             if (UserIsHost && Lobby.GetConnectedPlayersCount() >= Lobby.MinPlayers && Lobby.State == LobbyState.Preparing)
             {
-                Console.WriteLine("message sent");
-                return _hubConnection.SendAsync("StartGame");
+                 await _hubConnection.SendAsync("StartGame");
             }
-            else
+        }
+
+        public async Task SelectSelection(string selection)
+        {
+            Lobby.SelectSelection(selection);
+            await _hubConnection.SendAsync("SetSelection", selection);
+        }
+
+        public async Task SendDraw(DrawDetails drawDetails)
+        {
+            if (UserIsDrawing)
             {
-                return Task.CompletedTask;
+                Console.WriteLine("Trying to send drawDetails");
+                await _hubConnection.SendAsync("SendDraw", drawDetails);
             }
         }
 

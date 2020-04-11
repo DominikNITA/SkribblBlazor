@@ -1,0 +1,26 @@
+﻿@inject LobbyConnection LobbyConnection
+@if (LobbyConnection.UserIsDrawing)
+{
+    <h3>SelectWordComponent</h3>
+    <div class="words-container mx-auto w-auto d-flex flex-row">
+        @foreach (var word in Words)
+        {
+            <span @onclick="@(() => OnSelectionChoosed(word))" class="px-3 mx-2 py-2 border border-info">
+                @word
+            </span>
+        }
+    </div>
+}
+else
+{
+    <h3>Someone else is choosing!</h3>
+}
+
+@code {
+    [Parameter] public List<string> Words { get; set; }
+
+    private async Task OnSelectionChoosed(string selection)
+    {
+        await LobbyConnection.SelectSelection(selection);
+    }
+}

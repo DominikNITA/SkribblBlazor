@@ -1,19 +1,23 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Skribbl_Website.Server.Hubs;
 using Skribbl_Website.Server.Services;
+using Skribbl_Website.Shared;
 using Skribbl_Website.Shared.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Skribbl_Website.Server.Models
 {
     public class Lobby : LobbyBase<Player>
     {
         private readonly IHubContext<LobbyHub> _lobbyHub;
-        private IWordsProviderService _wordsProviderService;
+        private readonly IWordsProviderService _wordsProviderService;
+        private List<HintTimer> _hintTimers = new List<HintTimer>();
+        private Timer _selectionTimer = null;
+        private Timer _gameTimer = null;
 
         private IScoreCalculator _scoreCalculator;
 
@@ -129,8 +133,6 @@ namespace Skribbl_Website.Server.Models
             var actualDrawingPlayer = GetDrawingPlayer();
             var newDrawingPlayer = new Player();
             PrepareForNextDrawer();
-            //TODO: add listener
-            //await _lobbyHub.Clients.Group(Id).SendAsync("PrepareForNextDrawer");
             if (actualDrawingPlayer == null)
             {
                 newDrawingPlayer = Players.Where(player => player.IsConnected).First();
@@ -157,9 +159,11 @@ namespace Skribbl_Website.Server.Models
             }
             await this.SetDrawingPlayer(newDrawingPlayer.Name);
             await SendWordsToChoose();
-            _scoreCalculator = new SimpleScoreCalculator();
-            _scoreCalculator.StartCounting();
-            var timer = new Timer(async (e) => { await CheckForSelection(); }, null, 10000, Timeout.Infinite);
+
+            _selectionTimer = new Timer();
+            _selectionTimer.Interval = 10000;
+            _selectionTimer.Elapsed += async (sender,e) => await CheckForSelection();
+            _selectionTimer.Enabled = true;
         }
 
         private async Task SendWordsToChoose()
@@ -173,9 +177,18 @@ namespace Skribbl_Website.Server.Models
             if (GetDrawingPlayer() == player && Selection == string.Empty)
             {
                 SelectSelection(word);
-                await _lobbyHub.Clients.GroupExcept(Id, new List<string> { player.Connection }).SendAsync("ReceiveWordTemplate", new List<int> { word.Length });
+                var selectionTemplate = new SelectionTemplate(word);
+
+                _selectionTimer.Stop();
+                _selectionTimer = null;
+
+                _scoreCalculator = new SimpleScoreCalculator();
+                _scoreCalculator.StartCounting();
+
+                await _lobbyHub.Clients.GroupExcept(Id, new List<string> { player.Connection }).SendAsync("ReceiveWordTemplate", selectionTemplate);
                 await _lobbyHub.Clients.Client(player.Connection).SendAsync("ReceiveSelection", word);
-                //await StartTimer();
+
+                await StartTimer();
             }
         }
 
@@ -191,25 +204,21 @@ namespace Skribbl_Website.Server.Models
 
         private async Task StartTimer()
         {
-            var timer = new Timer(async (e) => { await SubstractOneSecond(); }, null, 1000, Timeout.Infinite);
+            _gameTimer = new Timer();
+            _gameTimer.Interval = LobbySettings.TimeLimit * 1000;
+            _gameTimer.Elapsed += async (sender, e) => await GoToNextStep();
+            _gameTimer.Enabled = true;
+
+
+            _hintTimers = HintsCreator.CreateHintTimersForSelection(Selection,LobbySettings.TimeLimit);
+            _hintTimers.ForEach( timer => timer.Elapsed += async (sender, e) => await SendHint(timer.Hint, sender));
+            _hintTimers.ForEach(timer => timer.Enabled = true);
         }
 
-        private async Task SubstractOneSecond()
-        {
-            TimeCount--;
-            if (TimeCount > 0 && State== LobbyState.Drawing)
-            {
-                await StartTimer();
-            }
-            else
-            {
-                await GoToNextStep();
-            }
-        }
 
         public async Task<bool> CheckGuess(Player player, string guess)
         {
-            if (guess == Selection)
+            if (guess.Equals(Selection, StringComparison.OrdinalIgnoreCase))
             {
                 player.HasGuessedCorrectly = true;
                 _scoreCalculator.AddPlayer(player.Name);
@@ -219,6 +228,7 @@ namespace Skribbl_Website.Server.Models
             }
             else
             {
+                //TODO: rework with interface
                 if (LevenshteinDistance.Calculate(guess, Selection) <= 2)
                 {
                     await _lobbyHub.Clients.Client(player.Connection).SendAsync("ReceiveMessage", new Message(guess + " is a close one!", Message.MessageType.CloseGuess));
@@ -234,14 +244,23 @@ namespace Skribbl_Website.Server.Models
                 await GoToNextStep();
             }
         }
+
         public new void PrepareForNextDrawer()
         {
+            _hintTimers = new List<HintTimer>();
             base.PrepareForNextDrawer();
         }
 
         private async Task GoToNextStep()
         {
+            //Clear all timers
+            _gameTimer.Stop();
+            _gameTimer = null;
+            _hintTimers.ForEach(timer => DisposeTimer(timer));
+            _hintTimers.Clear();
+
             await SendScores();
+
             await Task.Delay(4000);
             PrepareForNextDrawer();
             await SelectNextDrawingPlayer();
@@ -253,9 +272,21 @@ namespace Skribbl_Website.Server.Models
             await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveScores", newScores);
         }
 
+        private async Task SendHint(HintDto hint, object sender)
+        {
+            ((HintTimer)sender).Stop();
+            await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveHint", hint);
+        }
+
+        private void DisposeTimer(object sender)
+        {
+            var timer = (Timer)sender;
+            timer.Stop();
+            sender = null;
+        }
+
         private async Task EndGame()
         {
-            //TODO: add listener
             await _lobbyHub.Clients.Group(Id).SendAsync("EndGame");
         }
     }

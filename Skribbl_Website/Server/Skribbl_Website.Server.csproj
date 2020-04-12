@@ -16,9 +16,5 @@
     <ProjectReference Include="..\Shared\Skribbl_Website.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\" />
-  </ItemGroup>
-
 
 </Project>

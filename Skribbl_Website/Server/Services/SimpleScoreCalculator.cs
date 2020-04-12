@@ -8,7 +8,8 @@ namespace Skribbl_Website.Server.Services
 {
     public class SimpleScoreCalculator : IScoreCalculator
     {
-        private List<string> _order;
+        private List<string> _order = new List<string>();
+
         public void AddPlayer(string playerName)
         {
             _order.Add(playerName);

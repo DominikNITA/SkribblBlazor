@@ -18,6 +18,9 @@ namespace Skribbl_Website.Server.Services
         /// <returns></returns>
         public static int Calculate(string source1, string source2) //O(n*m)
         {
+            var source1Lower = source1.ToLower();
+            var source2Lower = source2.ToLower();
+
             var source1Length = source1.Length;
             var source2Length = source2.Length;
 
@@ -39,7 +42,7 @@ namespace Skribbl_Website.Server.Services
             {
                 for (var j = 1; j <= source2Length; j++)
                 {
-                    var cost = (source2[j - 1] == source1[i - 1]) ? 0 : 1;
+                    var cost = (source2Lower[j - 1] == source1Lower[i - 1]) ? 0 : 1;
 
                     matrix[i, j] = Math.Min(
                         Math.Min(matrix[i - 1, j] + 1, matrix[i, j - 1] + 1),

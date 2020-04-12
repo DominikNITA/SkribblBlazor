@@ -55,9 +55,13 @@ Lobby ID: @LobbyId
         }
         else
         {
-            <div class="bg-danger p-3 m-1">
-                @LobbyConnection.Lobby.SelectionTemplate[0]
-            </div>
+            if (LobbyConnection.Lobby.SelectionTemplate != null)
+            {
+                <div class="bg-danger p-3 m-1">
+                    <SelectionDisplayComponent SelectionTemplate="@LobbyConnection.Lobby.SelectionTemplate">
+                    </SelectionDisplayComponent>
+                </div>
+            }
         }
     }
     else if (LobbyConnection.Lobby.State == LobbyState.Started)

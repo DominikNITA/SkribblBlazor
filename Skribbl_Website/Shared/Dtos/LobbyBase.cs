@@ -11,7 +11,7 @@ namespace Skribbl_Website.Shared.Dtos
     {
         public List<string> WordsToChoose { get; set; } = new List<string>();
 
-        public List<int> SelectionTemplate { get; set; } = new List<int>();
+        public SelectionTemplate SelectionTemplate { get; set; } = new SelectionTemplate();
 
         public string Selection { get; set; } = string.Empty;
 
@@ -140,7 +140,7 @@ namespace Skribbl_Website.Shared.Dtos
         {
             Selection = string.Empty;
             WordsToChoose = new List<string>();
-            SelectionTemplate = new List<int>();
+            SelectionTemplate = new SelectionTemplate();
             Players.ForEach((player) => player.HasGuessedCorrectly = false);
         }
         

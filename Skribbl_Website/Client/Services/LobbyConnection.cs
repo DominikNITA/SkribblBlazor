@@ -16,7 +16,7 @@ namespace Skribbl_Website.Client.Services
         public LobbyClient Lobby { get; set; }
         public List<Message> Messages { get; set; } = new List<Message>();
 
-        private IJSRuntime _jsRuntime;
+        private readonly IJSRuntime _jsRuntime;
         private HubConnection _hubConnection;
 
         private void InvokeOnReceive(object sender = null, EventArgs e = null)
@@ -134,8 +134,9 @@ namespace Skribbl_Website.Client.Services
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<List<int>>("ReceiveWordTemplate", async (wordTemplate) =>
+            _hubConnection.On<SelectionTemplate>("ReceiveWordTemplate", async (wordTemplate) =>
             {
+                Console.WriteLine("templateCount: " + wordTemplate.Characters.Count);
                 Lobby.SelectionTemplate = wordTemplate;
                 Lobby.State = LobbyState.Drawing;
                 await Lobby.StartCounting();
@@ -157,9 +158,9 @@ namespace Skribbl_Website.Client.Services
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<char, int>("GetHint", (character, position) =>
+            _hubConnection.On<HintDto>("ReceiveHint", (hint) =>
             {
-                throw new NotImplementedException();
+                Lobby.SelectionTemplate.AddHintLetter(hint);
                 InvokeOnReceive();
             });
 
@@ -171,7 +172,6 @@ namespace Skribbl_Website.Client.Services
 
             _hubConnection.On<int>("UpdateRound", (newRoundCount) =>
             {
-                Console.WriteLine("new round " + newRoundCount);
                 Lobby.RoundCount = newRoundCount;
                 InvokeOnReceive();
             });

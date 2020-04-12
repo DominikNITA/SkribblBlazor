@@ -21,6 +21,12 @@ namespace Skribbl_Website.Shared.Dtos
             InviteLink = Guid.NewGuid().ToString().Substring(0, 5);
         }
 
+        protected virtual void OnTimeChanged()
+        {
+            TimeChanged?.Invoke(this, EventArgs.Empty);
+        }
+        public event EventHandler TimeChanged;
+
         public T GetPlayerByName(string username)
         {
             try
@@ -136,6 +142,11 @@ namespace Skribbl_Website.Shared.Dtos
             WordsToChoose = new List<string>();
             SelectionTemplate = new List<int>();
             Players.ForEach((player) => player.HasGuessedCorrectly = false);
+        }
+        
+        public void UpdateScores(List<ScoreDto> newScores)
+        {
+            newScores.ForEach((scoreDto) => GetPlayerByName(scoreDto.PlayerName).AddScore(scoreDto.ScoreToAdd));
         }
     }
 }

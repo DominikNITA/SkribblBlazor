@@ -38,6 +38,8 @@
     color: red; }
   .player--drawing {
     color: #100e82; }
+  .player__guessed {
+    background-color: #4cff00; }
 
 .players-list {
   width: 150px;

@@ -1,15 +1,12 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.JSInterop;
+using Skribbl_Website.Shared;
 using Skribbl_Website.Shared.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Components;
-using Skribbl_Website.Shared;
-using Microsoft.JSInterop;
 
 namespace Skribbl_Website.Client.Services
 {
@@ -22,28 +19,32 @@ namespace Skribbl_Website.Client.Services
         private IJSRuntime _jsRuntime;
         private HubConnection _hubConnection;
 
-        private void InvokeOnReceive()
+        private void InvokeOnReceive(object sender = null, EventArgs e = null)
         {
             StateChanged?.Invoke(this, EventArgs.Empty);
         }
+
         public event EventHandler StateChanged;
 
         protected virtual void OnError()
         {
             ErrorOccured?.Invoke(this, EventArgs.Empty);
         }
+
         public event EventHandler ErrorOccured;
 
         protected virtual void OnBan(string username)
         {
             UserBanned?.Invoke(this, username);
         }
+
         public event EventHandler<string> UserBanned;
 
         protected virtual void OnDraw(DrawDetails drawDetails)
         {
             DrawReceived?.Invoke(this, drawDetails);
         }
+
         public event EventHandler<DrawDetails> DrawReceived;
 
         public LobbyConnection(IJSRuntime jSRuntime)
@@ -75,6 +76,7 @@ namespace Skribbl_Website.Client.Services
             _hubConnection.On<LobbyClientDto>("SetLobby", (lobbyClientDto) =>
             {
                 Lobby = new LobbyClient(lobbyClientDto);
+                Lobby.TimeChanged += InvokeOnReceive;
                 InvokeOnReceive();
             });
 
@@ -125,41 +127,65 @@ namespace Skribbl_Website.Client.Services
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<List<string>>("ReceiveWords", (words) => {
+            _hubConnection.On<List<string>>("ReceiveWords", (words) =>
+            {
                 Lobby.WordsToChoose = words;
+                Lobby.State = LobbyState.Choosing;
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<List<int>>("ReceiveWordTemplate", (wordTemplate) => {
+            _hubConnection.On<List<int>>("ReceiveWordTemplate", async (wordTemplate) =>
+            {
                 Lobby.SelectionTemplate = wordTemplate;
                 Lobby.State = LobbyState.Drawing;
+                await Lobby.StartCounting();
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<string>("ReceiveSelection", (selection) => {
+            _hubConnection.On<string>("ReceiveSelection", async (selection) =>
+            {
                 Lobby.Selection = selection;
                 Lobby.State = LobbyState.Drawing;
+                await Lobby.StartCounting();
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<char,int>("GetHint", (character, position) => {
+            _hubConnection.On<List<ScoreDto>>("ReceiveScores", (newScores) =>
+            {
+                Lobby.UpdateScores(newScores);
+                Lobby.State = LobbyState.Completed;
+                InvokeOnReceive();
+            });
+
+            _hubConnection.On<char, int>("GetHint", (character, position) =>
+            {
                 throw new NotImplementedException();
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<DrawDetails>("GetDraw", (drawDetails) => {
+            _hubConnection.On<DrawDetails>("GetDraw", (drawDetails) =>
+            {
                 OnDraw(drawDetails);
                 InvokeOnReceive();
             });
 
-            _hubConnection.On<int>("UpdateRound", (newRoundCount) => {
+            _hubConnection.On<int>("UpdateRound", (newRoundCount) =>
+            {
                 Console.WriteLine("new round " + newRoundCount);
                 Lobby.RoundCount = newRoundCount;
                 InvokeOnReceive();
             });
 
-            _hubConnection.On("EndGame", () => {
+            _hubConnection.On("EndGame", () =>
+            {
                 OnBan("Game ended");
+                InvokeOnReceive();
+            });
+
+            _hubConnection.On<Message>("GuessedCorrectly", (message) =>
+            {
+                Lobby.GetPlayerByName(message.Sender).HasGuessedCorrectly = true;
+                Messages.Add(message);
                 InvokeOnReceive();
             });
 
@@ -173,6 +199,7 @@ namespace Skribbl_Website.Client.Services
                 OnError();
             }
         }
+
         public void CloseConnection()
         {
             _hubConnection.StopAsync();
@@ -209,7 +236,7 @@ namespace Skribbl_Website.Client.Services
         {
             if (UserIsHost && Lobby.GetConnectedPlayersCount() >= Lobby.MinPlayers && Lobby.State == LobbyState.Preparing)
             {
-                 await _hubConnection.SendAsync("StartGame");
+                await _hubConnection.SendAsync("StartGame");
             }
         }
 
@@ -221,9 +248,8 @@ namespace Skribbl_Website.Client.Services
 
         public async Task SendDraw(DrawDetails drawDetails)
         {
-            if (UserIsDrawing)
+            if (UserIsDrawing && Lobby.State == LobbyState.Drawing)
             {
-                Console.WriteLine("Trying to send drawDetails");
                 await _hubConnection.SendAsync("SendDraw", drawDetails);
             }
         }

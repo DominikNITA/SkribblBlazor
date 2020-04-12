@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Skribbl_Website.Server.Services
 {
+    //http://www.desiquintans.com/nounlist
     public class WordsProviderService : IWordsProviderService
     {
         public async Task<List<string>> GetWords()

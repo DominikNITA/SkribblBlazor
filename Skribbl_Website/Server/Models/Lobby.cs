@@ -15,7 +15,7 @@ namespace Skribbl_Website.Server.Models
         private readonly IHubContext<LobbyHub> _lobbyHub;
         private IWordsProviderService _wordsProviderService;
 
-        private List<Player> _guessedOrder = new List<Player>();
+        private IScoreCalculator _scoreCalculator;
 
         public Lobby(IHubContext<LobbyHub> lobbyHub, IWordsProviderService wordsProviderService) : base()
         {
@@ -123,18 +123,14 @@ namespace Skribbl_Website.Server.Models
             await Task.Delay(delay);
             await SelectNextDrawingPlayer();
         }
-        public new void PrepareForNextDrawer()
-        {
-            base.PrepareForNextDrawer();
-            _guessedOrder = new List<Player>();
-        }
+
         private async Task SelectNextDrawingPlayer()
         {
             var actualDrawingPlayer = GetDrawingPlayer();
             var newDrawingPlayer = new Player();
             PrepareForNextDrawer();
             //TODO: add listener
-            await _lobbyHub.Clients.Group(Id).SendAsync("PrepareForNextDrawer");
+            //await _lobbyHub.Clients.Group(Id).SendAsync("PrepareForNextDrawer");
             if (actualDrawingPlayer == null)
             {
                 newDrawingPlayer = Players.Where(player => player.IsConnected).First();
@@ -161,7 +157,9 @@ namespace Skribbl_Website.Server.Models
             }
             await this.SetDrawingPlayer(newDrawingPlayer.Name);
             await SendWordsToChoose();
-            var timer = new Timer(async (e) => { await CheckForSelection(); }, null, 5000, 10000);
+            _scoreCalculator = new SimpleScoreCalculator();
+            _scoreCalculator.StartCounting();
+            var timer = new Timer(async (e) => { await CheckForSelection(); }, null, 10000, Timeout.Infinite);
         }
 
         private async Task SendWordsToChoose()
@@ -177,6 +175,7 @@ namespace Skribbl_Website.Server.Models
                 SelectSelection(word);
                 await _lobbyHub.Clients.GroupExcept(Id, new List<string> { player.Connection }).SendAsync("ReceiveWordTemplate", new List<int> { word.Length });
                 await _lobbyHub.Clients.Client(player.Connection).SendAsync("ReceiveSelection", word);
+                //await StartTimer();
             }
         }
 
@@ -190,13 +189,30 @@ namespace Skribbl_Website.Server.Models
             }
         }
 
+        private async Task StartTimer()
+        {
+            var timer = new Timer(async (e) => { await SubstractOneSecond(); }, null, 1000, Timeout.Infinite);
+        }
+
+        private async Task SubstractOneSecond()
+        {
+            TimeCount--;
+            if (TimeCount > 0 && State== LobbyState.Drawing)
+            {
+                await StartTimer();
+            }
+            else
+            {
+                await GoToNextStep();
+            }
+        }
+
         public async Task<bool> CheckGuess(Player player, string guess)
         {
             if (guess == Selection)
             {
                 player.HasGuessedCorrectly = true;
-                _guessedOrder.Add(player);
-                //TODO: add listener
+                _scoreCalculator.AddPlayer(player.Name);
                 await _lobbyHub.Clients.Group(Id).SendAsync("GuessedCorrectly", new Message(player.Name + " guessed correctly.", Message.MessageType.Guessed, player.Name));
                 await CheckForCompletedGuessing();
                 return true;
@@ -218,18 +234,23 @@ namespace Skribbl_Website.Server.Models
                 await GoToNextStep();
             }
         }
+        public new void PrepareForNextDrawer()
+        {
+            base.PrepareForNextDrawer();
+        }
 
         private async Task GoToNextStep()
         {
             await SendScores();
-            PrepareForNextDrawer();        
+            await Task.Delay(4000);
+            PrepareForNextDrawer();
             await SelectNextDrawingPlayer();
         }
 
         private async Task SendScores()
         {
-            //TODO: add listener
-            await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveScores", _guessedOrder.Select((player) => (player.Name, Players.Count - _guessedOrder.IndexOf(player))).ToList());
+            var newScores = _scoreCalculator.GetScores(Players.Count);
+            await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveScores", newScores);
         }
 
         private async Task EndGame()

@@ -1,4 +1,8 @@
-﻿namespace Skribbl_Website.Shared.Dtos
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Skribbl_Website.Shared.Dtos
 {
     public class LobbyClient : LobbyBase<PlayerClient>
     {
@@ -18,6 +22,27 @@
         public LobbyClient() : base()
         {
 
+        }
+
+        public async Task StartCounting()
+        {
+            TimeCount = LobbySettings.TimeLimit;
+            await StartTimer();
+        }
+
+        private async Task StartTimer()
+        {
+            var timer = new Timer(async (e) => { await SubstractOneSecond(); }, null, 1000, Timeout.Infinite);
+        }
+
+        private async Task SubstractOneSecond()
+        {
+            TimeCount--;
+            OnTimeChanged();
+            if(TimeCount > 0 && State == LobbyState.Drawing)
+            {
+                await StartTimer();
+            }
         }
     }
 }

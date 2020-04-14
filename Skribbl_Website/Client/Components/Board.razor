@@ -8,7 +8,11 @@
     <span class="p-2">
         Time: @LobbyConnection.Lobby.TimeCount
     </span>
-    <canvas id="myCanvas" width="500" height="200" style="border:2px solid black"></canvas>
+    <div id="game-area">
+        <canvas id="myCanvas" style="border:2px solid black"></canvas>
+        <div id="canvasOverlay"></div>
+    </div>
+
 </div>
 @code {
     protected override Task OnAfterRenderAsync(bool firstRender)
@@ -31,7 +35,7 @@
     }
 
     [JSInvokable]
-    public async Task SendDraw(float x, float y, bool isDraw, string color, float width )
+    public async Task SendDraw(float x, float y, bool isDraw, string color, float width)
     {
         var drawDetails = new DrawDetails(x, y, isDraw, color, width);
         await LobbyConnection.SendDraw(drawDetails);

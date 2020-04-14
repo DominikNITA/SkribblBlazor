@@ -13,8 +13,8 @@ namespace Skribbl_Website.Server.Models
 {
     public class Lobby : LobbyBase<Player>
     {
-        private readonly IHubContext<LobbyHub> _lobbyHub;
-        private readonly IWordsProviderService _wordsProviderService;
+        private IHubContext<LobbyHub> _lobbyHub;
+        private IWordsProviderService _wordsProviderService;
         private List<HintTimer> _hintTimers = new List<HintTimer>();
         private Timer _selectionTimer = null;
         private Timer _gameTimer = null;
@@ -100,8 +100,7 @@ namespace Skribbl_Website.Server.Models
 
         private async Task CheckNeedForDrawingPlayer()
         {
-            //TODO: change to a method keeping order
-            await CheckNeedFor_Base(GetDrawingPlayer, SetDrawingPlayer);
+            await SelectNextDrawingPlayer();
         }
 
         private async Task CheckNeedFor_Base(Func<Player> ifStatement, Func<string, Task> setFunction)
@@ -139,13 +138,13 @@ namespace Skribbl_Website.Server.Models
             }
             else
             {
-                int actualDrawingIndex = Players.IndexOf(actualDrawingPlayer);
+                int currentDrawingIndex = Players.IndexOf(actualDrawingPlayer);
                 while (!newDrawingPlayer.IsConnected)
                 {
-                    actualDrawingIndex++;
-                    if (actualDrawingIndex >= Players.Count)
+                    currentDrawingIndex++;
+                    if (currentDrawingIndex >= Players.Count)
                     {
-                        actualDrawingIndex = 0;
+                        currentDrawingIndex = 0;
                         RoundCount++;
                         if (RoundCount > LobbySettings.RoundsLimit)
                         {
@@ -154,7 +153,7 @@ namespace Skribbl_Website.Server.Models
                         }
                         await _lobbyHub.Clients.Group(Id).SendAsync("UpdateRound", RoundCount);
                     }
-                    newDrawingPlayer = Players[actualDrawingIndex];
+                    newDrawingPlayer = Players[currentDrawingIndex];
                 }
             }
             await this.SetDrawingPlayer(newDrawingPlayer.Name);

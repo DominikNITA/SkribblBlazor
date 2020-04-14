@@ -15,40 +15,68 @@ changeShowBan = function (newState, playerName) {
 var mousePressed = false;
 var lastX, lastY;
 var ctx;
+var customCursor;
 var isDrawing = false;
+var lineWidth = 3;
+var color = "black";
+var boardWidth, boardHeight;
+var wrapper;
+var canvas;
 var boardDotNetRefernce;
 
 function initThis(reference) {
     boardDotNetRefernce = reference;
     console.log(boardDotNetRefernce);
+    canvas = document.getElementById('myCanvas');
     ctx = document.getElementById('myCanvas').getContext("2d");
+    customCursor = document.getElementById('customCursor');
+    wrapper = document.getElementById("game-area");
 
-    $('#myCanvas').mousedown(function (e) {
+    //Avoid blur
+    ctx.webkitImageSmoothingEnabled = false;
+    ctx.mozImageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = false;
+
+    setLineWidth(2);
+    setColor("black");
+
+    $('#canvasOverlay').mousedown(function (e) {
         mousePressed = true;
         draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
+        draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
     });
 
-    $('#myCanvas').mousemove(function (e) {
+    $('#canvasOverlay').mousemove(function (e) {
+        customCursor.style.top = (e.pageY - convertToActualLineWidth(lineWidth) / 2) + "px";
+        customCursor.style.left = (e.pageX - convertToActualLineWidth(lineWidth) / 2) + "px";
         if (mousePressed) {
             draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
         }
     });
 
-    $('#myCanvas').mouseup(function (e) {
+    $('#canvasOverlay').mouseup(function (e) {
         mousePressed = false;
     });
-    $('#myCanvas').mouseleave(function (e) {
+    $('#canvasOverlay').mouseleave(function (e) {
         mousePressed = false;
+        customCursor.style.display = "none";
     });
+    $('#canvasOverlay').mouseenter(function (e) {
+        customCursor.style.display = "block";
+    });
+
+    window.addEventListener('resize', fitBoardToWrapper);
+    fitBoardToWrapper();
 }
+
 let i = 0;
 let jump = 2;
 function draw(x, y, isDown) {
     if (isDrawing) {
         if (isDown) {
             ctx.beginPath();
-            ctx.strokeStyle = "green";
-            ctx.lineWidth = 3;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = convertToActualLineWidth(lineWidth);
             ctx.lineJoin = "round";
             ctx.moveTo(lastX, lastY);
             ctx.lineTo(x, y);
@@ -56,22 +84,24 @@ function draw(x, y, isDown) {
             ctx.stroke();
             i++;
             if (i >= jump) {
-                boardDotNetRefernce.invokeMethodAsync('SendDraw', x, y, isDown, "green", 3);
+                boardDotNetRefernce.invokeMethodAsync('SendDraw', x / boardWidth, y / boardHeight, isDown, color, lineWidth);
                 i = 0;
             }
         }
         else {
-            boardDotNetRefernce.invokeMethodAsync('SendDraw', x, y, isDown, "green", 3);
+            boardDotNetRefernce.invokeMethodAsync('SendDraw', x / boardWidth, y / boardHeight, isDown, color, lineWidth);
         }
         lastX = x; lastY = y;
     }
 }
 
-function drawFromOutside(x, y, isDown, color, size) {
+function drawFromOutside(xPercent, yPercent, isDown, color, size) {
+    var x = xPercent * boardWidth;
+    var y = yPercent * boardHeight;
     if (isDown) {
         ctx.beginPath();
         ctx.strokeStyle = color;
-        ctx.lineWidth = size;
+        ctx.lineWidth = convertToActualLineWidth(size);
         ctx.lineJoin = "round";
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(x, y);
@@ -94,4 +124,44 @@ function setIsDrawing(newIsDrawing) {
 function prepareBoard() {
     setIsDrawing(false);
     clearArea();
+}
+
+function setColor(newColor) {
+    color = newColor;
+    customCursor.style.backgroundColor = newColor;
+}
+
+function setLineWidth(newLineWidth) {
+    lineWidth = newLineWidth;
+    customCursor.style.width = convertToActualLineWidth(newLineWidth) + "px";
+    customCursor.style.height = convertToActualLineWidth(newLineWidth) + "px";
+    customCursor.style.borderRadius = convertToActualLineWidth(newLineWidth) + "px";
+}
+
+function convertToActualLineWidth(relativeLineWidth) {
+    return relativeLineWidth * boardHeight / 100;
+}
+
+function fitBoardToWrapper() {
+    console.log("in fitBoardToWrapper");
+    var tempCanvas = document.createElement("canvas");
+    var tempContext = tempCanvas.getContext("2d");
+
+    tempCanvas.width = boardWidth;
+    tempCanvas.height = boardHeight;
+
+    //avoid blur
+    tempContext.webkitImageSmoothingEnabled = false;
+    tempContext.mozImageSmoothingEnabled = false;
+    tempContext.imageSmoothingEnabled = false;
+    tempContext.drawImage(canvas, 0, 0);
+
+    boardWidth = wrapper.offsetWidth;
+    boardHeight = wrapper.offsetHeight;
+
+    canvas.style.width = boardWidth + "px";
+    canvas.style.height = boardHeight + "px"; 
+    canvas.width = boardWidth;
+    canvas.height = boardHeight;
+    ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, boardWidth, boardHeight);
 }

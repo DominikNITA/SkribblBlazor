@@ -25,12 +25,12 @@
     private bool _showBanPlayer = false;
     private DotNetObjectReference<PlayerComponent> dotNetReference;
 
-    protected override Task OnInitializedAsync()
+    protected async override Task OnInitializedAsync()
     {
         dotNetReference = DotNetObjectReference.Create(this);
-        JSRuntime.InvokeVoidAsync("addNewReference", dotNetReference, Player.Name);
+        await JSRuntime.InvokeVoidAsync("addNewReference", dotNetReference, Player.Name);
         LobbyConnection.StateChanged += (sender,e) => StateHasChanged();
-        return base.OnInitializedAsync();
+        await base.OnInitializedAsync();
     }
 
     public string GuessedStyle

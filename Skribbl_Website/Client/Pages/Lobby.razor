@@ -25,6 +25,13 @@ Lobby ID: @LobbyId
 
 
     <Board></Board>
+    <span id="customCursor"></span>
+    <ToolbarComponent></ToolbarComponent>
+    @if (LobbyConnection.UserIsDrawing)
+    {
+        <ToolbarComponent></ToolbarComponent>
+    }
+
 
 
     @if (LobbyConnection.Lobby.State == LobbyState.Preparing)

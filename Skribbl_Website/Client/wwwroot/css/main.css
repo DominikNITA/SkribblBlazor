@@ -46,3 +46,55 @@
   display: flex;
   flex-direction: column;
   background-color: beige; }
+
+.color-choice {
+  margin: 2px 4px;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid black;
+  border-radius: 5px;
+  cursor: pointer; }
+  .color-choice:hover {
+    width: 1.7rem;
+    height: 1.7rem; }
+
+#myCanvas {
+  cursor: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  z-index: 2; }
+
+#customCursor {
+  z-index: 5;
+  width: 5px;
+  height: 5px;
+  border-radius: 15px;
+  display: none;
+  position: absolute;
+  /*    cursor: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;*/
+  user-select: none; }
+
+#game-area {
+  width: 50%;
+  padding-bottom: 33.33%;
+  background: white;
+  position: relative; }
+  #game-area > * {
+    position: absolute;
+    top: 0;
+    left: 0; }
+
+#canvasOverlay {
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  cursor: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  user-select: none; }

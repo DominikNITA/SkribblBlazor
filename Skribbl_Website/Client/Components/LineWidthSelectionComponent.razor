@@ -1,0 +1,17 @@
+﻿@inject IJSRuntime JSRuntime
+<h3>LineWidthSelectionComponent</h3>
+<div class="d-flex d-row">
+    @foreach (var lineWidth in AvailableLineWidths)
+    {
+        <span class="p-3 border border-danger" @onclick="@(() => SetLineWidth(lineWidth))">@lineWidth</span>
+    }
+</div>
+
+@code {
+    private List<int> AvailableLineWidths = new List<int> { 1,2,3,4,5,10,50 };
+
+    private async Task SetLineWidth(float newLineWidth)
+    {
+        await JSRuntime.InvokeVoidAsync("setLineWidth", newLineWidth);
+    }
+}

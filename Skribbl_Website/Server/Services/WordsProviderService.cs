@@ -16,7 +16,7 @@ namespace Skribbl_Website.Server.Services
         }
         private void PopulateWordsList()
         {
-            string path = "Data/english_words.txt";
+            string path = "Data\\english_words.txt";
             string line;
             System.IO.StreamReader file =
     new System.IO.StreamReader(path);

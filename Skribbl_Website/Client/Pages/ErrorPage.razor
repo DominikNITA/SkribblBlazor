@@ -1,0 +1,9 @@
+﻿@page "/error/{ErrorDetail}"
+<h3>ErrorPage</h3>
+<p>
+    @ErrorDetail
+</p>
+@code {
+    [Parameter] public string ErrorDetail { get; set; }
+}
+

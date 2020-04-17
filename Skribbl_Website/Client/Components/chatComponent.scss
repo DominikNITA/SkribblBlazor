@@ -1,0 +1,23 @@
+﻿@import "../Styles/utility.scss";
+
+.lobby__chat {
+    @include lobby-segment;
+    width: 20%;
+    background-color: #d09761;
+    overflow: hidden;
+}
+
+.chat {
+    &__messages {
+        flex-grow: 2;
+        height: auto;
+        overflow-y: scroll;
+    }
+
+    &__input-container {
+    }
+
+    &__input {
+        margin: 3px auto;
+    }
+}

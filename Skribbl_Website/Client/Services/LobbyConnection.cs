@@ -60,6 +60,22 @@ namespace Skribbl_Website.Client.Services
             }).WithAutomaticReconnect().Build();
             User = user;
 
+            _hubConnection.On<Message>("ReceiveNewDrawingPlayer", async (message) =>
+            {
+                Lobby.PrepareForNextDrawer();
+                Messages.Add(message);
+                Lobby.SetDrawingPlayer(message.Sender);
+                if (UserIsDrawing)
+                {
+                    await _jsRuntime.InvokeVoidAsync("setIsDrawing", true);
+                }
+                else
+                {
+                    await _jsRuntime.InvokeVoidAsync("prepareBoard");
+                }
+                InvokeOnReceive();
+            });
+
             _hubConnection.On<Message>("ReceiveNewHost", (message) =>
             {
                 Messages.Add(new Message(message.MessageContent, message.Type));
@@ -98,7 +114,6 @@ namespace Skribbl_Website.Client.Services
 
             _hubConnection.On<LobbySettings>("ReceiveLobbySettings", (lobbySettings) =>
             {
-                Console.WriteLine("in receive");
                 Lobby.LobbySettings = lobbySettings;
                 InvokeOnReceive();
             });
@@ -111,19 +126,7 @@ namespace Skribbl_Website.Client.Services
             _hubConnection.On<int>("StartGame", (delay) =>
             {
                 Lobby.StartGame();
-                InvokeOnReceive();
-            });
-
-            _hubConnection.On<Message>("ReceiveNewDrawingPlayer", async (message) =>
-            {
-                await _jsRuntime.InvokeVoidAsync("prepareBoard");
-                Lobby.PrepareForNextDrawer();
-                Messages.Add(message);
-                Lobby.SetDrawingPlayer(message.Sender);
-                if (UserIsDrawing)
-                {
-                    await _jsRuntime.InvokeVoidAsync("setIsDrawing", true);
-                }
+                Messages.Add(new Message("Game has started!", Message.MessageType.Join));
                 InvokeOnReceive();
             });
 
@@ -131,6 +134,7 @@ namespace Skribbl_Website.Client.Services
             {
                 Lobby.WordsToChoose = words;
                 Lobby.State = LobbyState.Choosing;
+                Console.WriteLine("received words");
                 InvokeOnReceive();
             });
 
@@ -154,6 +158,7 @@ namespace Skribbl_Website.Client.Services
             _hubConnection.On<List<ScoreDto>>("ReceiveScores", (newScores) =>
             {
                 Lobby.UpdateScores(newScores);
+                Lobby.ScoresToUpdate = newScores;
                 Lobby.State = LobbyState.Completed;
                 InvokeOnReceive();
             });

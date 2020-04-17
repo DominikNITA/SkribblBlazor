@@ -1,11 +1,11 @@
 ﻿@inject LobbyConnection LobbyConnection
 @if (LobbyConnection.UserIsDrawing)
 {
-    <h3>SelectWordComponent</h3>
+    <h3 >Select word to draw:</h3>
     <div class="words-container mx-auto w-auto d-flex flex-row">
         @foreach (var word in Words)
         {
-            <span @onclick="@(() => OnSelectionChoosed(word))" class="px-3 mx-2 py-2 border border-info">
+            <span @onclick="@(() => OnSelectionChoosed(word))" class="word-selection px-3 mx-2 py-2">
                 @word
             </span>
         }
@@ -13,7 +13,8 @@
 }
 else
 {
-    <h3>Someone else is choosing!</h3>
+
+    <h3>@LobbyConnection.Lobby.GetDrawingPlayer().Name is choosing!</h3>
 }
 
 @code {

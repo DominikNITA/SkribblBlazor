@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,6 +7,7 @@ namespace Skribbl_Website.Shared.Dtos
 {
     public class LobbyClient : LobbyBase<PlayerClient>
     {
+        public List<ScoreDto> ScoresToUpdate { get; set; }
         public LobbyClient(LobbyClientDto lobbyClientDto)
         {
             Players = lobbyClientDto.Players;

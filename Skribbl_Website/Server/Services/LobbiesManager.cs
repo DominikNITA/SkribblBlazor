@@ -59,7 +59,7 @@ namespace Skribbl_Website.Server.Services
                     catch
                     {
                         throw new Exception("Lobby is full. Cannot join.");
-                    }                   
+                    }
                 }
             }
             throw new Exception("This invite link doesn't match to any lobby.");
@@ -68,6 +68,11 @@ namespace Skribbl_Website.Server.Services
         public Lobby GetLobbyById(string lobbyId)
         {
             return Lobbies.Where(lobby => lobby.Id == lobbyId).First();
+        }
+
+        public Lobby GetLobbyByInviteLink(string invitelink)
+        {
+            return Lobbies.Where(lobby => lobby.InviteLink == invitelink).First();
         }
 
         public Lobby GetLobbyByPlayerConnectionId(string connectionId)

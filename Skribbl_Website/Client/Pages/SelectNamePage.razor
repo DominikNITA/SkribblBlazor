@@ -8,19 +8,32 @@
 @inject LocalStorage LocalStorage
 @inject UserState UserState
 
+<div class="select-name-wrapper">
+    @if (InviteLink != null)
+    {
+        <h1 class="select-name--header">
+            Joining lobby hosted by @_hostName. Select your nickname:
+        </h1>
+    }
+    else
+    {
+        <h1 class="select-name--header">
+            Creating lobby, please select your nickname:
+        </h1>
+    }
+    <EditForm class="d-flex flex-column align-items-center" Model="_nameModel" OnValidSubmit="SubmitName">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <InputText class="name-input" @bind-Value="_nameModel.Name" placeholder="Nickname"></InputText>
+        <button class="submit-name-button" type="submit">@_buttonContent</button>
+    </EditForm>
+    @if (_info != string.Empty)
+    {
+        <div class="alert alert-danger alert-dismissible">@_info</div>
+    }
+</div>
 
-<EditForm Model="_nameModel" OnValidSubmit="SubmitName">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <InputText @bind-Value="_nameModel.Name"></InputText>
-    <button type="submit">Join</button>
-</EditForm>
 
-@if (_info != string.Empty)
-{
-    <div class="alert alert-danger alert-dismissible">@_info</div>
-}
-ChangedAfter
 
 
 @code {
@@ -28,17 +41,36 @@ ChangedAfter
 
     private NameModel _nameModel = new NameModel();
     private string _info = string.Empty;
+    private string _hostName = string.Empty;
+    private string _query = "lobbies/";
+    private string _buttonContent = "Create";
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (InviteLink != null)
+        {
+            _buttonContent = "Join";
+            var response = await Http.GetJsonAsync<NameModel>(_query + "join/" + InviteLink);
+            _hostName = response.Name;
+
+            if (string.IsNullOrEmpty(_hostName))
+            {
+                NavigationManager.NavigateTo("error/" + "Lobby does not exist anymore.");
+            }
+        }
+        await base.OnInitializedAsync();
+    }
 
     private async void SubmitName()
     {
         LobbyRedirectDto response = new LobbyRedirectDto();
-        string query = "lobbies/";
+
         if (InviteLink != null)
         {
-            query += String.Format("join/{0}/{1}", InviteLink, _nameModel.Name);
+            _query += String.Format("join/{0}/{1}", InviteLink, _nameModel.Name);
             try
             {
-                response = await Http.GetJsonAsync<LobbyRedirectDto>(query);
+                response = await Http.GetJsonAsync<LobbyRedirectDto>(_query);
             }
             catch (Exception e)
             {
@@ -47,8 +79,8 @@ ChangedAfter
         }
         else
         {
-            query += String.Format("create/{0}", _nameModel.Name);
-            response = await Http.GetJsonAsync<LobbyRedirectDto>(query);
+            _query += String.Format("create/{0}", _nameModel.Name);
+            response = await Http.GetJsonAsync<LobbyRedirectDto>(_query);
         }
         if (!response.HasError)
         {

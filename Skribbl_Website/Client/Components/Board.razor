@@ -1,19 +1,11 @@
 ﻿@inject IJSRuntime JSRuntime
 @inject LobbyConnection LobbyConnection
-<div class="border border-warning">
-    <h3>Board</h3>
-    <span class="p-2">
-        Round: @LobbyConnection.Lobby.RoundCount / @LobbyConnection.Lobby.LobbySettings.RoundsLimit
-    </span>
-    <span class="p-2">
-        Time: @LobbyConnection.Lobby.TimeCount
-    </span>
-    <div id="game-area">
-        <canvas id="myCanvas" style="border:2px solid black"></canvas>
-        <div id="canvasOverlay"></div>
-    </div>
 
+<div id="board-area">
+    <canvas id="myCanvas" style="border:2px solid black"></canvas>
+    <div id="canvasOverlay"></div>
 </div>
+
 @code {
     protected override Task OnAfterRenderAsync(bool firstRender)
     {

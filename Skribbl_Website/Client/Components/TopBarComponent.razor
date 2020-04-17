@@ -1,0 +1,37 @@
+﻿@inject LobbyConnection LobbyConnection
+
+@if (LobbyConnection.Lobby.State != LobbyState.Preparing)
+{
+    <div class="lobby__top-bar d-flex flex-row">
+
+        <span class="top-bar__rounds ml-2">
+            Round: @LobbyConnection.Lobby.RoundCount / @LobbyConnection.Lobby.LobbySettings.RoundsLimit
+        </span>
+
+        <div class="top-bar__selection">
+            @if (LobbyConnection.UserIsDrawing)
+            {
+                @LobbyConnection.Lobby.Selection
+            }
+            else
+            {
+                if (LobbyConnection.Lobby.SelectionTemplate != null)
+                {
+                    <SelectionDisplayComponent SelectionTemplate="@LobbyConnection.Lobby.SelectionTemplate">
+                    </SelectionDisplayComponent>
+                }
+            }
+        </div>
+        <span class="top-bar__time mr-2">
+            Time: @LobbyConnection.Lobby.TimeCount
+        </span>
+
+    </div>
+}
+@code {
+    protected override Task OnInitializedAsync()
+    {
+        LobbyConnection.StateChanged += (sender, e) => StateHasChanged();
+        return base.OnInitializedAsync();
+    }
+}

@@ -1,0 +1,7 @@
+﻿@import "../Styles/utility.scss";
+
+.lobby__top-bar{
+    @include lobby-segment;
+
+    justify-content: space-between;
+}

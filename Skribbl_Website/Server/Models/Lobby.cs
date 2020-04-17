@@ -157,6 +157,7 @@ namespace Skribbl_Website.Server.Models
                 }
             }
             await this.SetDrawingPlayer(newDrawingPlayer.Name);
+            await Task.Delay(50);
             await SendWordsToChoose();
 
             _selectionTimer = new Timer();

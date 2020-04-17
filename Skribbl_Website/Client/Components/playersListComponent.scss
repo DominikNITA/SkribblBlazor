@@ -1,7 +1,10 @@
-﻿@import "playerComponent.scss";
+﻿@import "../Styles/utility.scss";
+
+@import "playerComponent.scss";
 
 .players-list{
-    width: 150px;
+    @include lobby-segment; 
+    width: 15%;
     display: flex;
     flex-direction: column;
     background-color: beige;

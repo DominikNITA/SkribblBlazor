@@ -1,0 +1,35 @@
+﻿@import "../Styles/utility.scss";
+.select-name {
+    &-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: auto;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+    }
+
+    &--header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+}
+
+.name-input {
+    padding: 10px 5px;
+    height: 58px;
+    border: 4px solid blue;
+    border-radius: 50px;
+    width: 250px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+.submit-name-button {
+    @include general-button;
+    background-color: #4CAF50; /* Green */
+    width: 100px;
+}

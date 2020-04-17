@@ -75,6 +75,7 @@ namespace Skribbl_Website.Shared.Dtos
 
         public void SetDrawingPlayer(string username)
         {
+            Console.WriteLine("in set drawing player");
             SetAllPlayersToNotDrawing();
             State = LobbyState.Choosing;
             GetPlayerByName(username).IsDrawing = true;
@@ -146,7 +147,14 @@ namespace Skribbl_Website.Shared.Dtos
         
         public void UpdateScores(List<ScoreDto> newScores)
         {
-            newScores.ForEach((scoreDto) => GetPlayerByName(scoreDto.PlayerName).AddScore(scoreDto.ScoreToAdd));
+            try
+            {
+                newScores.ForEach((scoreDto) => GetPlayerByName(scoreDto.PlayerName).AddScore(scoreDto.ScoreToAdd));
+            }
+            catch
+            {
+                Console.WriteLine("error with updating the scores");
+            }
         }
     }
 }

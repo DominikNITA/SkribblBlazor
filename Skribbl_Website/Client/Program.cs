@@ -2,6 +2,8 @@ using Cloudcrate.AspNetCore.Blazor.Browser.Storage;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Skribbl_Website.Client.Services;
+using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Skribbl_Website.Client

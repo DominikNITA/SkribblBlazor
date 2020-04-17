@@ -1,0 +1,23 @@
+﻿$base-color: #491974;
+$second-color: #0b34d5;
+$highlight-color: #cac601;
+$text-color: #e5dcdc;
+
+@mixin lobby-segment{
+    padding: 5px;
+    margin: 3px;
+    border: 2px solid $second-color;
+    border-radius: 10px;
+}
+
+@mixin general-button {
+    border: none;
+    color: white;
+    padding: 12px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 15px;
+    margin-bottom: 1.5rem;
+}

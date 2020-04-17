@@ -1,0 +1,33 @@
+﻿@import "../Components/topBarComponent.scss";
+@import "../Styles/utility.scss";
+
+.lobby {
+    min-width: 600px;
+    width: 95%;
+    min-height: 500px;
+    height: 80vh;
+    margin: auto;
+
+    &__content {
+        height: 100%;
+        align-items: stretch;
+    }
+
+    &__drawing-area {
+        @include lobby-segment;
+        align-items: center;
+        justify-content: center;
+        min-width: 65%;
+    }
+}
+
+.leave-button{
+    @include general-button;
+    background-color: red;
+}
+
+.start-button{
+    @include general-button;
+    background-color: $second-color;
+    color: $text-color;
+}

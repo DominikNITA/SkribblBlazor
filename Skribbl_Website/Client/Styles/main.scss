@@ -1,8 +1,13 @@
-﻿@import "messageComponent.scss";
-@import "chatComponent.scss";
+﻿@import "utility.scss";
+
+@import "../Components/messageComponent.scss";
+@import "../Components/chatComponent.scss";
 @import "../Components/playersListComponent.scss";
 @import "../Components/toolbarComponent.scss";
 @import "../Components/board.scss";
+@import "../Pages/selectNamePage.scss"; 
+@import "../Pages/lobby.scss";
+@import "../Components/selectWordComponent.scss";
 
 body {
 }

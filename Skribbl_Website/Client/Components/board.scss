@@ -11,19 +11,23 @@
     z-index: 5;
     width: 5px;
     height: 5px;
+    border: 1px dashed black;
     border-radius: 15px;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(255,255,255,1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(255,255,255,1);
+    box-shadow: 0px 0px 0px 1px rgba(255,255,255,1);
     display: none;
     position: absolute;
-/*    cursor: none;
+    cursor: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    -webkit-user-select: none;*/
+    -webkit-user-select: none;
     user-select: none;
 }
 
-#game-area {
-    width: 50%;
-    padding-bottom: 33.33%;
+#board-area {
+    width: 100%;
+    padding-bottom: 66.66%;
     background: white;
     position: relative;
 

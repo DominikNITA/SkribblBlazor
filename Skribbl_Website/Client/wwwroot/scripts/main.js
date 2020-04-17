@@ -30,7 +30,7 @@ function initThis(reference) {
     canvas = document.getElementById('myCanvas');
     ctx = document.getElementById('myCanvas').getContext("2d");
     customCursor = document.getElementById('customCursor');
-    wrapper = document.getElementById("game-area");
+    wrapper = document.getElementById("board-area");
 
     //Avoid blur
     ctx.webkitImageSmoothingEnabled = false;

@@ -17,19 +17,18 @@ namespace Skribbl_Website.Server.Services
         }
         private void PopulateWordsList()
         {
-    //    //http://www.desiquintans.com/downloads/nounlist/nounlist.txt
-    //        string path = Directory.GetCurrentDirectory() + "/Data/english_words.txt";
-    //        string line;
-    //        System.IO.StreamReader file =
-    //new System.IO.StreamReader(path);
-    //        while ((line = file.ReadLine()) != null)
-    //        {
-    //            _words.Add(line);
-    //        }
+            //    //http://www.desiquintans.com/downloads/nounlist/nounlist.txt
+            string path = "../Skribbl_Website/Server/Data/english_words.txt";
+            string line;
+            System.IO.StreamReader file =
+    new System.IO.StreamReader(path);
+            while ((line = file.ReadLine()) != null)
+            {
+                _words.Add(line);
+            }
         }
         public async Task<List<string>> GetWords()
         {
-            return new List<string> { "dog", "cat", "tester" };
             var random = new Random();
             int wordsCount = 3;
             var result = new List<string>();

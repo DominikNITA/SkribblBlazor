@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,7 +17,12 @@ namespace Skribbl_Website.Server.Services
         }
         private void PopulateWordsList()
         {
-            string path = "Data/english_words.txt";
+            //    //http://www.desiquintans.com/downloads/nounlist/nounlist.txt
+            string path = "../Skribbl_Website/Server/Data/english_words.txt";
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                path = "Data/english_words.txt";
+            }
             string line;
             System.IO.StreamReader file =
     new System.IO.StreamReader(path);

@@ -15,22 +15,23 @@ namespace Skribbl_Website.Server.Services
         {
             PopulateWordsList();
         }
+
         private void PopulateWordsList()
         {
-            //    //http://www.desiquintans.com/downloads/nounlist/nounlist.txt
+            //http://www.desiquintans.com/downloads/nounlist/nounlist.txt
             string path = "../Skribbl_Website/Server/Data/english_words.txt";
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
             {
                 path = "Data/english_words.txt";
             }
             string line;
-            System.IO.StreamReader file =
-    new System.IO.StreamReader(path);
+            var file = new StreamReader(path);
             while ((line = file.ReadLine()) != null)
             {
                 _words.Add(line);
             }
         }
+
         public async Task<List<string>> GetWords()
         {
             var random = new Random();

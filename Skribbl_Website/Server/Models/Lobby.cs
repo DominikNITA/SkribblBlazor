@@ -129,41 +129,44 @@ namespace Skribbl_Website.Server.Models
 
         private async Task SelectNextDrawingPlayer()
         {
-            var actualDrawingPlayer = GetDrawingPlayer();
-            var newDrawingPlayer = new Player();
-            PrepareForNextDrawer();
-            if (actualDrawingPlayer == null)
+            if (State != LobbyState.Preparing && State != LobbyState.Ended)
             {
-                newDrawingPlayer = Players.Where(player => player.IsConnected).First();
-            }
-            else
-            {
-                int currentDrawingIndex = Players.IndexOf(actualDrawingPlayer);
-                while (!newDrawingPlayer.IsConnected)
+                var actualDrawingPlayer = GetDrawingPlayer();
+                var newDrawingPlayer = new Player();
+                PrepareForNextDrawer();
+                if (actualDrawingPlayer == null)
                 {
-                    currentDrawingIndex++;
-                    if (currentDrawingIndex >= Players.Count)
-                    {
-                        currentDrawingIndex = 0;
-                        RoundCount++;
-                        if (RoundCount > LobbySettings.RoundsLimit)
-                        {
-                            await EndGame();
-                            return;
-                        }
-                        await _lobbyHub.Clients.Group(Id).SendAsync("UpdateRound", RoundCount);
-                    }
-                    newDrawingPlayer = Players[currentDrawingIndex];
+                    newDrawingPlayer = Players.Where(player => player.IsConnected).First();
                 }
-            }
-            await this.SetDrawingPlayer(newDrawingPlayer.Name);
-            await Task.Delay(50);
-            await SendWordsToChoose();
+                else
+                {
+                    int currentDrawingIndex = Players.IndexOf(actualDrawingPlayer);
+                    while (!newDrawingPlayer.IsConnected)
+                    {
+                        currentDrawingIndex++;
+                        if (currentDrawingIndex >= Players.Count)
+                        {
+                            currentDrawingIndex = 0;
+                            RoundCount++;
+                            if (RoundCount > LobbySettings.RoundsLimit)
+                            {
+                                await EndGame();
+                                return;
+                            }
+                            await _lobbyHub.Clients.Group(Id).SendAsync("UpdateRound", RoundCount);
+                        }
+                        newDrawingPlayer = Players[currentDrawingIndex];
+                    }
+                }
+                await this.SetDrawingPlayer(newDrawingPlayer.Name);
+                await Task.Delay(50);
+                await SendWordsToChoose();
 
-            _selectionTimer = new Timer();
-            _selectionTimer.Interval = 10000;
-            _selectionTimer.Elapsed += async (sender,e) => await CheckForSelection();
-            _selectionTimer.Enabled = true;
+                _selectionTimer = new Timer();
+                _selectionTimer.Interval = 10000;
+                _selectionTimer.Elapsed += async (sender, e) => await CheckForSelection();
+                _selectionTimer.Enabled = true; 
+            }
         }
 
         private async Task SendWordsToChoose()
@@ -188,7 +191,7 @@ namespace Skribbl_Website.Server.Models
                 await _lobbyHub.Clients.GroupExcept(Id, new List<string> { player.Connection }).SendAsync("ReceiveWordTemplate", selectionTemplate);
                 await _lobbyHub.Clients.Client(player.Connection).SendAsync("ReceiveSelection", word);
 
-                await StartTimer();
+                await StartTimers();
             }
         }
 
@@ -202,7 +205,7 @@ namespace Skribbl_Website.Server.Models
             }
         }
 
-        private async Task StartTimer()
+        private async Task StartTimers()
         {
             _gameTimer = new Timer();
             _gameTimer.Interval = LobbySettings.TimeLimit * 1000;
@@ -253,11 +256,7 @@ namespace Skribbl_Website.Server.Models
 
         private async Task GoToNextStep()
         {
-            //Clear all timers
-            _gameTimer.Stop();
-            _gameTimer = null;
-            _hintTimers.ForEach(timer => DisposeTimer(timer));
-            _hintTimers.Clear();
+            DisposeAllTimers();
 
             await SendScores();
 
@@ -276,6 +275,14 @@ namespace Skribbl_Website.Server.Models
         {
             ((HintTimer)sender).Stop();
             await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveHint", hint);
+        }
+
+        private void DisposeAllTimers()
+        {
+            _gameTimer.Stop();
+            _gameTimer = null;
+            _hintTimers.ForEach(timer => DisposeTimer(timer));
+            _hintTimers.Clear();
         }
 
         private void DisposeTimer(object sender)

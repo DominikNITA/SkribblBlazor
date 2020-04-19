@@ -33,10 +33,13 @@ namespace Skribbl_Website.Server.Models
 
         public async new Task<int> RemovePlayerByName(string username)
         {
-            GetPlayerByName(username).IsConnected = false;
-            await CheckNeedForNewHost();
-            await CheckNeedForDrawingPlayer();
+            await SetUserStateToDisconnected(username);
             return base.RemovePlayerByName(username);
+        }
+
+        public async Task<int> RemovePlayerByConnectionId(string connectionId)
+        {
+            return await RemovePlayerByName(GetPlayerByConnectionId(connectionId).Name);
         }
 
         public void SetConnectionIdForPlayer(string connection, string username)

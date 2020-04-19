@@ -125,7 +125,7 @@ new Message(player.Name + " lost connection.", Message.MessageType.Leave));
                 var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobby.Id);
                 await Clients.Group(lobby.Id).SendAsync("RemovePlayer", new Message(player.Name + " left.", Message.MessageType.Leave, player.Name));
-                await lobby.RemovePlayerByName(player.Name);
+                await lobby.RemovePlayerByConnectionId(player.Name);
             }
             await base.OnDisconnectedAsync(exception);
         }

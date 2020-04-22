@@ -69,24 +69,26 @@ function initThis(reference) {
     fitBoardToWrapper();
 }
 
-let i = 0;
-let jump = 2;
+//TODO: Refactor below
 function draw(x, y, isDown) {
     if (isDrawing) {
         if (isDown) {
             ctx.beginPath();
-            ctx.strokeStyle = color;
-            ctx.lineWidth = convertToActualLineWidth(lineWidth);
-            ctx.lineJoin = "round";
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(x, y);
-            ctx.closePath();
-            ctx.stroke();
-            i++;
-            if (i >= jump) {
-                boardDotNetRefernce.invokeMethodAsync('SendDraw', x / boardWidth, y / boardHeight, isDown, color, lineWidth);
-                i = 0;
+            if (x == lastX && y == lastY) {
+                ctx.fillStyle = color;
+                ctx.arc(x, y, convertToActualLineWidth(lineWidth)/2, 0, Math.PI * 2, true);
+                ctx.fill();
             }
+            else {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = convertToActualLineWidth(lineWidth);
+                ctx.lineJoin = "round";
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(x, y);
+                ctx.closePath();
+                ctx.stroke();
+            }
+            boardDotNetRefernce.invokeMethodAsync('SendDraw', x / boardWidth, y / boardHeight, isDown, color, lineWidth);
         }
         else {
             boardDotNetRefernce.invokeMethodAsync('SendDraw', x / boardWidth, y / boardHeight, isDown, color, lineWidth);
@@ -100,13 +102,20 @@ function drawFromOutside(xPercent, yPercent, isDown, color, size) {
     var y = yPercent * boardHeight;
     if (isDown) {
         ctx.beginPath();
-        ctx.strokeStyle = color;
-        ctx.lineWidth = convertToActualLineWidth(size);
-        ctx.lineJoin = "round";
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(x, y);
-        ctx.closePath();
-        ctx.stroke();
+        if (x == lastX && y == lastY) {
+            ctx.fillStyle = color;
+            ctx.arc(x, y, convertToActualLineWidth(size)/2, 0, Math.PI * 2, true);
+            ctx.fill();
+        }
+        else {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = convertToActualLineWidth(size);
+            ctx.lineJoin = "round";
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.closePath();
+            ctx.stroke();
+        }
     }
     lastX = x; lastY = y;
 }

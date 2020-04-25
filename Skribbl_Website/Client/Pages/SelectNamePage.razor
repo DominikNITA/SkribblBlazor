@@ -50,7 +50,7 @@
         if (InviteLink != null)
         {
             _buttonContent = "Join";
-            var response = await Http.GetJsonAsync<NameModel>(_query + "join/" + InviteLink);
+            var response = await Http.GetFromJsonAsync<NameModel>(_query + "join/" + InviteLink);
             _hostName = response.Name;
 
             if (string.IsNullOrEmpty(_hostName))
@@ -70,7 +70,7 @@
             _query += String.Format("join/{0}/{1}", InviteLink, _nameModel.Name);
             try
             {
-                response = await Http.GetJsonAsync<LobbyRedirectDto>(_query);
+                response = await Http.GetFromJsonAsync<LobbyRedirectDto>(_query);
             }
             catch (Exception e)
             {
@@ -80,7 +80,7 @@
         else
         {
             _query += String.Format("create/{0}", _nameModel.Name);
-            response = await Http.GetJsonAsync<LobbyRedirectDto>(_query);
+            response = await Http.GetFromJsonAsync<LobbyRedirectDto>(_query);
         }
         if (!response.HasError)
         {

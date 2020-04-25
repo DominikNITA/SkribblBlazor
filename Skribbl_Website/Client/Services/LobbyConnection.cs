@@ -18,6 +18,10 @@ namespace Skribbl_Website.Client.Services
 
         private readonly IJSRuntime _jsRuntime;
         private HubConnection _hubConnection;
+        public LobbyConnection(IJSRuntime jSRuntime)
+        {
+            _jsRuntime = jSRuntime;
+        }
 
         private void InvokeOnReceive(object sender = null, EventArgs e = null)
         {
@@ -46,11 +50,6 @@ namespace Skribbl_Website.Client.Services
         }
 
         public event EventHandler<DrawDetails> DrawReceived;
-
-        public LobbyConnection(IJSRuntime jSRuntime)
-        {
-            _jsRuntime = jSRuntime;
-        }
 
         public async Task StartConnection(Player user, Uri hubUrl, string lobbyId)
         {
@@ -208,6 +207,7 @@ namespace Skribbl_Website.Client.Services
         public void CloseConnection()
         {
             _hubConnection.StopAsync();
+            Messages = new List<Message>();
             //TODO: Clear UserState
         }
 

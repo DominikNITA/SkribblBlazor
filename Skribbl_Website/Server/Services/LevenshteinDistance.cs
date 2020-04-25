@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Skribbl_Website.Server.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace Skribbl_Website.Server.Services
     /// <summary>
     /// Got from: https://gist.github.com/Davidblkx/e12ab0bb2aff7fd8072632b396538560
     /// </summary>
-    public static class LevenshteinDistance
+    public class LevenshteinDistance : IWordDistanceCalculator
     {
         /// <summary>
         ///     Calculate the difference between 2 strings using the Levenshtein distance algorithm
@@ -16,7 +17,7 @@ namespace Skribbl_Website.Server.Services
         /// <param name="source1">First string</param>
         /// <param name="source2">Second string</param>
         /// <returns></returns>
-        public static int Calculate(string source1, string source2) //O(n*m)
+        public int Calculate(string source1, string source2) //O(n*m)
         {
             var source1Lower = source1.ToLower();
             var source2Lower = source2.ToLower();

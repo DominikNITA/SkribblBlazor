@@ -23,7 +23,7 @@ namespace Skribbl_Website.Server.Services
 
         public void StartCounting()
         {
-            
+            _order = new List<string>();
         }
     }
 }

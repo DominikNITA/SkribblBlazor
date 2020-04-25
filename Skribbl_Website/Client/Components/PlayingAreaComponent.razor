@@ -1,0 +1,61 @@
+﻿@inject LobbyConnection LobbyConnection
+
+@switch (LobbyConnection.Lobby.State)
+{
+    case LobbyState.Preparing:
+        <LobbySettingsComponent LobbySettings="LobbyConnection.Lobby.LobbySettings" IsHost="LobbyConnection.UserIsHost"></LobbySettingsComponent>
+
+        break;
+    case LobbyState.Started:
+        <h3>Game starts in a moment</h3>
+
+        break;
+    case LobbyState.Choosing:
+        <SelectWordComponent Words="LobbyConnection.Lobby.WordsToChoose"></SelectWordComponent>
+
+        break;
+    case LobbyState.Drawing:
+        <Board></Board>
+        <ToolbarComponent></ToolbarComponent>
+
+        break;
+    case LobbyState.Completed:
+        <h3>Points won this turn:</h3>
+        <div class="scores mt-2 d-flex flex-column">
+            @foreach (var score in LobbyConnection.Lobby.ScoresToUpdate)
+            {
+                <div class="score d-flex flex-row justify-content-between">
+                    <span>@score.PlayerName : </span>
+                    <span>@score.ScoreToAdd</span>
+                </div>
+            }
+        </div>
+
+        break;
+    case LobbyState.Ended:
+        <h3>Game finished!</h3>
+        <div class="p-2 border border-primary">
+            @LobbyConnection.Lobby.Players.First(player => player.Score == LobbyConnection.Lobby.Players.Max(player => player.Score)).Name won!
+        </div>
+
+        break;
+    default:
+        <h1>Error occured! Unknown state :(</h1>
+        break;
+}
+
+@code {
+
+    protected override Task OnInitializedAsync()
+    {
+        LobbyConnection.StateChanged += Update;
+        return base.OnInitializedAsync();
+    }
+
+    private async void Update(object sender, EventArgs e)
+    {
+        StateHasChanged();
+        await Task.Delay(50);
+        StateHasChanged();
+    }
+}

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Skribbl_Website.Server.Hubs;
+using Skribbl_Website.Server.Interfaces;
 using Skribbl_Website.Server.Models;
 using Skribbl_Website.Shared.Dtos;
 using Skribbl_Website.Shared.Exceptions;
@@ -11,23 +12,27 @@ namespace Skribbl_Website.Server.Services
 {
     public class LobbiesManager
     {
-        //TODO: change to private
-        public List<Lobby> Lobbies { get; private set; } = new List<Lobby>();
+        private List<Lobby> _lobbies = new List<Lobby>();
 
         private readonly IHubContext<LobbyHub> _lobbyHub;
         private IWordsProviderService _wordsProviderService;
+        private IWordDistanceCalculator _wordDistanceCalculator;
+        private IServiceProvider _serviceProvider;
 
-        public LobbiesManager(IHubContext<LobbyHub> hubContext, IWordsProviderService wordsProviderService)
+        public LobbiesManager(IHubContext<LobbyHub> lobbyHub, IWordsProviderService wordsProviderService, IWordDistanceCalculator wordDistanceCalculator, IServiceProvider serviceProvider)
         {
-            _lobbyHub = hubContext;
+            _lobbyHub = lobbyHub;
             _wordsProviderService = wordsProviderService;
+            _wordDistanceCalculator = wordDistanceCalculator;
+            _serviceProvider = serviceProvider;
         }
 
         public string CreateLobby(Player host)
         {
-            var lobby = new Lobby(_lobbyHub, _wordsProviderService);
+            var scoreCalculator = (IScoreCalculator)_serviceProvider.GetService(typeof(IScoreCalculator));
+            var lobby = new Lobby(_lobbyHub,_wordsProviderService,scoreCalculator,_wordDistanceCalculator);
             lobby.AddPlayer(host);
-            Lobbies.Add(lobby);
+            _lobbies.Add(lobby);
             return lobby.Id.ToString();
         }
 
@@ -41,7 +46,7 @@ namespace Skribbl_Website.Server.Services
         /// <returns></returns>
         public string AddPlayerToLobby(string inviteLink, Player player)
         {
-            foreach (var lobby in Lobbies)
+            foreach (var lobby in _lobbies)
             {
                 //Search for lobby with corresponding invite link
                 if (lobby.InviteLink.Equals(inviteLink))
@@ -67,17 +72,17 @@ namespace Skribbl_Website.Server.Services
 
         public Lobby GetLobbyById(string lobbyId)
         {
-            return Lobbies.Where(lobby => lobby.Id == lobbyId).First();
+            return _lobbies.Where(lobby => lobby.Id == lobbyId).First();
         }
 
         public Lobby GetLobbyByInviteLink(string invitelink)
         {
-            return Lobbies.Where(lobby => lobby.InviteLink == invitelink).First();
+            return _lobbies.Where(lobby => lobby.InviteLink == invitelink).First();
         }
 
         public Lobby GetLobbyByPlayerConnectionId(string connectionId)
         {
-            return Lobbies.Where(lobby => lobby.Players.Any(player => player.Connection == connectionId)).First();
+            return _lobbies.Where(lobby => lobby.Players.Any(player => player.Connection == connectionId)).First();
         }
     }
 }

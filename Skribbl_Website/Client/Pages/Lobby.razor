@@ -21,45 +21,8 @@
                 <PlayersListComponent Players="LobbyConnection.Lobby.Players" UserIsHost="LobbyConnection.UserIsHost">
                 </PlayersListComponent>
             }
-            <div class="lobby__drawing-area d-flex flex-column">
-                @if (LobbyConnection.Lobby.State == LobbyState.Preparing)
-                {
-                    <LobbySettingsComponent LobbySettings="LobbyConnection.Lobby.LobbySettings" IsHost="LobbyConnection.UserIsHost"></LobbySettingsComponent>
-                    <button class="start-button mt-2" @onclick="LobbyConnection.StartGame"> Start Game!</button>
-                }
-                else if (LobbyConnection.Lobby.State == LobbyState.Drawing)
-                {
-                    <Board></Board>
-                    <ToolbarComponent></ToolbarComponent>
-                }
-                else if (LobbyConnection.Lobby.State == LobbyState.Choosing)
-                {
-                    <SelectWordComponent Words="LobbyConnection.Lobby.WordsToChoose"></SelectWordComponent>
-                }
-                else if (LobbyConnection.Lobby.State == LobbyState.Started)
-                {
-                    <h3>Game starts in a moment</h3>
-                }
-                else if(LobbyConnection.Lobby.State == LobbyState.Ended)
-                {
-                    <h3>Game finished!</h3>
-                    <div class="p-2 border border-primary">
-                        @LobbyConnection.Lobby.Players.First(player => player.Score == LobbyConnection.Lobby.Players.Max(player => player.Score)) won!
-                    </div>
-                }
-                else if( LobbyConnection.Lobby.State == LobbyState.Completed)
-                {
-                    <h3>Points won this turn:</h3>
-                    <div class="scores mt-2 d-flex flex-column">
-                        @foreach (var score in LobbyConnection.Lobby.ScoresToUpdate)
-                        {
-                            <div class="score d-flex flex-row justify-content-between">
-                                <span>@score.PlayerName : </span>
-                                <span>@score.ScoreToAdd</span>
-                            </div>
-                        }
-                    </div>
-                }
+            <div class="lobby__playing-area d-flex flex-column">
+                <PlayingAreaComponent></PlayingAreaComponent>
             </div>
             @if (LobbyConnection.Messages != null)
             {

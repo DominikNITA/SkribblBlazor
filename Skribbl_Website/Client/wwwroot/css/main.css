@@ -173,7 +173,7 @@
   .lobby__content {
     height: 100%;
     align-items: stretch; }
-  .lobby__drawing-area {
+  .lobby__playing-area {
     padding: 5px;
     margin: 3px;
     border: 2px solid #0b34d5;

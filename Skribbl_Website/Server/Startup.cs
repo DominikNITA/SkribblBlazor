@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Skribbl_Website.Server.Hubs;
+using Skribbl_Website.Server.Interfaces;
 using Skribbl_Website.Server.Services;
 
 namespace Skribbl_Website.Server
@@ -25,8 +26,11 @@ namespace Skribbl_Website.Server
             services.AddSignalR().AddJsonProtocol(options => {
                 options.PayloadSerializerOptions.PropertyNamingPolicy = null;
     });
-            services.AddSingleton<LobbiesManager>();
             services.AddSingleton<IWordsProviderService, WordsProviderService>();
+            services.AddSingleton<IWordDistanceCalculator, LevenshteinDistance>();
+            services.AddTransient<IScoreCalculator, SimpleScoreCalculator>();
+            services.AddSingleton<LobbiesManager>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

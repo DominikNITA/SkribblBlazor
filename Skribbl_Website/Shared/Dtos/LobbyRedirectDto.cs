@@ -9,6 +9,7 @@
 
         public LobbyRedirectDto(Player confirmedUser, string lobbyUrl)
         {
+            //TODO: Change to only send playerID
             ConfirmedUser = confirmedUser;
             LobbyUrl = lobbyUrl;
             ExceptionMessage = string.Empty;

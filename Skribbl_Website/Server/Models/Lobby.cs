@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Skribbl_Website.Server.Hubs;
+using Skribbl_Website.Server.Interfaces;
 using Skribbl_Website.Server.Services;
 using Skribbl_Website.Shared;
 using Skribbl_Website.Shared.Dtos;
@@ -15,16 +16,18 @@ namespace Skribbl_Website.Server.Models
     {
         private IHubContext<LobbyHub> _lobbyHub;
         private IWordsProviderService _wordsProviderService;
+        private IScoreCalculator _scoreCalculator;
+        private IWordDistanceCalculator _wordDistanceCalculator;
         private List<HintTimer> _hintTimers = new List<HintTimer>();
         private Timer _selectionTimer = null;
         private Timer _gameTimer = null;
 
-        private IScoreCalculator _scoreCalculator;
-
-        public Lobby(IHubContext<LobbyHub> lobbyHub, IWordsProviderService wordsProviderService) : base()
+        public Lobby(IHubContext<LobbyHub> lobbyHub, IWordsProviderService wordsProviderService, IScoreCalculator scoreCalculator, IWordDistanceCalculator wordDistanceCalculator)
         {
-            _lobbyHub = lobbyHub;
-            _wordsProviderService = wordsProviderService;
+            _lobbyHub = lobbyHub ?? throw new ArgumentNullException(nameof(lobbyHub));
+            _wordsProviderService = wordsProviderService ?? throw new ArgumentNullException(nameof(wordsProviderService));
+            _scoreCalculator = scoreCalculator ?? throw new ArgumentNullException(nameof(scoreCalculator));
+            _wordDistanceCalculator = wordDistanceCalculator ?? throw new ArgumentNullException(nameof(wordDistanceCalculator));
         }
 
         public Lobby()
@@ -188,7 +191,6 @@ namespace Skribbl_Website.Server.Models
                 _selectionTimer.Stop();
                 _selectionTimer = null;
 
-                _scoreCalculator = new SimpleScoreCalculator();
                 _scoreCalculator.StartCounting();
 
                 await _lobbyHub.Clients.GroupExcept(Id, new List<string> { player.Connection }).SendAsync("ReceiveWordTemplate", selectionTemplate);
@@ -235,7 +237,7 @@ namespace Skribbl_Website.Server.Models
             else
             {
                 //TODO: rework with interface
-                if (LevenshteinDistance.Calculate(guess, Selection) <= 2)
+                if (_wordDistanceCalculator.Calculate(guess, Selection) <= 2)
                 {
                     await _lobbyHub.Clients.Client(player.Connection).SendAsync("ReceiveMessage", new Message(guess + " is a close one!", Message.MessageType.CloseGuess));
                 }

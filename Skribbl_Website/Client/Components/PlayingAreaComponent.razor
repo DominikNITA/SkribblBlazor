@@ -20,6 +20,7 @@
 
         break;
     case LobbyState.Completed:
+        <h1 class="pb-3"> Correct answer: @LobbyConnection.Lobby.Selection</h1>
         <h3>Points won this turn:</h3>
         <div class="scores mt-2 d-flex flex-column">
             @foreach (var score in LobbyConnection.Lobby.ScoresToUpdate)

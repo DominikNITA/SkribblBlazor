@@ -226,6 +226,10 @@ namespace Skribbl_Website.Server.Models
 
         public async Task<bool> CheckGuess(Player player, string guess)
         {
+            if(State != LobbyState.Drawing)
+            {
+                return true;
+            }
             if (guess.Equals(Selection, StringComparison.OrdinalIgnoreCase))
             {
                 player.HasGuessedCorrectly = true;
@@ -274,6 +278,7 @@ namespace Skribbl_Website.Server.Models
         {
             var newScores = _scoreCalculator.GetScores(Players.Count);
             await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveScores", newScores);
+            await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveCorrectAnswer", Selection);
         }
 
         private async Task SendHint(HintDto hint, object sender)

@@ -193,6 +193,12 @@ namespace Skribbl_Website.Client.Services
                 InvokeOnReceive();
             });
 
+            _hubConnection.On<string>("ReceiveCorrectAnswer", (answer) => {
+                Lobby.Selection = answer;
+                Messages.Add(new Message("The correct answer was: " + answer, Message.MessageType.Guessed));
+                InvokeOnReceive();
+            });
+
             await _hubConnection.StartAsync();
             try
             {

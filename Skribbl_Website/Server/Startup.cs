@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -56,7 +57,15 @@ namespace Skribbl_Website.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<LobbyHub>("/lobbyHub");
+                if (env.IsDevelopment())
+                {
+                    endpoints.MapHub<LobbyHub>("/lobbyHub", options => { options.Transports = HttpTransportType.LongPolling; });
+                }
+                else
+                {
+                    endpoints.MapHub<LobbyHub>("/lobbyHub");
+                }
+                
                 endpoints.MapFallbackToFile("index.html");
             });
         }

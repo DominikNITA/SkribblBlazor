@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Skribbl_Website.Server.Services;
-using Skribbl_Website.Shared.Dtos;
-using System;
+﻿using System;
 using System.Threading.Tasks;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Skribbl_Website.Shared;
+using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using Skribbl_Website.Server.Services;
+using Skribbl_Website.Shared;
+using Skribbl_Website.Shared.Dtos;
 
 namespace Skribbl_Website.Server.Hubs
 {
@@ -21,21 +19,16 @@ namespace Skribbl_Website.Server.Hubs
 
         public async Task SendMessage(Message message)
         {
-            if(message.MessageContent != null && message.MessageContent != string.Empty)
+            if (message.MessageContent != null && message.MessageContent != string.Empty)
             {
                 var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
-                if(lobby.State == LobbyState.Drawing)
+                if (lobby.State == LobbyState.Drawing)
                 {
                     var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
-                    if (player.HasGuessedCorrectly || lobby.GetDrawingPlayer() == player)
-                    {
-                        return;
-                    }
-                    if(await lobby.CheckGuess(player, message.MessageContent))
-                    {
-                        return;
-                    }
+                    if (player.HasGuessedCorrectly || lobby.GetDrawingPlayer() == player) return;
+                    if (await lobby.CheckGuess(player, message.MessageContent)) return;
                 }
+
                 await Clients.Group(lobby.Id).SendAsync("ReceiveMessage", message);
             }
         }
@@ -43,10 +36,7 @@ namespace Skribbl_Website.Server.Hubs
         public async Task StartGame()
         {
             var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
-            if (lobby.IsConnectionAHost(Context.ConnectionId))
-            {
-                await lobby.StartGame();
-            }
+            if (lobby.IsConnectionAHost(Context.ConnectionId)) await lobby.StartGame();
         }
 
         public async Task AddToGroup(string userId, string lobbyId)
@@ -62,16 +52,13 @@ namespace Skribbl_Website.Server.Hubs
             await Clients.Group(lobbyId).SendAsync("ReceiveMessage",
                 new Message(player.Name + " joined.", Message.MessageType.Join));
 
-            if (lobby.GetHostPlayer() == null)
-            {
-                await lobby.SetHostPlayer(player.Name);
-            }
+            if (lobby.GetHostPlayer() == null) await lobby.SetHostPlayer(player.Name);
         }
 
         public async Task SendLobbySettings(LobbySettings lobbySettings)
         {
             var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
-            if(lobby.GetHostPlayer().Connection == Context.ConnectionId)
+            if (lobby.GetHostPlayer().Connection == Context.ConnectionId)
             {
                 lobby.LobbySettings = lobbySettings;
                 await Clients.Group(lobby.Id).SendAsync("ReceiveLobbySettings", lobbySettings);
@@ -84,10 +71,12 @@ namespace Skribbl_Website.Server.Hubs
             if (lobby.IsConnectionAHost(Context.ConnectionId))
             {
                 var playerToBan = lobby.GetPlayerByName(playerName);
-                await Clients.Client(playerToBan.Connection).SendAsync("RedirectToKickedPage", lobby.GetHostPlayer().Name);
+                await Clients.Client(playerToBan.Connection)
+                    .SendAsync("RedirectToKickedPage", lobby.GetHostPlayer().Name);
                 await Groups.RemoveFromGroupAsync(playerToBan.Connection, lobby.Id);
                 await lobby.RemovePlayerByName(playerName);
-                await Clients.Group(lobby.Id).SendAsync("RemovePlayer", new Message(playerName + " banned.", Message.MessageType.Leave, playerName));
+                await Clients.Group(lobby.Id).SendAsync("RemovePlayer",
+                    new Message(playerName + " banned.", Message.MessageType.Leave, playerName));
             }
         }
 
@@ -102,10 +91,8 @@ namespace Skribbl_Website.Server.Hubs
         {
             var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
             var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
-            if(lobby.GetDrawingPlayer() == player && lobby.State == LobbyState.Drawing)
-            {
+            if (lobby.GetDrawingPlayer() == player && lobby.State == LobbyState.Drawing)
                 await Clients.OthersInGroup(lobby.Id).SendAsync("GetDraw", drawDetails);
-            }
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
@@ -117,16 +104,18 @@ namespace Skribbl_Website.Server.Hubs
                 await lobby.SetUserStateToDisconnected(Context.ConnectionId);
                 //TODO send request to set is connected to false.
                 await Clients.Group(lobby.Id).SendAsync("ReceiveMessage",
-new Message(player.Name + " lost connection.", Message.MessageType.Leave));
+                    new Message(player.Name + " lost connection.", Message.MessageType.Leave));
             }
             else
             {
                 var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
                 var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobby.Id);
-                await Clients.Group(lobby.Id).SendAsync("RemovePlayer", new Message(player.Name + " left.", Message.MessageType.Leave, player.Name));
+                await Clients.Group(lobby.Id).SendAsync("RemovePlayer",
+                    new Message(player.Name + " left.", Message.MessageType.Leave, player.Name));
                 await lobby.RemovePlayerByConnectionId(player.Name);
             }
+
             await base.OnDisconnectedAsync(exception);
         }
     }

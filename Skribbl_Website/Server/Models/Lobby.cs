@@ -1,40 +1,43 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Timers;
+using Microsoft.AspNetCore.SignalR;
 using Skribbl_Website.Server.Hubs;
 using Skribbl_Website.Server.Interfaces;
 using Skribbl_Website.Server.Services;
 using Skribbl_Website.Shared;
 using Skribbl_Website.Shared.Dtos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Timers;
 
 namespace Skribbl_Website.Server.Models
 {
     public class Lobby : LobbyBase<Player>
     {
-        private IHubContext<LobbyHub> _lobbyHub;
-        private IWordsProviderService _wordsProviderService;
-        private IScoreCalculator _scoreCalculator;
-        private IWordDistanceCalculator _wordDistanceCalculator;
+        private readonly IHubContext<LobbyHub> _lobbyHub;
+        private readonly IScoreCalculator _scoreCalculator;
+        private readonly IWordDistanceCalculator _wordDistanceCalculator;
+        private readonly IWordsProviderService _wordsProviderService;
+        private Timer _gameTimer;
         private List<HintTimer> _hintTimers = new List<HintTimer>();
-        private Timer _selectionTimer = null;
-        private Timer _gameTimer = null;
+        private Timer _selectionTimer;
 
-        public Lobby(IHubContext<LobbyHub> lobbyHub, IWordsProviderService wordsProviderService, IScoreCalculator scoreCalculator, IWordDistanceCalculator wordDistanceCalculator)
+        public Lobby(IHubContext<LobbyHub> lobbyHub, IWordsProviderService wordsProviderService,
+            IScoreCalculator scoreCalculator, IWordDistanceCalculator wordDistanceCalculator)
         {
             _lobbyHub = lobbyHub ?? throw new ArgumentNullException(nameof(lobbyHub));
-            _wordsProviderService = wordsProviderService ?? throw new ArgumentNullException(nameof(wordsProviderService));
+            _wordsProviderService =
+                wordsProviderService ?? throw new ArgumentNullException(nameof(wordsProviderService));
             _scoreCalculator = scoreCalculator ?? throw new ArgumentNullException(nameof(scoreCalculator));
-            _wordDistanceCalculator = wordDistanceCalculator ?? throw new ArgumentNullException(nameof(wordDistanceCalculator));
+            _wordDistanceCalculator =
+                wordDistanceCalculator ?? throw new ArgumentNullException(nameof(wordDistanceCalculator));
         }
 
         public Lobby()
         {
         }
 
-        public async new Task<int> RemovePlayerByName(string username)
+        public new async Task<int> RemovePlayerByName(string username)
         {
             await SetUserStateToDisconnected(username);
             return base.RemovePlayerByName(username);
@@ -47,10 +50,7 @@ namespace Skribbl_Website.Server.Models
 
         public void SetConnectionIdForPlayer(string connection, string username)
         {
-            if (connection == null || connection == string.Empty)
-            {
-                throw new ArgumentException();
-            }
+            if (connection == null || connection == string.Empty) throw new ArgumentException();
             var player = GetPlayerByName(username);
             player.Connection = connection;
         }
@@ -88,7 +88,7 @@ namespace Skribbl_Website.Server.Models
         {
             base.SetHostPlayer(username);
             await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveNewHost",
-    new Message(username + " is the new host.", Message.MessageType.Host, username));
+                new Message(username + " is the new host.", Message.MessageType.Host, username));
         }
 
         private async Task CheckNeedForNewHost()
@@ -101,7 +101,7 @@ namespace Skribbl_Website.Server.Models
             base.SetDrawingPlayer(username);
             State = LobbyState.Drawing;
             await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveNewDrawingPlayer",
-    new Message(username + " is drawing now.", Message.MessageType.Join, username));
+                new Message(username + " is drawing now.", Message.MessageType.Join, username));
         }
 
         private async Task CheckNeedForDrawingPlayer()
@@ -112,22 +112,18 @@ namespace Skribbl_Website.Server.Models
         private async Task CheckNeedFor_Base(Func<Player> ifStatement, Func<string, Task> setFunction)
         {
             if (Players.Count > 1 && ifStatement() == null)
-            {
                 foreach (var player in Players)
-                {
                     if (player.IsConnected)
                     {
                         await setFunction(player.Name);
                         break;
                     }
-                }
-            }
         }
 
         public new async Task StartGame()
         {
             base.StartGame();
-            int delay = 3000;
+            var delay = 3000;
             await _lobbyHub.Clients.Group(Id).SendAsync("StartGame", delay);
             await Task.Delay(delay);
             await SelectNextDrawingPlayer();
@@ -146,7 +142,7 @@ namespace Skribbl_Website.Server.Models
                 }
                 else
                 {
-                    int currentDrawingIndex = Players.IndexOf(actualDrawingPlayer);
+                    var currentDrawingIndex = Players.IndexOf(actualDrawingPlayer);
                     while (!newDrawingPlayer.IsConnected)
                     {
                         currentDrawingIndex++;
@@ -159,19 +155,22 @@ namespace Skribbl_Website.Server.Models
                                 await EndGame();
                                 return;
                             }
+
                             await _lobbyHub.Clients.Group(Id).SendAsync("UpdateRound", RoundCount);
                         }
+
                         newDrawingPlayer = Players[currentDrawingIndex];
                     }
                 }
-                await this.SetDrawingPlayer(newDrawingPlayer.Name);
+
+                await SetDrawingPlayer(newDrawingPlayer.Name);
                 await Task.Delay(50);
                 await SendWordsToChoose();
 
                 _selectionTimer = new Timer();
                 _selectionTimer.Interval = 10000;
                 _selectionTimer.Elapsed += async (sender, e) => await CheckForSelection();
-                _selectionTimer.Enabled = true; 
+                _selectionTimer.Enabled = true;
             }
         }
 
@@ -193,7 +192,8 @@ namespace Skribbl_Website.Server.Models
 
                 _scoreCalculator.StartCounting();
 
-                await _lobbyHub.Clients.GroupExcept(Id, new List<string> { player.Connection }).SendAsync("ReceiveWordTemplate", selectionTemplate);
+                await _lobbyHub.Clients.GroupExcept(Id, new List<string> {player.Connection})
+                    .SendAsync("ReceiveWordTemplate", selectionTemplate);
                 await _lobbyHub.Clients.Client(player.Connection).SendAsync("ReceiveSelection", word);
 
                 await StartTimers();
@@ -202,59 +202,55 @@ namespace Skribbl_Website.Server.Models
 
         private async Task CheckForSelection()
         {
-            if (Selection == null || Selection == string.Empty)
+            if (string.IsNullOrEmpty(Selection))
             {
                 var random = new Random();
-                int index = random.Next(WordsToChoose.Count);
+                var index = random.Next(WordsToChoose.Count);
                 await SelectSelection(GetDrawingPlayer(), WordsToChoose[index]);
             }
         }
 
-        private async Task StartTimers()
+        private Task StartTimers()
         {
-            _gameTimer = new Timer();
-            _gameTimer.Interval = LobbySettings.TimeLimit * 1000;
+            _gameTimer = new Timer
+            {
+                Interval = LobbySettings.TimeLimit * 1000
+            };
             _gameTimer.Elapsed += async (sender, e) => await GoToNextStep();
             _gameTimer.Enabled = true;
 
 
-            _hintTimers = HintsCreator.CreateHintTimersForSelection(Selection,LobbySettings.TimeLimit);
-            _hintTimers.ForEach( timer => timer.Elapsed += async (sender, e) => await SendHint(timer.Hint, sender));
+            _hintTimers = HintsCreator.CreateHintTimersForSelection(Selection, LobbySettings.TimeLimit);
+            _hintTimers.ForEach(timer => timer.Elapsed += async (sender, e) => await SendHint(timer.Hint, sender));
             _hintTimers.ForEach(timer => timer.Enabled = true);
+            return Task.CompletedTask;
         }
 
 
         public async Task<bool> CheckGuess(Player player, string guess)
         {
-            if(State != LobbyState.Drawing)
-            {
-                return true;
-            }
+            if (State != LobbyState.Drawing) return true;
             if (guess.Equals(Selection, StringComparison.OrdinalIgnoreCase))
             {
                 player.HasGuessedCorrectly = true;
                 _scoreCalculator.AddPlayer(player.Name);
-                await _lobbyHub.Clients.Group(Id).SendAsync("GuessedCorrectly", new Message(player.Name + " guessed correctly.", Message.MessageType.Guessed, player.Name));
+                await _lobbyHub.Clients.Group(Id).SendAsync("GuessedCorrectly",
+                    new Message(player.Name + " guessed correctly.", Message.MessageType.Guessed, player.Name));
                 await CheckForCompletedGuessing();
                 return true;
             }
-            else
-            {
-                //TODO: rework with interface
-                if (_wordDistanceCalculator.Calculate(guess, Selection) <= 2)
-                {
-                    await _lobbyHub.Clients.Client(player.Connection).SendAsync("ReceiveMessage", new Message(guess + " is a close one!", Message.MessageType.CloseGuess));
-                }
-                return false;
-            }
+
+            //TODO: rework with interface
+            if (_wordDistanceCalculator.Calculate(guess, Selection) <= 2)
+                await _lobbyHub.Clients.Client(player.Connection).SendAsync("ReceiveMessage",
+                    new Message(guess + " is a close one!", Message.MessageType.CloseGuess));
+            return false;
         }
 
         private async Task CheckForCompletedGuessing()
         {
-            if (Players.Where(player => player.IsConnected && !player.IsDrawing).All((player) => player.HasGuessedCorrectly))
-            {
-                await GoToNextStep();
-            }
+            if (Players.Where(player => player.IsConnected && !player.IsDrawing)
+                .All(player => player.HasGuessedCorrectly)) await GoToNextStep();
         }
 
         public new void PrepareForNextDrawer()
@@ -283,7 +279,7 @@ namespace Skribbl_Website.Server.Models
 
         private async Task SendHint(HintDto hint, object sender)
         {
-            ((HintTimer)sender).Stop();
+            ((HintTimer) sender).Stop();
             await _lobbyHub.Clients.Group(Id).SendAsync("ReceiveHint", hint);
         }
 
@@ -291,13 +287,13 @@ namespace Skribbl_Website.Server.Models
         {
             _gameTimer.Stop();
             _gameTimer = null;
-            _hintTimers.ForEach(timer => DisposeTimer(timer));
+            _hintTimers.ForEach(DisposeTimer);
             _hintTimers.Clear();
         }
 
-        private void DisposeTimer(object sender)
+        private static void DisposeTimer(object sender)
         {
-            var timer = (Timer)sender;
+            var timer = (Timer) sender;
             timer.Stop();
             sender = null;
         }

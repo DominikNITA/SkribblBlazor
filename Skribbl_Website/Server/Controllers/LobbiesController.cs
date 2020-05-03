@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Skribbl_Website.Server.Services;
 using Skribbl_Website.Shared;
 using Skribbl_Website.Shared.Dtos;
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,7 +21,7 @@ namespace Skribbl_Website.Server.Controllers
         }
 
         [HttpGet("create/{name}")]
-        async public Task<ActionResult<LobbyRedirectDto>> Get(string name)
+        public async Task<ActionResult<LobbyRedirectDto>> Get(string name)
         {
             var host = new Player(name);
             var lobbyUrl = _lobbiesManager.CreateLobby(host);
@@ -32,7 +29,7 @@ namespace Skribbl_Website.Server.Controllers
         }
 
         [HttpGet("join/{inviteLink}/{name}")]
-        async public Task<ActionResult<LobbyRedirectDto>> Get(string inviteLink, string name)
+        public async Task<ActionResult<LobbyRedirectDto>> Get(string inviteLink, string name)
         {
             try
             {
@@ -48,7 +45,7 @@ namespace Skribbl_Website.Server.Controllers
         }
 
         [HttpGet("join/{inviteLink}")]
-        async public Task<ActionResult<NameModel>> GetHostName(string inviteLink)
+        public async Task<ActionResult<NameModel>> GetHostName(string inviteLink)
         {
             try
             {

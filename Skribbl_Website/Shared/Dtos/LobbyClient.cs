@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,7 +6,6 @@ namespace Skribbl_Website.Shared.Dtos
 {
     public class LobbyClient : LobbyBase<PlayerClient>
     {
-        public List<ScoreDto> ScoresToUpdate { get; set; }
         public LobbyClient(LobbyClientDto lobbyClientDto)
         {
             Players = lobbyClientDto.Players;
@@ -21,10 +19,11 @@ namespace Skribbl_Website.Shared.Dtos
             State = lobbyClientDto.State;
         }
 
-        public LobbyClient() : base()
+        public LobbyClient()
         {
-
         }
+
+        public List<ScoreDto> ScoresToUpdate { get; set; }
 
         public async Task StartCounting()
         {
@@ -34,14 +33,14 @@ namespace Skribbl_Website.Shared.Dtos
 
         private async Task StartTimer()
         {
-            var timer = new Timer(async (e) => { await SubstractOneSecond(); }, null, 1000, Timeout.Infinite);
+            var timer = new Timer(async e => { await SubstractOneSecond(); }, null, 1000, Timeout.Infinite);
         }
 
         private async Task SubstractOneSecond()
         {
             TimeCount--;
             OnTimeChanged();
-            if(TimeCount > 0 && State == LobbyState.Drawing)
+            if (TimeCount > 0 && State == LobbyState.Drawing)
             {
                 await StartTimer();
             }

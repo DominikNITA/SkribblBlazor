@@ -1,24 +1,13 @@
-﻿using Skribbl_Website.Server.Models;
+﻿using System;
+using Skribbl_Website.Server.Models;
 using Skribbl_Website.Shared.Dtos;
 using Skribbl_Website.Shared.Exceptions;
-using System;
 using Xunit;
 
 namespace LobbyTests
 {
     public class LobbyTests
     {
-        [Fact]
-        public void Lobby_ShouldWork()
-        {
-            var player = new Player("player");
-
-            var lobby = new Lobby();
-            lobby.AddPlayer(player);
-
-            Assert.Contains(player, lobby.Players);
-        }
-
         [Fact]
         public void AddPlayer_FullLobbyShouldThrowException()
         {
@@ -28,6 +17,14 @@ namespace LobbyTests
             lobby.AddPlayer(new Player("player2"));
 
             Assert.Throws<MaxPlayersReachedException>(() => lobby.AddPlayer(new Player("player3")));
+        }
+
+        [Fact]
+        public void AddPlayer_NullPlayerShouldThrowException()
+        {
+            var lobby = new Lobby();
+
+            Assert.Throws<ArgumentNullException>(() => lobby.AddPlayer(null));
         }
 
         [Fact]
@@ -42,11 +39,13 @@ namespace LobbyTests
         }
 
         [Fact]
-        public void AddPlayer_NullPlayerShouldThrowException()
+        public void GetPlayerById_NonexistentIdShouldThrowException()
         {
+            var player = new Player("player");
             var lobby = new Lobby();
+            lobby.AddPlayer(player);
 
-            Assert.Throws<ArgumentNullException>(() => lobby.AddPlayer(null));
+            Assert.Throws<ArgumentException>(() => lobby.GetPlayerById("nonexistentId"));
         }
 
         [Fact]
@@ -64,25 +63,14 @@ namespace LobbyTests
         }
 
         [Fact]
-        public void GetPlayerById_NonexistentIdShouldThrowException()
+        public void Lobby_ShouldWork()
         {
             var player = new Player("player");
+
             var lobby = new Lobby();
             lobby.AddPlayer(player);
 
-            Assert.Throws<ArgumentException>(() => lobby.GetPlayerById("nonexistentId"));
-        }
-
-        [Fact]
-        public void SetConnectionIdForPlayer_ShouldWork()
-        {
-            var player = new Player("player");
-            var lobby = new Lobby();
-            lobby.AddPlayer(player);
-
-            lobby.SetConnectionIdForPlayer("testConnection", player.Name);
-
-            Assert.Equal("testConnection", player.Connection);
+            Assert.Contains(player, lobby.Players);
         }
 
         [Fact]
@@ -92,7 +80,8 @@ namespace LobbyTests
             var lobby = new Lobby();
             lobby.AddPlayer(player);
 
-            Assert.Throws<ArgumentException>(() => lobby.SetConnectionIdForPlayer("testConnection", "nonexistentPlayer"));
+            Assert.Throws<ArgumentException>(
+                () => lobby.SetConnectionIdForPlayer("testConnection", "nonexistentPlayer"));
         }
 
         [Fact]
@@ -106,5 +95,16 @@ namespace LobbyTests
             Assert.Throws<ArgumentException>(() => lobby.SetConnectionIdForPlayer("", player.Name));
         }
 
+        [Fact]
+        public void SetConnectionIdForPlayer_ShouldWork()
+        {
+            var player = new Player("player");
+            var lobby = new Lobby();
+            lobby.AddPlayer(player);
+
+            lobby.SetConnectionIdForPlayer("testConnection", player.Name);
+
+            Assert.Equal("testConnection", player.Connection);
+        }
     }
 }

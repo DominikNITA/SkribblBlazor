@@ -1,5 +1,5 @@
 ﻿<div class="message @_style d-flex flex-row">
-    @if(Message.Sender != null && Message.Sender != string.Empty && Message.Type == Message.MessageType.Guess)
+    @if (Message.Sender != null && Message.Sender != string.Empty && Message.Type == Message.MessageType.Guess)
     {
         <span class="message__sender">@Message.Sender:</span>
     }
@@ -10,7 +10,9 @@
 
 
 @code {
-    [Parameter] public Message Message { get; set; }
+
+    [Parameter]
+    public Message Message { get; set; }
 
     private string _style = "message--default";
 
@@ -51,8 +53,7 @@
             case Message.MessageType.Server:
                 _style = "message--server";
                 break;
-            default:
-                break;
         }
     }
+
 }

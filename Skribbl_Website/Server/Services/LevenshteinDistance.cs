@@ -26,18 +26,13 @@ namespace Skribbl_Website.Server.Services
 
             // First calculation, if one entry is empty return full length
             if (source1Length == 0)
-                return source2Length;
-
-            if (source2Length == 0)
-                return source1Length;
-
-            // Initialization of matrix with row size source1Length and columns size source2Length
-            for (var i = 0; i <= source1Length; matrix[i, 0] = i++)
             {
+                return source2Length;
             }
 
-            for (var j = 0; j <= source2Length; matrix[0, j] = j++)
+            if (source2Length == 0)
             {
+                return source1Length;
             }
 
             // Calculate rows and collumns distances

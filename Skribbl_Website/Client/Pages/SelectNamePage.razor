@@ -1,8 +1,5 @@
 ﻿@page "/name"
 @page "/join/{inviteLink}"
-@using Skribbl_Website.Shared.Exceptions
-@using Skribbl_Website.Shared
-@using System.Net.Http
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject LocalStorage LocalStorage
@@ -22,8 +19,8 @@
         </h1>
     }
     <EditForm class="d-flex flex-column align-items-center" Model="_nameModel" OnValidSubmit="SubmitName">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
         <InputText class="name-input" @bind-Value="_nameModel.Name" placeholder="Nickname"></InputText>
         <button class="submit-name-button" type="submit">@_buttonContent</button>
     </EditForm>
@@ -34,18 +31,18 @@
 </div>
 
 
-
-
 @code {
-    [Parameter] public string InviteLink { get; set; }
 
-    private NameModel _nameModel = new NameModel();
+    [Parameter]
+    public string InviteLink { get; set; }
+
+    private readonly NameModel _nameModel = new NameModel();
     private string _info = string.Empty;
     private string _hostName = string.Empty;
     private string _query = "lobbies/";
     private string _buttonContent = "Create";
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         if (InviteLink != null)
         {
@@ -63,11 +60,11 @@
 
     private async void SubmitName()
     {
-        LobbyRedirectDto response = new LobbyRedirectDto();
+        var response = new LobbyRedirectDto();
 
         if (InviteLink != null)
         {
-            _query += String.Format("join/{0}/{1}", InviteLink, _nameModel.Name);
+            _query += string.Format("join/{0}/{1}", InviteLink, _nameModel.Name);
             try
             {
                 response = await Http.GetFromJsonAsync<LobbyRedirectDto>(_query);
@@ -79,7 +76,7 @@
         }
         else
         {
-            _query += String.Format("create/{0}", _nameModel.Name);
+            _query += string.Format("create/{0}", _nameModel.Name);
             response = await Http.GetFromJsonAsync<LobbyRedirectDto>(_query);
         }
         if (!response.HasError)
@@ -92,6 +89,6 @@
             _info = response.ExceptionMessage;
             StateHasChanged();
         }
-
     }
+
 }

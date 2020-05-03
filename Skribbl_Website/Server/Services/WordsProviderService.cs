@@ -20,7 +20,11 @@ namespace Skribbl_Website.Server.Services
             var random = new Random();
             var wordsCount = 3;
             var result = new List<string>();
-            for (var i = 0; i < wordsCount; i++) result.Add(_words[random.Next(_words.Count)]);
+            for (var i = 0; i < wordsCount; i++)
+            {
+                result.Add(_words[random.Next(_words.Count)]);
+            }
+
             return result;
         }
 
@@ -29,10 +33,16 @@ namespace Skribbl_Website.Server.Services
             //http://www.desiquintans.com/downloads/nounlist/nounlist.txt
             var path = "../Skribbl_Website/Server/Data/english_words.txt";
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
                 path = "Data/english_words.txt";
+            }
+
             string line;
             var file = new StreamReader(path);
-            while ((line = file.ReadLine()) != null) _words.Add(line);
+            while ((line = file.ReadLine()) != null)
+            {
+                _words.Add(line);
+            }
         }
     }
 }

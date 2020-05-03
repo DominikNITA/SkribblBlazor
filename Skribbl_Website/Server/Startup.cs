@@ -59,10 +59,14 @@ namespace Skribbl_Website.Server
             {
                 endpoints.MapControllers();
                 if (env.IsDevelopment())
+                {
                     endpoints.MapHub<LobbyHub>("/lobbyHub",
                         options => { options.Transports = HttpTransportType.LongPolling; });
+                }
                 else
+                {
                     endpoints.MapHub<LobbyHub>("/lobbyHub");
+                }
 
                 endpoints.MapFallbackToFile("index.html");
             });

@@ -28,10 +28,13 @@
 
     </div>
 }
+
 @code {
+
     protected override Task OnInitializedAsync()
     {
         LobbyConnection.StateChanged += (sender, e) => StateHasChanged();
         return base.OnInitializedAsync();
     }
+
 }

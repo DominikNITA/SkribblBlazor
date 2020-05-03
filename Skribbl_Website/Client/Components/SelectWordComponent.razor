@@ -13,15 +13,17 @@
 }
 else
 {
-
     <h3>@LobbyConnection.Lobby.GetDrawingPlayer().Name is choosing!</h3>
 }
 
 @code {
-    [Parameter] public List<string> Words { get; set; }
+
+    [Parameter]
+    public List<string> Words { get; set; }
 
     private async Task OnSelectionChoosed(string selection)
     {
         await LobbyConnection.SelectSelection(selection);
     }
+
 }

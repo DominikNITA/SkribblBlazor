@@ -15,9 +15,15 @@ namespace Skribbl_Website.Server.Services
         {
             var selectionLength = selection.Length;
             if (selectionLength < 4)
+            {
                 return GetSpecificAmountOfHints(selection, 1, timeLimit);
+            }
+
             if (selectionLength < 8)
+            {
                 return GetSpecificAmountOfHints(selection, 2, timeLimit);
+            }
+
             return GetSpecificAmountOfHints(selection, 3, timeLimit);
         }
 
@@ -30,8 +36,10 @@ namespace Skribbl_Website.Server.Services
                 var index = random.Next(selection.Length);
                 var hintLetter = selection[index];
                 if (!OmittedCharacters.Contains(hintLetter) || timers.Any(timer => timer.Hint.Index == index))
+                {
                     timers.Add(new HintTimer(new HintDto(index, hintLetter),
                         GetIntervalForTimer(timers.Count + 1, amount, timeLimit * 1000)));
+                }
             }
 
             return timers;

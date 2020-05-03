@@ -50,7 +50,11 @@ namespace Skribbl_Website.Server.Models
 
         public void SetConnectionIdForPlayer(string connection, string username)
         {
-            if (connection == null || connection == string.Empty) throw new ArgumentException();
+            if (connection == null || connection == string.Empty)
+            {
+                throw new ArgumentException();
+            }
+
             var player = GetPlayerByName(username);
             player.Connection = connection;
         }
@@ -112,12 +116,16 @@ namespace Skribbl_Website.Server.Models
         private async Task CheckNeedFor_Base(Func<Player> ifStatement, Func<string, Task> setFunction)
         {
             if (Players.Count > 1 && ifStatement() == null)
+            {
                 foreach (var player in Players)
+                {
                     if (player.IsConnected)
                     {
                         await setFunction(player.Name);
                         break;
                     }
+                }
+            }
         }
 
         public new async Task StartGame()
@@ -229,7 +237,11 @@ namespace Skribbl_Website.Server.Models
 
         public async Task<bool> CheckGuess(Player player, string guess)
         {
-            if (State != LobbyState.Drawing) return true;
+            if (State != LobbyState.Drawing)
+            {
+                return true;
+            }
+
             if (guess.Equals(Selection, StringComparison.OrdinalIgnoreCase))
             {
                 player.HasGuessedCorrectly = true;
@@ -242,15 +254,21 @@ namespace Skribbl_Website.Server.Models
 
             //TODO: rework with interface
             if (_wordDistanceCalculator.Calculate(guess, Selection) <= 2)
+            {
                 await _lobbyHub.Clients.Client(player.Connection).SendAsync("ReceiveMessage",
                     new Message(guess + " is a close one!", Message.MessageType.CloseGuess));
+            }
+
             return false;
         }
 
         private async Task CheckForCompletedGuessing()
         {
             if (Players.Where(player => player.IsConnected && !player.IsDrawing)
-                .All(player => player.HasGuessedCorrectly)) await GoToNextStep();
+                .All(player => player.HasGuessedCorrectly))
+            {
+                await GoToNextStep();
+            }
         }
 
         public new void PrepareForNextDrawer()

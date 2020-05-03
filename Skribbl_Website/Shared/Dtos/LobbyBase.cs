@@ -1,30 +1,39 @@
-﻿using Skribbl_Website.Shared.Exceptions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Skribbl_Website.Shared.Exceptions;
 
 namespace Skribbl_Website.Shared.Dtos
 {
-    public enum LobbyState { Preparing, Started, Choosing, Drawing, Completed, Ended }
+    public enum LobbyState
+    {
+        Preparing,
+        Started,
+        Choosing,
+        Drawing,
+        Completed,
+        Ended
+    }
 
     public class LobbyBase<T> : LobbyParameters<T> where T : PlayerClient
     {
-        public List<string> WordsToChoose { get; set; } = new List<string>();
-
-        public SelectionTemplate SelectionTemplate { get; set; } = new SelectionTemplate();
-
-        public string Selection { get; set; } = string.Empty;
-
         public LobbyBase()
         {
             Id = Guid.NewGuid().ToString();
             InviteLink = Guid.NewGuid().ToString().Substring(0, 5);
         }
 
+        public List<string> WordsToChoose { get; set; } = new List<string>();
+
+        public SelectionTemplate SelectionTemplate { get; set; } = new SelectionTemplate();
+
+        public string Selection { get; set; } = string.Empty;
+
         protected virtual void OnTimeChanged()
         {
             TimeChanged?.Invoke(this, EventArgs.Empty);
         }
+
         public event EventHandler TimeChanged;
 
         public T GetPlayerByName(string username)
@@ -56,10 +65,12 @@ namespace Skribbl_Website.Shared.Dtos
             {
                 throw new ArgumentNullException();
             }
+
             if (Players.Count >= MaxPlayers)
             {
                 throw new MaxPlayersReachedException();
             }
+
             if (ContainsPlayerWithName(playerDto.Name))
             {
                 throw new UserNameAlreadyExistsException();
@@ -70,7 +81,7 @@ namespace Skribbl_Website.Shared.Dtos
 
         private void SetAllPlayersToNotDrawing()
         {
-            Players.ForEach((player) => player.IsDrawing = false);
+            Players.ForEach(player => player.IsDrawing = false);
         }
 
         public void SetDrawingPlayer(string username)
@@ -93,7 +104,7 @@ namespace Skribbl_Website.Shared.Dtos
 
         private void SetAllPlayersToNotHosts()
         {
-            Players.ForEach((player) => player.IsHost = false);
+            Players.ForEach(player => player.IsHost = false);
         }
 
         public virtual void SetHostPlayer(string username)
@@ -103,6 +114,7 @@ namespace Skribbl_Website.Shared.Dtos
             {
                 throw new DisconnectedPlayerException();
             }
+
             SetAllPlayersToNotHosts();
             player.IsHost = true;
         }
@@ -142,14 +154,14 @@ namespace Skribbl_Website.Shared.Dtos
             Selection = string.Empty;
             WordsToChoose = new List<string>();
             SelectionTemplate = new SelectionTemplate();
-            Players.ForEach((player) => player.HasGuessedCorrectly = false);
+            Players.ForEach(player => player.HasGuessedCorrectly = false);
         }
-        
+
         public void UpdateScores(List<ScoreDto> newScores)
         {
             try
             {
-                newScores.ForEach((scoreDto) => GetPlayerByName(scoreDto.PlayerName).AddScore(scoreDto.ScoreToAdd));
+                newScores.ForEach(scoreDto => GetPlayerByName(scoreDto.PlayerName).AddScore(scoreDto.ScoreToAdd));
             }
             catch
             {

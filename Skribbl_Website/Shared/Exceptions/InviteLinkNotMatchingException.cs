@@ -2,9 +2,5 @@
 {
     public class InviteLinkNotMatchingException : LobbyExceptionBase
     {
-        public InviteLinkNotMatchingException()
-        {
-
-        }
     }
 }

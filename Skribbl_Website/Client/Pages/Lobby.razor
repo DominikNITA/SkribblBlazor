@@ -3,13 +3,11 @@
 @inject UserState UserState
 @inject LobbyConnection LobbyConnection
 
-@using Skribbl_Website.Client.Components
-
 
 @if (LobbyConnection.Lobby != null)
 {
     <div>
-        Invite:   @NavigationManager.ToAbsoluteUri("join/" + LobbyConnection.Lobby.InviteLink)
+        Invite: @NavigationManager.ToAbsoluteUri("join/" + LobbyConnection.Lobby.InviteLink)
     </div>
 
     <div class="lobby d-flex flex-column">
@@ -27,7 +25,8 @@
             @if (LobbyConnection.Messages != null)
             {
                 <ChatComponent Messages="@LobbyConnection.Messages"
-                               LobbyConnection="@LobbyConnection"></ChatComponent>
+                               LobbyConnection="@LobbyConnection">
+                </ChatComponent>
             }
         </div>
     </div>
@@ -43,13 +42,14 @@
 
 
 @code {
+
     [Parameter]
     public string LobbyId { get; set; }
 
     private Player _user = new Player();
     private string _info = string.Empty;
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         try
         {
@@ -89,8 +89,9 @@
 
     private void LeaveLobby()
     {
-        //TODO: Show dialog
+    //TODO: Show dialog
         LobbyConnection.CloseConnection();
         NavigationManager.NavigateTo("");
     }
+
 }

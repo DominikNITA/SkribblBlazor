@@ -2,11 +2,6 @@
 {
     public class LobbyRedirectDto
     {
-        public Player ConfirmedUser { get; set; }
-        public string LobbyUrl { get; set; }
-        public string ExceptionMessage { get; set; }
-        public bool HasError { get; set; }
-
         public LobbyRedirectDto(Player confirmedUser, string lobbyUrl)
         {
             //TODO: Change to only send playerID
@@ -15,6 +10,7 @@
             ExceptionMessage = string.Empty;
             HasError = false;
         }
+
         public LobbyRedirectDto(string exceptionMessage)
         {
             ExceptionMessage = exceptionMessage;
@@ -22,9 +18,14 @@
             ConfirmedUser = new Player();
             LobbyUrl = string.Empty;
         }
+
         public LobbyRedirectDto()
         {
-
         }
+
+        public Player ConfirmedUser { get; set; }
+        public string LobbyUrl { get; set; }
+        public string ExceptionMessage { get; set; }
+        public bool HasError { get; set; }
     }
 }

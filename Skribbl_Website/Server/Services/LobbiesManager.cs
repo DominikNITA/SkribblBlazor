@@ -12,8 +12,8 @@ namespace Skribbl_Website.Server.Services
 {
     public class LobbiesManager
     {
-        private readonly IHubContext<LobbyHub> _lobbyHub;
         private readonly List<Lobby> _lobbies = new List<Lobby>();
+        private readonly IHubContext<LobbyHub> _lobbyHub;
         private readonly IServiceProvider _serviceProvider;
         private readonly IWordDistanceCalculator _wordDistanceCalculator;
         private readonly IWordsProviderService _wordsProviderService;
@@ -47,10 +47,14 @@ namespace Skribbl_Website.Server.Services
         {
             foreach (var lobby in _lobbies)
                 //Search for lobby with corresponding invite link
+            {
                 if (lobby.InviteLink.Equals(inviteLink))
                 {
                     if (lobby.Players.Any(user => user.Name == player.Name))
+                    {
                         throw new Exception("Username already exists in this lobby! Try another one.");
+                    }
+
                     //Try to add a new player
                     try
                     {
@@ -62,6 +66,7 @@ namespace Skribbl_Website.Server.Services
                         throw new Exception("Lobby is full. Cannot join.");
                     }
                 }
+            }
 
             throw new Exception("This invite link doesn't match to any lobby.");
         }

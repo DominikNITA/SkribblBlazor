@@ -1,5 +1,5 @@
-﻿using Skribbl_Website.Shared.Dtos;
-using System;
+﻿using System;
+using Skribbl_Website.Shared.Dtos;
 using Xunit;
 
 namespace LobbyTests
@@ -28,23 +28,13 @@ namespace LobbyTests
         }
 
         [Fact]
-        public void SetIsHost_ShouldWork()
-        {
-            var player = new PlayerClient("player");
-            player.IsConnected = true;
-
-            player.IsHost = true;
-
-            Assert.True(player.IsHost);
-        }
-
-        [Fact]
-        public void SetIsHost_NotConnectedPlayer_ThrowsError()
+        public void SetIsDrawing_NotConnectedPlayer_ThrowsError()
         {
             var player = new PlayerClient("player");
             player.IsConnected = false;
-            Assert.Throws<Exception>(() => player.IsHost = true);
+            Assert.Throws<Exception>(() => player.IsDrawing = true);
         }
+
         [Fact]
         public void SetIsDrawing_ShouldWork()
         {
@@ -57,11 +47,22 @@ namespace LobbyTests
         }
 
         [Fact]
-        public void SetIsDrawing_NotConnectedPlayer_ThrowsError()
+        public void SetIsHost_NotConnectedPlayer_ThrowsError()
         {
             var player = new PlayerClient("player");
             player.IsConnected = false;
-            Assert.Throws<Exception>(() => player.IsDrawing = true);
+            Assert.Throws<Exception>(() => player.IsHost = true);
+        }
+
+        [Fact]
+        public void SetIsHost_ShouldWork()
+        {
+            var player = new PlayerClient("player");
+            player.IsConnected = true;
+
+            player.IsHost = true;
+
+            Assert.True(player.IsHost);
         }
     }
 }

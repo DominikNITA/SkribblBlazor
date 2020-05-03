@@ -25,8 +25,15 @@ namespace Skribbl_Website.Server.Hubs
                 if (lobby.State == LobbyState.Drawing)
                 {
                     var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
-                    if (player.HasGuessedCorrectly || lobby.GetDrawingPlayer() == player) return;
-                    if (await lobby.CheckGuess(player, message.MessageContent)) return;
+                    if (player.HasGuessedCorrectly || lobby.GetDrawingPlayer() == player)
+                    {
+                        return;
+                    }
+
+                    if (await lobby.CheckGuess(player, message.MessageContent))
+                    {
+                        return;
+                    }
                 }
 
                 await Clients.Group(lobby.Id).SendAsync("ReceiveMessage", message);
@@ -36,7 +43,10 @@ namespace Skribbl_Website.Server.Hubs
         public async Task StartGame()
         {
             var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
-            if (lobby.IsConnectionAHost(Context.ConnectionId)) await lobby.StartGame();
+            if (lobby.IsConnectionAHost(Context.ConnectionId))
+            {
+                await lobby.StartGame();
+            }
         }
 
         public async Task AddToGroup(string userId, string lobbyId)
@@ -52,7 +62,10 @@ namespace Skribbl_Website.Server.Hubs
             await Clients.Group(lobbyId).SendAsync("ReceiveMessage",
                 new Message(player.Name + " joined.", Message.MessageType.Join));
 
-            if (lobby.GetHostPlayer() == null) await lobby.SetHostPlayer(player.Name);
+            if (lobby.GetHostPlayer() == null)
+            {
+                await lobby.SetHostPlayer(player.Name);
+            }
         }
 
         public async Task SendLobbySettings(LobbySettings lobbySettings)
@@ -92,7 +105,9 @@ namespace Skribbl_Website.Server.Hubs
             var lobby = _lobbiesManager.GetLobbyByPlayerConnectionId(Context.ConnectionId);
             var player = lobby.GetPlayerByConnectionId(Context.ConnectionId);
             if (lobby.GetDrawingPlayer() == player && lobby.State == LobbyState.Drawing)
+            {
                 await Clients.OthersInGroup(lobby.Id).SendAsync("GetDraw", drawDetails);
+            }
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)

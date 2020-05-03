@@ -1,5 +1,5 @@
 ﻿<div class="players-list">
-    Players: 
+    Players:
     @foreach (var player in Players)
     {
         <PlayerComponent Player="player" UserIsHost="@UserIsHost"></PlayerComponent>
@@ -7,6 +7,11 @@
 </div>
 
 @code {
-    [Parameter] public List<PlayerClient> Players { get; set; }
-    [Parameter] public bool UserIsHost { get; set; }
+
+    [Parameter]
+    public List<PlayerClient> Players { get; set; }
+
+    [Parameter]
+    public bool UserIsHost { get; set; }
+
 }

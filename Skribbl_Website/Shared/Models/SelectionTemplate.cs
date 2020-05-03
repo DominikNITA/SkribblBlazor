@@ -1,16 +1,12 @@
-﻿using Skribbl_Website.Shared.Dtos;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Skribbl_Website.Shared.Dtos;
 
 namespace Skribbl_Website.Shared
 {
     public class SelectionTemplate
     {
-        public List<char> Characters { get; set; } = new List<char>();
-
-        private readonly static List<char> _showedChars = new List<char> { '\'','-' };
+        private static readonly List<char> _showedChars = new List<char> {'\'', '-'};
 
         public SelectionTemplate(string selection)
         {
@@ -20,7 +16,7 @@ namespace Skribbl_Website.Shared
                 var characters = word.ToCharArray().ToList();
                 characters.ForEach(ch =>
                 {
-                    if(_showedChars.Contains(ch))
+                    if (_showedChars.Contains(ch))
                     {
                         Characters.Add(ch);
                     }
@@ -33,14 +29,15 @@ namespace Skribbl_Website.Shared
             });
         }
 
+        public SelectionTemplate()
+        {
+        }
+
+        public List<char> Characters { get; set; } = new List<char>();
+
         public void AddHintLetter(HintDto hint)
         {
             Characters[hint.Index] = hint.Letter;
-        }
-
-        public SelectionTemplate()
-        {
-                
         }
     }
 }

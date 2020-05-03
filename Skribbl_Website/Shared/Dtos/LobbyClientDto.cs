@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Skribbl_Website.Shared.Dtos
 {
@@ -7,7 +6,7 @@ namespace Skribbl_Website.Shared.Dtos
     {
         public LobbyClientDto(LobbyParameters<Player> lobby)
         {
-            var playersClient = lobby.Players.Select(player => (PlayerClient)player).ToList();
+            var playersClient = lobby.Players.Select(player => (PlayerClient) player).ToList();
             Players = playersClient;
             MaxPlayers = lobby.MaxPlayers;
             MinPlayers = lobby.MinPlayers;
@@ -18,9 +17,9 @@ namespace Skribbl_Website.Shared.Dtos
             TimeCount = lobby.TimeCount;
             State = lobby.State;
         }
+
         public LobbyClientDto()
         {
-
         }
     }
 }

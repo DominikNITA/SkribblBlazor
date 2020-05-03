@@ -6,25 +6,25 @@ namespace Skribbl_Website.Shared.Dtos
     {
         private string _connection;
 
-        public string Id { get; set; }
-
-        public string Connection
-        {
-            get => _connection; 
-            set {
-                IsConnected = true;
-                _connection = value;
-            }
-        }
-
         public Player(string name) : base(name)
         {
             Id = Guid.NewGuid().ToString();
         }
+
         public Player()
         {
-
         }
 
+        public string Id { get; set; }
+
+        public string Connection
+        {
+            get => _connection;
+            set
+            {
+                IsConnected = true;
+                _connection = value;
+            }
+        }
     }
 }

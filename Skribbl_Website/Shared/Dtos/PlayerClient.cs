@@ -4,11 +4,26 @@ namespace Skribbl_Website.Shared.Dtos
 {
     public class PlayerClient
     {
-        private bool _isHost;
-        private bool _isDrawing;
         private bool _isConnected;
+        private bool _isDrawing;
+        private bool _isHost;
+
+        public PlayerClient(string name)
+        {
+            Name = name;
+            IsHost = false;
+            IsConnected = false;
+            IsDrawing = false;
+            HasGuessedCorrectly = false;
+            Score = 0;
+        }
+
+        public PlayerClient()
+        {
+        }
 
         public string Name { get; set; }
+
         public bool IsConnected
         {
             get => _isConnected;
@@ -25,8 +40,8 @@ namespace Skribbl_Website.Shared.Dtos
                     _isDrawing = false;
                 }
             }
-
         }
+
         public int Score { get; set; }
 
         public bool IsHost
@@ -44,6 +59,7 @@ namespace Skribbl_Website.Shared.Dtos
                 }
             }
         }
+
         public bool IsDrawing
         {
             get => _isDrawing;
@@ -59,21 +75,8 @@ namespace Skribbl_Website.Shared.Dtos
                 }
             }
         }
+
         public bool HasGuessedCorrectly { get; set; }
-
-        public PlayerClient(string name)
-        {
-            Name = name;
-            IsHost = false;
-            IsConnected = false;
-            IsDrawing = false;
-            HasGuessedCorrectly = false;
-            Score = 0;
-        }
-        public PlayerClient()
-        {
-
-        }
 
         public void AddScore(int scoreToAdd)
         {
@@ -81,11 +84,8 @@ namespace Skribbl_Website.Shared.Dtos
             {
                 throw new ArgumentOutOfRangeException();
             }
-            else
-            {
-                Score += scoreToAdd;
-            }
-        }
 
+            Score += scoreToAdd;
+        }
     }
 }

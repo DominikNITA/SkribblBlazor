@@ -1,18 +1,18 @@
-﻿using Cloudcrate.AspNetCore.Blazor.Browser.Storage;
+﻿using System.Threading.Tasks;
+using Cloudcrate.AspNetCore.Blazor.Browser.Storage;
 using Skribbl_Website.Shared.Dtos;
 using Skribbl_Website.Shared.Exceptions;
-using System.Threading.Tasks;
 
 namespace Skribbl_Website.Client.Services
 {
     public class UserState
     {
-        public LocalStorage LocalStorage { get; set; }
-
         public UserState(LocalStorage localStorage)
         {
             LocalStorage = localStorage;
         }
+
+        public LocalStorage LocalStorage { get; set; }
 
         public async void SaveUser(Player user)
         {
@@ -28,6 +28,7 @@ namespace Skribbl_Website.Client.Services
             {
                 throw new UserNotInLocalStorageException("User not found! Or you do not have access to this lobby.");
             }
+
             var user = new Player(name)
             {
                 Id = id

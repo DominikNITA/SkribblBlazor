@@ -19,17 +19,21 @@
 </div>
 
 @code {
-    [Parameter] public PlayerClient Player { get; set; }
-    [Parameter] public bool UserIsHost { get; set; }
 
-    private bool _showBanPlayer = false;
+    [Parameter]
+    public PlayerClient Player { get; set; }
+
+    [Parameter]
+    public bool UserIsHost { get; set; }
+
+    private bool _showBanPlayer;
     private DotNetObjectReference<PlayerComponent> dotNetReference;
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         dotNetReference = DotNetObjectReference.Create(this);
         await JSRuntime.InvokeVoidAsync("addNewReference", dotNetReference, Player.Name);
-        LobbyConnection.StateChanged += (sender,e) => StateHasChanged();
+        LobbyConnection.StateChanged += (sender, e) => StateHasChanged();
         await base.OnInitializedAsync();
     }
 
@@ -48,7 +52,8 @@
 
     private async Task BanPlayer()
     {
-        //TODO: ask for confirmation
+    //TODO: ask for confirmation
         await LobbyConnection.BanPlayer(Player.Name);
     }
+
 }

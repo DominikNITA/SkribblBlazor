@@ -8,10 +8,11 @@
 </div>
 
 @code {
-    private List<int> AvailableLineWidths = new List<int> { 1,2,3,4,5,10,50 };
+    private readonly List<int> AvailableLineWidths = new List<int> {1, 2, 3, 4, 5, 10, 50};
 
     private async Task SetLineWidth(float newLineWidth)
     {
         await JSRuntime.InvokeVoidAsync("setLineWidth", newLineWidth);
     }
+
 }

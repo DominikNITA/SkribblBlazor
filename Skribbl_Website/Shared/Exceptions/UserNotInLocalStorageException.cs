@@ -6,12 +6,10 @@ namespace Skribbl_Website.Shared.Exceptions
     {
         public UserNotInLocalStorageException()
         {
-
         }
 
         public UserNotInLocalStorageException(string message) : base(message)
         {
-
         }
     }
 }

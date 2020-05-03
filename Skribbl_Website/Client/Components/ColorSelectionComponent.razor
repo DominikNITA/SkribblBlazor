@@ -4,15 +4,16 @@
 <div class="toolbar__color-picker d-flex flex-row">
     @foreach (var color in AvailableColors)
     {
-        <span class="color-choice" style="background:@color" @onclick="@(() => SetColor(color))"></span>
+        <span class="color-choice" style="background: @color" @onclick="@(() => SetColor(color))"></span>
     }
 </div>
 
 @code {
-    private List<string> AvailableColors = new List<string> { "white", "black", "blue", "red", "green", "yellow", "orange", "blueviolet", "saddlebrown", "lightgrey", "pink"};
+    private readonly List<string> AvailableColors = new List<string> {"white", "black", "blue", "red", "green", "yellow", "orange", "blueviolet", "saddlebrown", "lightgrey", "pink"};
 
     private async Task SetColor(string newColor)
     {
         await JSRuntime.InvokeVoidAsync("setColor", newColor);
     }
+
 }

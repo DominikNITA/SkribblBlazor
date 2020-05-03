@@ -2,11 +2,12 @@
 @inject LobbyConnection LobbyConnection
 
 <div id="board-area">
-    <canvas id="myCanvas" style="border:2px solid black"></canvas>
+    <canvas id="myCanvas" style="border: 2px solid black"></canvas>
     <div id="canvasOverlay"></div>
 </div>
 
 @code {
+
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -37,4 +38,5 @@
     {
         JSRuntime.InvokeVoidAsync("drawFromOutside", drawDetails.X, drawDetails.Y, drawDetails.IsDown, drawDetails.Color, drawDetails.Size);
     }
+
 }

@@ -9,7 +9,7 @@
             @foreach (var roundLimit in LobbySettings.PossibleRoundsLimit)
             {
                 <label class="mx-1">
-                    <InputRadio name="round" SelectedValue="roundLimit" @bind-Value="LobbySettings.RoundsLimit" @onclick="OnValuesChanged" IsDisabled="!IsHost" />
+                    <InputRadio name="round" SelectedValue="roundLimit" @bind-Value="LobbySettings.RoundsLimit" @onclick="OnValuesChanged" IsDisabled="!IsHost"/>
                     @roundLimit
                 </label>
             }
@@ -21,7 +21,7 @@
             @foreach (var timeLimit in LobbySettings.PossibleTimeLimit)
             {
                 <label class="mx-1">
-                    <InputRadio name="time" SelectedValue="timeLimit" @bind-Value="@LobbySettings.TimeLimit" @onclick="OnValuesChanged" IsDisabled="!IsHost" />
+                    <InputRadio name="time" SelectedValue="timeLimit" @bind-Value="@LobbySettings.TimeLimit" @onclick="OnValuesChanged" IsDisabled="!IsHost"/>
                     @timeLimit
                 </label>
             }
@@ -34,10 +34,12 @@
 
 
 @code {
+
     [Parameter]
     public LobbySettings LobbySettings { get; set; }
 
-    [Parameter] public bool IsHost { get; set; }
+    [Parameter]
+    public bool IsHost { get; set; }
 
 
     private async Task OnValuesChanged()
@@ -45,4 +47,5 @@
         await Task.Delay(50);
         await LobbyConnection.UpdateLobbySettings();
     }
+
 }

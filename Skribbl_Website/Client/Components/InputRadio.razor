@@ -1,15 +1,17 @@
-﻿@using System.Globalization
-@typeparam TValue
+﻿@typeparam TValue
+@using System.Globalization
 @inherits InputBase<TValue>
 
 <input @attributes="AdditionalAttributes" type="radio" value="@SelectedValue"
-       checked="@(SelectedValue.Equals(Value))" @onchange="OnChange" disabled="@IsDisabled"/>
+        checked="@(SelectedValue.Equals(Value))" @onchange="OnChange" disabled="@IsDisabled"/>
 
 @code {
+
     [Parameter]
     public TValue SelectedValue { get; set; }
 
-    [Parameter] public bool IsDisabled { get; set; }
+    [Parameter]
+    public bool IsDisabled { get; set; }
 
     private void OnChange(ChangeEventArgs args)
     {
@@ -28,12 +30,10 @@
 
             return true;
         }
-        else
-        {
-            result = default;
-            errorMessage = $"{FieldIdentifier.FieldName} field isn't valid.";
+        result = default;
+        errorMessage = $"{FieldIdentifier.FieldName} field isn't valid.";
 
-            return false;
-        }
+        return false;
     }
+
 }

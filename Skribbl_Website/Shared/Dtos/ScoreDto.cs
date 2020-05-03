@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Skribbl_Website.Shared.Dtos
+﻿namespace Skribbl_Website.Shared.Dtos
 {
     public class ScoreDto
     {
-        public string PlayerName { get; set; }
-        public int ScoreToAdd { get; set; }
-
         public ScoreDto(string playerName, int scoreToAdd)
         {
             PlayerName = playerName;
@@ -17,7 +10,9 @@ namespace Skribbl_Website.Shared.Dtos
 
         public ScoreDto()
         {
-
         }
+
+        public string PlayerName { get; set; }
+        public int ScoreToAdd { get; set; }
     }
 }

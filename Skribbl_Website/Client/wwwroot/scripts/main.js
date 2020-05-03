@@ -1,13 +1,13 @@
 ﻿
 objectReferences = {};
 
-addNewReference = function (reference, id) {
+addNewReference = function(reference, id) {
     objectReferences[id] = reference;
 };
 
-changeShowBan = function (newState, playerName) {
+changeShowBan = function(newState, playerName) {
     let dotNetObject = objectReferences[playerName];
-    dotNetObject.invokeMethodAsync('ChangeShowBanPlayer', newState);
+    dotNetObject.invokeMethodAsync("ChangeShowBanPlayer", newState);
 };
 
 //https://www.codicode.com/art/how_to_draw_on_a_html5_canvas_with_a_mouse.aspx
@@ -27,9 +27,9 @@ var boardDotNetRefernce;
 function initThis(reference) {
     boardDotNetRefernce = reference;
     console.log(boardDotNetRefernce);
-    canvas = document.getElementById('myCanvas');
-    ctx = document.getElementById('myCanvas').getContext("2d");
-    customCursor = document.getElementById('customCursor');
+    canvas = document.getElementById("myCanvas");
+    ctx = document.getElementById("myCanvas").getContext("2d");
+    customCursor = document.getElementById("customCursor");
     wrapper = document.getElementById("board-area");
 
     //Avoid blur
@@ -40,13 +40,13 @@ function initThis(reference) {
     setLineWidth(2);
     setColor("black");
 
-    $('#canvasOverlay').mousedown(function (e) {
+    $("#canvasOverlay").mousedown(function(e) {
         mousePressed = true;
         draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
         draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
     });
 
-    $('#canvasOverlay').mousemove(function (e) {
+    $("#canvasOverlay").mousemove(function(e) {
         customCursor.style.top = (e.pageY - convertToActualLineWidth(lineWidth) / 2) + "px";
         customCursor.style.left = (e.pageX - convertToActualLineWidth(lineWidth) / 2) + "px";
         if (mousePressed) {
@@ -54,18 +54,18 @@ function initThis(reference) {
         }
     });
 
-    $('#canvasOverlay').mouseup(function (e) {
+    $("#canvasOverlay").mouseup(function(e) {
         mousePressed = false;
     });
-    $('#canvasOverlay').mouseleave(function (e) {
+    $("#canvasOverlay").mouseleave(function(e) {
         mousePressed = false;
         customCursor.style.display = "none";
     });
-    $('#canvasOverlay').mouseenter(function (e) {
+    $("#canvasOverlay").mouseenter(function(e) {
         customCursor.style.display = "block";
     });
 
-    window.addEventListener('resize', fitBoardToWrapper);
+    window.addEventListener("resize", fitBoardToWrapper);
     fitBoardToWrapper();
 }
 
@@ -76,10 +76,9 @@ function draw(x, y, isDown) {
             ctx.beginPath();
             if (x == lastX && y == lastY) {
                 ctx.fillStyle = color;
-                ctx.arc(x, y, convertToActualLineWidth(lineWidth)/2, 0, Math.PI * 2, true);
+                ctx.arc(x, y, convertToActualLineWidth(lineWidth) / 2, 0, Math.PI * 2, true);
                 ctx.fill();
-            }
-            else {
+            } else {
                 ctx.strokeStyle = color;
                 ctx.lineWidth = convertToActualLineWidth(lineWidth);
                 ctx.lineJoin = "round";
@@ -88,12 +87,22 @@ function draw(x, y, isDown) {
                 ctx.closePath();
                 ctx.stroke();
             }
-            boardDotNetRefernce.invokeMethodAsync('SendDraw', x / boardWidth, y / boardHeight, isDown, color, lineWidth);
+            boardDotNetRefernce.invokeMethodAsync("SendDraw",
+                x / boardWidth,
+                y / boardHeight,
+                isDown,
+                color,
+                lineWidth);
+        } else {
+            boardDotNetRefernce.invokeMethodAsync("SendDraw",
+                x / boardWidth,
+                y / boardHeight,
+                isDown,
+                color,
+                lineWidth);
         }
-        else {
-            boardDotNetRefernce.invokeMethodAsync('SendDraw', x / boardWidth, y / boardHeight, isDown, color, lineWidth);
-        }
-        lastX = x; lastY = y;
+        lastX = x;
+        lastY = y;
     }
 }
 
@@ -104,10 +113,9 @@ function drawFromOutside(xPercent, yPercent, isDown, color, size) {
         ctx.beginPath();
         if (x == lastX && y == lastY) {
             ctx.fillStyle = color;
-            ctx.arc(x, y, convertToActualLineWidth(size)/2, 0, Math.PI * 2, true);
+            ctx.arc(x, y, convertToActualLineWidth(size) / 2, 0, Math.PI * 2, true);
             ctx.fill();
-        }
-        else {
+        } else {
             ctx.strokeStyle = color;
             ctx.lineWidth = convertToActualLineWidth(size);
             ctx.lineJoin = "round";
@@ -117,7 +125,8 @@ function drawFromOutside(xPercent, yPercent, isDown, color, size) {
             ctx.stroke();
         }
     }
-    lastX = x; lastY = y;
+    lastX = x;
+    lastY = y;
 }
 
 function clearArea() {
@@ -169,7 +178,7 @@ function fitBoardToWrapper() {
     boardHeight = wrapper.offsetHeight;
 
     canvas.style.width = boardWidth + "px";
-    canvas.style.height = boardHeight + "px"; 
+    canvas.style.height = boardHeight + "px";
     canvas.width = boardWidth;
     canvas.height = boardHeight;
     ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, boardWidth, boardHeight);

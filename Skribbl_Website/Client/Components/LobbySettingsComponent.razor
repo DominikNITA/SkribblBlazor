@@ -6,25 +6,29 @@
     <div class="rounds-input d-flex flex-row">
         <span class="rounds-input--title">Rounds:</span>
         <div class="rounds-input--radios d-flex flex-row">
-            @foreach (var roundLimit in LobbySettings.PossibleRoundsLimit)
-            {
-                <label class="mx-1">
-                    <InputRadio name="round" SelectedValue="roundLimit" @bind-Value="LobbySettings.RoundsLimit" @onclick="OnValuesChanged" IsDisabled="!IsHost"/>
-                    @roundLimit
-                </label>
-            }
+            <InputRadioGroup @bind-Value="LobbySettings.RoundsLimit">
+                @foreach (var roundLimit in LobbySettings.PossibleRoundsLimit)
+                {
+                    <label class="mx-1">
+                        <InputRadio Value="@roundLimit" IsDisabled="!IsHost" />
+                        @roundLimit
+                    </label>
+                }
+            </InputRadioGroup>
         </div>
     </div>
     <div class="time-input d-flex flex-row">
         <span class="time-input--title">Time:</span>
         <div class="time-input--radios d-flex flex-row">
-            @foreach (var timeLimit in LobbySettings.PossibleTimeLimit)
-            {
-                <label class="mx-1">
-                    <InputRadio name="time" SelectedValue="timeLimit" @bind-Value="@LobbySettings.TimeLimit" @onclick="OnValuesChanged" IsDisabled="!IsHost"/>
-                    @timeLimit
-                </label>
-            }
+            <InputRadioGroup @bind-Value="LobbySettings.TimeLimit">
+                @foreach (var timeLimit in LobbySettings.PossibleTimeLimit)
+                {
+                    <label class="mx-1">
+                        <InputRadio Value="timeLimit" IsDisabled="!IsHost" />
+                        @timeLimit
+                    </label>
+                }
+            </InputRadioGroup>
         </div>
     </div>
 </EditForm>

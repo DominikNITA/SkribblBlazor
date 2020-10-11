@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
 using Skribbl_Website.Server.Services;
 using Skribbl_Website.Shared;
 using Skribbl_Website.Shared.Dtos;
@@ -54,7 +54,7 @@ namespace Skribbl_Website.Server.Hubs
             var lobby = _lobbiesManager.GetLobbyById(lobbyId);
             var player = lobby.GetPlayerById(userId);
             player.Connection = Context.ConnectionId;
-            var playerDto = JsonConvert.DeserializeObject<PlayerClient>(JsonConvert.SerializeObject(player));
+            var playerDto = JsonSerializer.Deserialize<PlayerClient>(JsonSerializer.Serialize(player)); //JsonConvert.DeserializeObject<PlayerClient>(JsonConvert.SerializeObject(player));
             await Clients.Group(lobbyId).SendAsync("AddPlayer", playerDto);
             await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId);
             var lobbyState = new LobbyClientDto(lobby);

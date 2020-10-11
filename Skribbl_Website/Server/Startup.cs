@@ -58,6 +58,7 @@ namespace Skribbl_Website.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
                 if (env.IsDevelopment())
                 {
                     endpoints.MapHub<LobbyHub>("/lobbyHub",

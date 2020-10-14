@@ -2,7 +2,6 @@
 @page "/join/{inviteLink}"
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
-@*@inject LocalStorage LocalStorage*@
 @inject UserState UserState
 
 <div class="select-name-wrapper">
@@ -33,8 +32,7 @@
 
 @code {
 
-    [Parameter]
-    public string InviteLink { get; set; }
+    [Parameter] public string InviteLink { get; set; }
 
     private readonly NameModel _nameModel = new NameModel();
     private string _info = string.Empty;

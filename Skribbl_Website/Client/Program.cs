@@ -21,6 +21,7 @@ namespace Skribbl_Website.Client
             builder.Services.AddSingleton(new HttpClient {BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)});
             builder.Services.AddStorage();
             builder.Services.AddScoped<UserState>();
+            builder.Services.AddSingleton<MessagesContainer>();
             builder.Services.AddSingleton<LobbyConnection>();
 
             await builder.Build().RunAsync();

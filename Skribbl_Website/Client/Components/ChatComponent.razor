@@ -1,27 +1,29 @@
-﻿<div class="lobby__chat d-flex flex-column">
-    <div class="chat__messages d-flex flex-column">
-        @foreach (var message in Messages)
+﻿@inject MessagesContainer MessagesContainer
+@inject IJSRuntime Js
+
+<div class="lobby__chat d-flex flex-column">
+    <div id="chat-scroller" class="chat__messages d-flex flex-column">
+        @foreach (var message in MessagesContainer.Messages)
         {
             <MessageComponent Message="message"></MessageComponent>
         }
     </div>
     <div class="chat__input-container d-flex flex-row">
-        <div class="chat__input">
-            <input @bind="_newMessageContent" type="text" @onkeyup="CheckForSubmitKey"/>
-            <button @onclick="SendMessage">Send!</button>
-        </div>
+        <input @bind="_newMessageContent" type="text" class="chat__input" @onkeyup="CheckForSubmitKey" placeholder="Type your guess here..." />
+        <button @onclick="SendMessage">Send!</button>
     </div>
 </div>
 
 @code {
-
-    [Parameter]
-    public List<Message> Messages { get; set; }
-
-    [Parameter]
-    public LobbyConnection LobbyConnection { get; set; }
+    [Parameter] public LobbyConnection LobbyConnection { get; set; }
 
     private string _newMessageContent;
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+            await Js.InvokeVoidAsync("setupChat","chat-scroller");
+    }
 
     public async Task SendMessage()
     {
@@ -36,5 +38,4 @@
             await SendMessage();
         }
     }
-
 }

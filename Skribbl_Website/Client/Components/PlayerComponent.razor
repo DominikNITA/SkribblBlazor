@@ -15,16 +15,15 @@
     {
         <span class="player--drawing oi oi-pencil"></span>
     }
-    Score: @Player.Score
+    <span class="player__score">@Player.Score</span>
+
 </div>
 
 @code {
 
-    [Parameter]
-    public PlayerClient Player { get; set; }
+    [Parameter] public PlayerClient Player { get; set; }
 
-    [Parameter]
-    public bool UserIsHost { get; set; }
+    [Parameter] public bool UserIsHost { get; set; }
 
     private bool _showBanPlayer;
     private DotNetObjectReference<PlayerComponent> dotNetReference;
@@ -39,7 +38,7 @@
 
     public string GuessedStyle
     {
-        get => Player.HasGuessedCorrectly ? "player__guessed" : "";
+        get => Player.HasGuessedCorrectly ? "player--guessed" : "";
         private set { }
     }
 
@@ -52,7 +51,7 @@
 
     private async Task BanPlayer()
     {
-    //TODO: ask for confirmation
+        //TODO: ask for confirmation
         await LobbyConnection.BanPlayer(Player.Name);
     }
 

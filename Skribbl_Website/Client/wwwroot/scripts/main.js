@@ -1,11 +1,11 @@
 ﻿
 objectReferences = {};
 
-addNewReference = function(reference, id) {
+addNewReference = function (reference, id) {
     objectReferences[id] = reference;
 };
 
-changeShowBan = function(newState, playerName) {
+changeShowBan = function (newState, playerName) {
     let dotNetObject = objectReferences[playerName];
     dotNetObject.invokeMethodAsync("ChangeShowBanPlayer", newState);
 };
@@ -40,13 +40,13 @@ function initThis(reference) {
     setLineWidth(2);
     setColor("black");
 
-    $("#canvasOverlay").mousedown(function(e) {
+    $("#canvasOverlay").mousedown(function (e) {
         mousePressed = true;
         draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
         draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
     });
 
-    $("#canvasOverlay").mousemove(function(e) {
+    $("#canvasOverlay").mousemove(function (e) {
         customCursor.style.top = (e.pageY - convertToActualLineWidth(lineWidth) / 2) + "px";
         customCursor.style.left = (e.pageX - convertToActualLineWidth(lineWidth) / 2) + "px";
         if (mousePressed) {
@@ -54,14 +54,14 @@ function initThis(reference) {
         }
     });
 
-    $("#canvasOverlay").mouseup(function(e) {
+    $("#canvasOverlay").mouseup(function (e) {
         mousePressed = false;
     });
-    $("#canvasOverlay").mouseleave(function(e) {
+    $("#canvasOverlay").mouseleave(function (e) {
         mousePressed = false;
         customCursor.style.display = "none";
     });
-    $("#canvasOverlay").mouseenter(function(e) {
+    $("#canvasOverlay").mouseenter(function (e) {
         customCursor.style.display = "block";
     });
 
@@ -71,39 +71,38 @@ function initThis(reference) {
 
 //TODO: Refactor below
 function draw(x, y, isDown) {
-    if (isDrawing) {
-        if (isDown) {
-            ctx.beginPath();
-            if (x == lastX && y == lastY) {
-                ctx.fillStyle = color;
-                ctx.arc(x, y, convertToActualLineWidth(lineWidth) / 2, 0, Math.PI * 2, true);
-                ctx.fill();
-            } else {
-                ctx.strokeStyle = color;
-                ctx.lineWidth = convertToActualLineWidth(lineWidth);
-                ctx.lineJoin = "round";
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(x, y);
-                ctx.closePath();
-                ctx.stroke();
-            }
-            boardDotNetRefernce.invokeMethodAsync("SendDraw",
-                x / boardWidth,
-                y / boardHeight,
-                isDown,
-                color,
-                lineWidth);
+    if (!isDrawing) return;
+    if (isDown) {
+        ctx.beginPath();
+        if (x == lastX && y == lastY) {
+            ctx.fillStyle = color;
+            ctx.arc(x, y, convertToActualLineWidth(lineWidth) / 2, 0, Math.PI * 2, true);
+            ctx.fill();
         } else {
-            boardDotNetRefernce.invokeMethodAsync("SendDraw",
-                x / boardWidth,
-                y / boardHeight,
-                isDown,
-                color,
-                lineWidth);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = convertToActualLineWidth(lineWidth);
+            ctx.lineJoin = "round";
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.closePath();
+            ctx.stroke();
         }
-        lastX = x;
-        lastY = y;
+        boardDotNetRefernce.invokeMethodAsync("SendDraw",
+            x / boardWidth,
+            y / boardHeight,
+            isDown,
+            color,
+            lineWidth);
+    } else {
+        boardDotNetRefernce.invokeMethodAsync("SendDraw",
+            x / boardWidth,
+            y / boardHeight,
+            isDown,
+            color,
+            lineWidth);
     }
+    lastX = x;
+    lastY = y;
 }
 
 function drawFromOutside(xPercent, yPercent, isDown, color, size) {

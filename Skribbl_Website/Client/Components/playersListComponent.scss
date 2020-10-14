@@ -2,10 +2,17 @@
 
 @import "playerComponent.scss";
 
-.players-list{
-    @include lobby-segment; 
+.players-list {
+    @include lobby-segment;
     width: 15%;
     display: flex;
     flex-direction: column;
-    background-color: beige;
+    align-self: flex-start;
+
+    &__title {
+        font-size: 2.1rem;
+        text-align: center;
+        color: $highlight-color;
+        font-weight: 600;
+    }
 }

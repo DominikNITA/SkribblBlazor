@@ -2,11 +2,10 @@
 
 @inject NavigationManager NavigationManager
 
-<h1 class="w-auto">Blazor Skribble</h1>
+<h1 class="title">Blazor Skribble</h1>
 
-<div class="w-auto">
-    POC for Draw&Guess game made with Blazor WASM hosted, SignalR Core and SASS.
+<div class="project-description"> Proof of Concept for and Draw&Guess game made with Blazor WebAssembly hosted with ASP.NET Core, SignalR Core for real-time communication and SASS for improved styling. Code for the project is accessible on my <a href="https://github.com/DominikNITA/SkribblBlazor" target="_blank">Github</a>.
 </div>
 
 
-<button class="submit-name-button" @onclick="@(() => NavigationManager.NavigateTo("/name"))"> Create Lobby</button>
+<button class="create-lobby-button" @onclick="@(() => NavigationManager.NavigateTo("/name"))"> Create Lobby</button>

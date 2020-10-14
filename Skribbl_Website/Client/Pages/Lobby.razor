@@ -6,9 +6,7 @@
 
 @if (LobbyConnection.Lobby != null)
 {
-    <div>
-        Invite: @NavigationManager.ToAbsoluteUri("join/" + LobbyConnection.Lobby.InviteLink)
-    </div>
+    <InviteDisplay InviteLink="@NavigationManager.ToAbsoluteUri("join/" + LobbyConnection.Lobby.InviteLink).ToString()"></InviteDisplay>
 
     <div class="lobby d-flex flex-column">
         <TopBarComponent></TopBarComponent>
@@ -22,12 +20,8 @@
             <div class="lobby__playing-area d-flex flex-column">
                 <PlayingAreaComponent></PlayingAreaComponent>
             </div>
-            @if (LobbyConnection.Messages != null)
-            {
-                <ChatComponent Messages="@LobbyConnection.Messages"
-                               LobbyConnection="@LobbyConnection">
-                </ChatComponent>
-            }
+            <ChatComponent LobbyConnection="@LobbyConnection">
+            </ChatComponent>
         </div>
     </div>
     <span id="customCursor"></span>
@@ -43,8 +37,7 @@
 
 @code {
 
-    [Parameter]
-    public string LobbyId { get; set; }
+    [Parameter] public string LobbyId { get; set; }
 
     private Player _user = new Player();
     private string _info = string.Empty;
@@ -89,7 +82,7 @@
 
     private void LeaveLobby()
     {
-    //TODO: Show dialog
+        //TODO: Show dialog
         LobbyConnection.CloseConnection();
         NavigationManager.NavigateTo("");
     }

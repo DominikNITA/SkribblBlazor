@@ -1,11 +1,11 @@
-﻿
+﻿@import "../Styles/utility.scss";
 
 .message {
     width: 100%;
     min-height: 28px;
-    padding: 2px 3px;
-    border: solid 1px #000000;
-    background-color: #808080;
+    padding: 3px 5px;
+    border-bottom: solid 1px #313030;
+    background-color: $message-base;
 
     &__content {
         width: auto;
@@ -13,14 +13,26 @@
     }
 
     &--join, &--host {
-        background-color: #5ca026;
+        background: #DCEDC8;
     }
 
-    &--host{
+    &--closeGuess {
+        background: #FFF9C4;
+    }
+
+    &--ban {
+        background: #ef5350;
+    }
+
+    &--disconnect, &--leave {
+        background-color: #F8BBD0;
+    }
+
+    &--join,&--host, &--ban {
         font-weight: 700;
     }
 
-    &__sender{
+    &__sender {
         font-weight: 700;
         padding-right: 3px;
     }

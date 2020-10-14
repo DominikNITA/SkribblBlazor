@@ -1,12 +1,18 @@
 ﻿$base-color: #491974;
 $second-color: #0b34d5;
 $highlight-color: #cac601;
-$text-color: #e5dcdc;
+$text-color: #34495e;
 
-@mixin lobby-segment{
-    padding: 5px;
+$background-color: #BDBDBD;
+$component-background: #FAFAFA;
+$main-color: #9b59b6;
+$highlight-color: #e67e22;
+$message-base: #FBE9E7;
+
+@mixin lobby-segment {
     margin: 3px;
-    border: 2px solid $second-color;
+    border: 4px solid $main-color;
+    background: $component-background;
     border-radius: 10px;
 }
 
@@ -19,5 +25,4 @@ $text-color: #e5dcdc;
     display: inline-block;
     font-size: 16px;
     border-radius: 15px;
-    margin-bottom: 1.5rem;
 }

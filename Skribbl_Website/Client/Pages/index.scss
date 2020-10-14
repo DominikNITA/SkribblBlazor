@@ -1,0 +1,34 @@
+﻿@import "../Styles/utility.scss";
+
+.content {
+    background: $background-color;
+    color: $text-color;
+    align-items: center;
+    justify-content: center;
+    padding-top: 1.1rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    color: $main-color;
+    font-weight: bold;
+}
+
+.title {
+    font-size: 5rem;
+    font-weight: bold;
+    color: #8e44ad;
+}
+
+.project-description{
+    max-width: 500px;
+}
+
+.create-lobby-button {
+    @include general-button;
+    background: $main-color;
+    color: $background-color;
+    margin-top: 2rem;
+}

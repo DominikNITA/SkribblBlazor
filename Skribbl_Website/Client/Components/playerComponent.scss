@@ -1,22 +1,36 @@
-﻿
-.player{
-    width: 100%;
-    justify-content:space-between;
-    font-size: 1.3rem;
+﻿@import "../Styles/utility.scss";
 
-    &--name{
+.player {
+    width: 100%;
+    align-items: center;
+    font-size: 1.3rem;
+    padding: 0 8px;
+
+    &--host, &--drawing, &--ban {
+        margin: 0 5px;
+    }
+
+    &--name {
         font-weight: 600;
     }
 
-    &--ban{
+    &--ban {
         color: red;
+        cursor: pointer;
     }
 
-    &--drawing{
+    &--drawing {
         color: #100e82;
     }
 
-    &__guessed{
-        background-color: #4cff00;
+    &--guessed {
+        background-color: #AED581;
+    }
+
+    &__score {
+        font-weight: bold;
+        flex-grow: 1;
+        text-align: right;
+        font-size: 1.9rem;
     }
 }

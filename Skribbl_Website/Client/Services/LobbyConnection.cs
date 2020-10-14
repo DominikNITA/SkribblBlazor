@@ -12,17 +12,18 @@ namespace Skribbl_Website.Client.Services
 {
     public class LobbyConnection
     {
-        private readonly IJSRuntime _jsRuntime;
-        private HubConnection _hubConnection;
+        readonly IJSRuntime _jsRuntime;
+        readonly MessagesContainer _messages;
+        HubConnection _hubConnection;
 
-        public LobbyConnection(IJSRuntime jSRuntime)
+        public LobbyConnection(IJSRuntime jSRuntime, MessagesContainer messages)
         {
             _jsRuntime = jSRuntime;
+            _messages = messages;
         }
 
         public Player User { get; set; }
         public LobbyClient Lobby { get; set; }
-        public List<Message> Messages { get; set; } = new List<Message>();
 
         public bool UserIsHost => User?.Name == Lobby.GetHostPlayer()?.Name;
 
@@ -67,7 +68,7 @@ namespace Skribbl_Website.Client.Services
             _hubConnection.On<Message>("ReceiveNewDrawingPlayer", async message =>
             {
                 Lobby.PrepareForNextDrawer();
-                Messages.Add(message);
+                _messages.AddNewMessageAsync(message);
                 Lobby.SetDrawingPlayer(message.Sender);
                 if (UserIsDrawing)
                 {
@@ -83,14 +84,14 @@ namespace Skribbl_Website.Client.Services
 
             _hubConnection.On<Message>("ReceiveNewHost", message =>
             {
-                Messages.Add(new Message(message.MessageContent, message.Type));
+                _messages.AddNewMessageAsync(new Message(message.MessageContent, message.Type));
                 Lobby.SetHostPlayer(message.Sender);
                 InvokeOnReceive();
             });
 
             _hubConnection.On<Message>("ReceiveMessage", message =>
             {
-                Messages.Add(message);
+                _messages.AddNewMessageAsync(message);
                 InvokeOnReceive();
             });
 
@@ -114,7 +115,7 @@ namespace Skribbl_Website.Client.Services
             _hubConnection.On<Message>("RemovePlayer", message =>
             {
                 Lobby.RemovePlayerByName(message.Sender);
-                Messages.Add(message);
+                _messages.AddNewMessageAsync(message);
                 InvokeOnReceive();
             });
 
@@ -129,7 +130,7 @@ namespace Skribbl_Website.Client.Services
             _hubConnection.On<int>("StartGame", delay =>
             {
                 Lobby.StartGame();
-                Messages.Add(new Message("Game has started!", Message.MessageType.Join));
+                _messages.AddNewMessageAsync(new Message("Game has started!", Message.MessageType.Join));
                 InvokeOnReceive();
             });
 
@@ -193,14 +194,14 @@ namespace Skribbl_Website.Client.Services
             _hubConnection.On<Message>("GuessedCorrectly", message =>
             {
                 Lobby.GetPlayerByName(message.Sender).HasGuessedCorrectly = true;
-                Messages.Add(message);
+                _messages.AddNewMessageAsync(message);
                 InvokeOnReceive();
             });
 
             _hubConnection.On<string>("ReceiveCorrectAnswer", answer =>
             {
                 Lobby.Selection = answer;
-                Messages.Add(new Message("The correct answer was: " + answer, Message.MessageType.Guessed));
+                _messages.AddNewMessageAsync(new Message("The correct answer was: " + answer, Message.MessageType.Guessed));
                 InvokeOnReceive();
             });
 
@@ -218,7 +219,7 @@ namespace Skribbl_Website.Client.Services
         public void CloseConnection()
         {
             _hubConnection.StopAsync();
-            Messages = new List<Message>();
+            _messages.ClearMessages();
             //TODO: Clear UserState
         }
 

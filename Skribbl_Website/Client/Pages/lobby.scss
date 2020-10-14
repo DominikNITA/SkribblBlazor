@@ -4,20 +4,23 @@
 .lobby {
     min-width: 600px;
     width: 95%;
-    min-height: 500px;
     height: 80vh;
     margin: auto;
 
     &__content {
-        height: 100%;
-        align-items: stretch;
+        justify-content:center
     }
 
     &__playing-area {
         @include lobby-segment;
         align-items: center;
         justify-content: center;
-        min-width: 65%;
+        min-width: 600px;
+        min-height: 500px;
+        max-width: 1200px;
+        max-height: 1000px;
+        width: 65%;
+
     }
 }
 

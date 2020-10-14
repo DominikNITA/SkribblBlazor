@@ -3,21 +3,33 @@
 .lobby__chat {
     @include lobby-segment;
     width: 20%;
-    background-color: #d09761;
     overflow: hidden;
+    padding: 0;
+    max-height: 80vh;
 }
 
 .chat {
     &__messages {
         flex-grow: 2;
-        height: auto;
+        max-height: 100%;
+        background: $message-base;
         overflow-y: scroll;
     }
 
-    &__input-container {
+    &__input {
+        flex-grow: 1;
     }
 
-    &__input {
-        margin: 3px auto;
+    &__input-container {
+        width: 100%;
+        display: flex;
+        border-top: 3px solid $main-color;
+
+        button {
+            background: $highlight-color;
+            @include general-button;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
     }
 }

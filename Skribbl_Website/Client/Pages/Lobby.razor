@@ -3,7 +3,7 @@
 @inject UserState UserState
 @inject LobbyConnection LobbyConnection
 
-
+<button class="leave-button mt-2" @onclick="LeaveLobby">Leave!</button>
 @if (LobbyConnection.Lobby != null)
 {
     <InviteDisplay InviteLink="@NavigationManager.ToAbsoluteUri("join/" + LobbyConnection.Lobby.InviteLink).ToString()"></InviteDisplay>
@@ -32,7 +32,7 @@
     <div class="alert alert-danger">@_info</div>
 }
 
-<button class="leave-button mt-2" @onclick="LeaveLobby">Leave!</button>
+
 
 
 @code {
@@ -65,7 +65,7 @@
     private async void Update(object sender, EventArgs e)
     {
         StateHasChanged();
-        await Task.Delay(50);
+        await Task.Delay(40);
         StateHasChanged();
     }
 

@@ -1,8 +1,24 @@
-﻿<div class="invite">
-    Invite: @InviteLink
-    <button onclick="">Copy</button>
+﻿<div class="invite" @onmouseenter="ChangeShowLinkState" @onmouseleave="ChangeShowLinkState" @onclick="CopyLinkToClipboard">
+    @if (_showLink)
+    {
+        <p>Hover&Click to copy link</p>
+    }
+    else
+    {
+        @InviteLink
+    }
 </div>
 
 @code {
     [Parameter] public string InviteLink { get; set; }
+    bool _showLink = false;
+
+    void ChangeShowLinkState()
+    {
+        _showLink = !_showLink;
+    }
+    void CopyLinkToClipboard()
+    {
+        Console.WriteLine("Copying not implemented");
+    }
 }

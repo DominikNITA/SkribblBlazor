@@ -7,11 +7,9 @@
 
 @code {
 
-    [Parameter]
-    public TValue SelectedValue { get; set; }
+    [Parameter] public TValue SelectedValue { get; set; }
 
-    [Parameter]
-    public bool IsDisabled { get; set; }
+    [Parameter] public bool IsDisabled { get; set; }
 
     private void OnChange(ChangeEventArgs args)
     {

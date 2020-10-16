@@ -1,0 +1,63 @@
+﻿@import "../Styles/utility.scss";
+
+.radios {
+    background-color: $background-color;
+    padding: 0.2rem;
+    border-radius: 2.2rem;
+    margin: auto;
+
+    & label {
+        width: 3rem;
+        height: 3rem;
+        display: flex;
+        justify-content: center;
+        align-items: baseline;
+        cursor: pointer;
+        margin-bottom: 0;
+    }
+
+    & input + span {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: bold;
+        color: $component-background;
+        transition: all .3s ease;
+    }
+
+    & input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+
+        &:hover + span {
+            color: $main-color;
+        }
+
+        &:checked + span {
+            color: $highlight-color;
+        }
+    }
+}
+.rounds-input, .time-input {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.rounds-input--title, .time-input--title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-align: right;
+    width: 6rem;
+    height: 2rem;
+}
+
+h1 {
+    color: $main-color;
+    font-weight: 600;
+}
+
+.start-button {
+    @include general-button;
+    background: $main-color;
+    color: $component-background;
+}

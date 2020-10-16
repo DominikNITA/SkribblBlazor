@@ -1,55 +1,53 @@
 ﻿@inject LobbyConnection LobbyConnection
 
 <h1>Blazor Skribbl</h1>
-<h3>Prepare the game using following settings:</h3>
-<EditForm Model="LobbySettings" OnValidSubmit="OnValuesChanged" class="mt-3">
-    <div class="rounds-input d-flex flex-row">
-        <span class="rounds-input--title">Rounds:</span>
-        <div class="rounds-input--radios d-flex flex-row">
-            <InputRadioGroup @bind-Value="LobbySettings.RoundsLimit">
+<p>Prepare the game using following settings:</p>
+@if (IsHost)
+{
+    <EditForm Model="LobbySettings" OnValidSubmit="OnValuesChanged" class="mt-3">
+        <div class="rounds-input d-flex flex-row">
+            <span class="rounds-input--title">Rounds:</span>
+            <div class="rounds-input--radios radios d-flex flex-row">
                 @foreach (var roundLimit in LobbySettings.PossibleRoundsLimit)
                 {
-                    <label class="mx-1">
-                        <InputRadio Value="@roundLimit" IsDisabled="!IsHost" />
-                        @roundLimit
+                    <label>
+                        <InputRadioCustom name="round" SelectedValue="@roundLimit" @bind-Value="LobbySettings.RoundsLimit" @onclick="OnValuesChanged" IsDisabled="@false" />
+                        <span>@roundLimit</span>
                     </label>
                 }
-            </InputRadioGroup>
+            </div>
         </div>
-    </div>
-    <div class="time-input d-flex flex-row">
-        <span class="time-input--title">Time:</span>
-        <div class="time-input--radios d-flex flex-row">
-            <InputRadioGroup @bind-Value="LobbySettings.TimeLimit">
+        <div class="time-input d-flex flex-row">
+            <span class="time-input--title">Time:</span>
+            <div class="time-input--radios radios d-flex flex-row">
                 @foreach (var timeLimit in LobbySettings.PossibleTimeLimit)
                 {
-                    <label class="mx-1">
-                        <InputRadio Value="timeLimit" IsDisabled="!IsHost" />
-                        @timeLimit
+                    <label>
+                        <InputRadioCustom name="time" SelectedValue="timeLimit" @bind-Value="LobbySettings.TimeLimit" @onclick="OnValuesChanged" IsDisabled="@false" />
+                        <span>@timeLimit</span>
                     </label>
                 }
-            </InputRadioGroup>
+            </div>
         </div>
-    </div>
-</EditForm>
-<div> Rounds: @LobbySettings.RoundsLimit</div>
-<div> Time: @LobbySettings.TimeLimit</div>
+    </EditForm>
+}
+else
+{
+    <div> Rounds: @LobbySettings.RoundsLimit</div>
+    <div> Time: @LobbySettings.TimeLimit</div>
+}
+
 <button class="start-button mt-2" @onclick="LobbyConnection.StartGame"> Start Game!</button>
 
 
 @code {
+    [Parameter] public LobbySettings LobbySettings { get; set; }
+    [Parameter] public bool IsHost { get; set; }
 
-    [Parameter]
-    public LobbySettings LobbySettings { get; set; }
-
-    [Parameter]
-    public bool IsHost { get; set; }
-
-
-    private async Task OnValuesChanged()
+    async Task OnValuesChanged()
     {
+        Console.WriteLine("Values changed");
         await Task.Delay(50);
         await LobbyConnection.UpdateLobbySettings();
     }
-
 }

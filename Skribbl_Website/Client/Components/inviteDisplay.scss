@@ -1,0 +1,15 @@
+﻿@import "../Styles/utility.scss";
+
+.invite{
+    background: $highlight-color;
+    border: 3px solid $main-color;
+    border-radius: 2.2rem;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: bold;
+
+    &:hover{
+        background: $component-background;
+        color: $highlight-color;
+    }
+}

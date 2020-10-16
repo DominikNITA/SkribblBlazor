@@ -8,5 +8,4 @@ function onMessageAdd() {
     setTimeout(() => {
         chatComponent.scrollTop = chatComponent.scrollHeight;
     }, 2);
-
 }

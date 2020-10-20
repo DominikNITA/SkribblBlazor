@@ -1,13 +1,10 @@
 ﻿@foreach (var letter in SelectionTemplate.Characters)
 {
-    <span>
+    <span class="letter">
         @letter
     </span>
 }
 
 @code {
-
-    [Parameter]
-    public SelectionTemplate SelectionTemplate { get; set; }
-
+    [Parameter] public SelectionTemplate SelectionTemplate { get; set; }
 }

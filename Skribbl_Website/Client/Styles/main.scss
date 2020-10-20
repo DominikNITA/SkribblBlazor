@@ -12,3 +12,11 @@
 @import "../Pages/index.scss";
 @import "../Pages/selectNamePage.scss"; 
 @import "../Pages/lobby.scss";
+
+.text-purple {
+    color: $main-color;
+}
+
+*:focus{
+    outline: none;
+}

@@ -1,11 +1,11 @@
 ﻿<div class="invite" @onmouseenter="ChangeShowLinkState" @onmouseleave="ChangeShowLinkState" @onclick="CopyLinkToClipboard">
-    @if (_showLink)
+    @if (!_showLink)
     {
-        <p>Hover&Click to copy link</p>
+        <p class="m-0 hover-text">Hover&Click to copy link</p>
     }
     else
     {
-        @InviteLink
+        <p class="text-purple m-0">@InviteLink</p>
     }
 </div>
 
@@ -17,6 +17,7 @@
     {
         _showLink = !_showLink;
     }
+
     void CopyLinkToClipboard()
     {
         Console.WriteLine("Copying not implemented");

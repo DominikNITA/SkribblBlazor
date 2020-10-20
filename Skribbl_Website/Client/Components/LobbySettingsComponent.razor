@@ -30,14 +30,21 @@
             </div>
         </div>
     </EditForm>
+    <button class="start-button mt-2" @onclick="LobbyConnection.StartGame"> Start Game!</button>
 }
 else
 {
-    <div> Rounds: @LobbySettings.RoundsLimit</div>
-    <div> Time: @LobbySettings.TimeLimit</div>
+    <div>
+        <span class="rounds-input--title">Rounds: </span>
+        <span class="setting-display">@LobbySettings.RoundsLimit</span>
+    </div>
+    <div>
+        <span class="time-input--title">Time: </span>
+        <span class="setting-display">@LobbySettings.TimeLimit</span>
+    </div>
 }
 
-<button class="start-button mt-2" @onclick="LobbyConnection.StartGame"> Start Game!</button>
+
 
 
 @code {

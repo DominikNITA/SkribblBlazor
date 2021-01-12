@@ -8,7 +8,7 @@ namespace Skribbl_Website.Server.Services
 {
     public static class HintsCreator
     {
-        public static List<char> OmittedCharacters = new List<char> {' ', '_', '\''};
+        public static List<char> OmittedCharacters = new List<char> { ' ', '_', '\'' };
         private static readonly int _minimumTimeLeftAfterLastHint = 10000;
 
         public static List<HintTimer> CreateHintTimersForSelection(string selection, int timeLimit)

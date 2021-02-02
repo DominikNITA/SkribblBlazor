@@ -1,0 +1,13 @@
+﻿.color-choice{
+    margin: 2px 4px;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid black;
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover{
+        width: 1.7rem;
+        height: 1.7rem;
+    }
+}

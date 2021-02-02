@@ -6,7 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BuildWebCompiler" Version="1.12.388" />
+    <None Include="wwwroot\css\main.css" />
+    <None Include="wwwroot\css\main.min.css" />
+    <None Include="wwwroot\css\main.scss" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Delegate.SassBuilder" Version="1.4.0"></PackageReference>
     <PackageReference Include="Cloudcrate.AspNetCore.Blazor.Browser.Storage" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.0" PrivateAssets="all" />
@@ -18,10 +24,6 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Shared\Skribbl_Website.Shared.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Include="compilerconfig.json" />
   </ItemGroup>
 
   <ItemGroup>

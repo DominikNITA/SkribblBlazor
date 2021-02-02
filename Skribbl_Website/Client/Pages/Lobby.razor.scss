@@ -1,0 +1,32 @@
+﻿@import "../Components/TopBarComponent.razor.scss";
+@import "../Styles/utility.scss";
+
+.lobby {
+    min-width: 600px;
+    width: 95%;
+    height: 80vh;
+    margin: auto;
+
+    &__content {
+        justify-content:center
+    }
+
+    &__playing-area {
+        @include lobby-segment;
+        align-items: center;
+        justify-content: center;
+        min-width: 600px;
+        min-height: 500px;
+        max-width: 1200px;
+        max-height: 1000px;
+        width: 65%;
+    }
+}
+
+.leave-button{
+    @include general-button;
+    background-color: red;
+    position: absolute;
+    top: 20px;
+    left: 40px;
+}

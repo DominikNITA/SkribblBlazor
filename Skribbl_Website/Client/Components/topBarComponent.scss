@@ -1,8 +1,0 @@
-﻿@import "../Styles/utility.scss";
-@import "selectionDisplayComponent.scss";
-
-.lobby__top-bar{
-    @include lobby-segment;
-
-    justify-content: space-between;
-}

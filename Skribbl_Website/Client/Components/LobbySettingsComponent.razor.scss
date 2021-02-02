@@ -1,6 +1,6 @@
 ﻿@import "../Styles/utility.scss";
 
-.radios {
+::deep .radios {
     background-color: $background-color;
     padding: 0.2rem;
     border-radius: 2.2rem;

@@ -1,4 +1,6 @@
-﻿<div class="invite" @onmouseenter="ChangeShowLinkState" @onmouseleave="ChangeShowLinkState" @onclick="CopyLinkToClipboard">
+﻿@inject IJSRuntime JSRuntime
+
+<div class="invite" @onmouseenter="ChangeShowLinkState" @onmouseleave="ChangeShowLinkState" @onclick="CopyLinkToClipboard">
     @if (!_showLink)
     {
         <p class="m-0 hover-text">Hover&Click to copy link</p>
@@ -18,8 +20,8 @@
         _showLink = !_showLink;
     }
 
-    void CopyLinkToClipboard()
+    async Task CopyLinkToClipboard()
     {
-        Console.WriteLine("Copying not implemented");
+        await JSRuntime.InvokeVoidAsync("copyText", InviteLink);
     }
 }

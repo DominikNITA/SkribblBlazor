@@ -1,13 +1,15 @@
-﻿
+﻿// Copy to the clipboard
+
+    function copyText(text) {
+        navigator.clipboard.writeText(text);
+    }
+
+
+// References
 objectReferences = {};
 
 addNewReference = function (reference, id) {
     objectReferences[id] = reference;
-};
-
-changeShowBan = function (newState, playerName) {
-    let dotNetObject = objectReferences[playerName];
-    dotNetObject.invokeMethodAsync("ChangeShowBanPlayer", newState);
 };
 
 //https://www.codicode.com/art/how_to_draw_on_a_html5_canvas_with_a_mouse.aspx

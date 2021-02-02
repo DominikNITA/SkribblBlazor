@@ -1,7 +1,6 @@
-﻿@inject IJSRuntime JSRuntime
-@inject LobbyConnection LobbyConnection
+﻿@inject LobbyConnection LobbyConnection
 
-<div class="player @GuessedStyle d-flex flex-row" onmouseenter="changeShowBan(true,'@Player.Name')" onmouseleave="changeShowBan(false,'@Player.Name')">
+<div class="player @GuessedStyle d-flex flex-row" @onmouseenter="(() => ChangeShowBanPlayer(true))" @onmouseleave="@(() => ChangeShowBanPlayer(false))">
     <span class="player--name">@Player.Name</span>
     @if (Player.IsHost)
     {
@@ -16,7 +15,6 @@
         <span class="player--drawing oi oi-pencil"></span>
     }
     <span class="player__score">@Player.Score</span>
-
 </div>
 
 @code {
@@ -26,12 +24,9 @@
     [Parameter] public bool UserIsHost { get; set; }
 
     private bool _showBanPlayer;
-    private DotNetObjectReference<PlayerComponent> dotNetReference;
 
     protected override async Task OnInitializedAsync()
     {
-        dotNetReference = DotNetObjectReference.Create(this);
-        await JSRuntime.InvokeVoidAsync("addNewReference", dotNetReference, Player.Name);
         LobbyConnection.StateChanged += (sender, e) => StateHasChanged();
         await base.OnInitializedAsync();
     }
@@ -42,7 +37,6 @@
         private set { }
     }
 
-    [JSInvokable]
     public void ChangeShowBanPlayer(bool newState)
     {
         _showBanPlayer = newState;

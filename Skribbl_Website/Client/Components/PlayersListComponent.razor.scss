@@ -1,6 +1,6 @@
 ﻿@import "../Styles/utility.scss";
 
-@import "playerComponent.scss";
+@import "PlayerComponent.razor.scss";
 
 .players-list {
     @include lobby-segment;

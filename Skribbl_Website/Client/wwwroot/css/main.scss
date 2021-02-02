@@ -1,0 +1,25 @@
+﻿@import "../../Styles/utility.scss";
+
+.text-purple {
+    color: $main-color;
+}
+
+*:focus{
+    outline: none;
+}
+
+.content {
+    background: $background-color;
+    color: $text-color;
+    align-items: center;
+    justify-content: center;
+    padding-top: 1.1rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    color: $main-color;
+    font-weight: bold;
+}

@@ -1,5 +1,5 @@
 ﻿@import "../Styles/utility.scss";
-@import "selectionDisplayComponent.scss";
+@import "SelectionDisplayComponent.razor.scss";
 
 .lobby__top-bar{
     @include lobby-segment;

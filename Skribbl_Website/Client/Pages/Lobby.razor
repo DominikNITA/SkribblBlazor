@@ -26,6 +26,10 @@
     </div>
     <span id="customCursor"></span>
 }
+else
+{
+    <p class="text-purple font-weight-bold">Connecting to the lobby...</p>
+}
 
 @if (!string.IsNullOrEmpty(_info))
 {
@@ -44,7 +48,6 @@
         try
         {
             _user = await UserState.GetUser();
-            Console.WriteLine(_user.IsHost);
         }
         catch (UserNotInLocalStorageException exception)
         {
